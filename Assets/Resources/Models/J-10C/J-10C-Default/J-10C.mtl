@@ -1,0 +1,115 @@
+newmtl df4a7597-da5e-4605-a44a-daa047108081
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/seat_martin_baker_mk16_c.jpg
+map_Ks textures/seat_martin_baker_mk16_n_s.jpg
+map_normal textures/seat_martin_baker_mk16_n_n.jpg
+map_ao textures/seat_martin_baker_mk16_n_ao.jpg
+
+newmtl c98c1610-3354-417a-a9ac-2c1e4db559c2
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/j_10c_c.jpg
+map_Ks textures/j_10c_n_s.jpg
+map_normal textures/j_10c_n_n.jpg
+map_ao textures/j_10c_n_ao.jpg
+
+newmtl dc8b1ca7-c9d3-408e-8bb3-128c2bd5ef94
+Kd 1.000 0.000 1.000
+Ks 0.067 0.067 0.067
+Ns 30
+Ke 0.000 0.000 0.000
+
+newmtl cfbad240-5cf4-4be1-ade7-ee76f2c5976e
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/ch_800l_fyx800_drop_tank_c.jpg
+map_Ks textures/ch_800l_fyx800_drop_tank_n_s.jpg
+map_normal textures/ch_800l_fyx800_drop_tank_n_n.jpg
+map_ao textures/ch_800l_fyx800_drop_tank_n_ao.jpg
+
+newmtl ca2a4441-df56-4f41-9b63-a58d6f87577b
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/ch_1140l_drop_tank_pylon_bluegrey_c.jpg
+map_Ks textures/ch_1140l_drop_tank_pylon_n_s.jpg
+map_normal textures/ch_1140l_drop_tank_pylon_n_n.jpg
+map_ao textures/ch_1140l_drop_tank_pylon_n_ao.jpg
+
+newmtl 81cf5e2b-deba-44eb-890d-61640ea9c208
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/ch_1600l_drop_tank_pylon_c.jpg
+map_Ks textures/ch_1600l_drop_tank_pylon_n_s.jpg
+map_normal textures/ch_1600l_drop_tank_pylon_n_n.jpg
+map_ao textures/ch_1600l_drop_tank_pylon_n_ao.jpg
+
+newmtl 107429c5-dc00-44e4-b457-ecfb73f923a6
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/ch_1600l_drop_tank_c.jpg
+map_Ks textures/ch_1600l_drop_tank_n_s.jpg
+map_normal textures/ch_1600l_drop_tank_n_n.jpg
+map_ao textures/ch_1600l_drop_tank_n_ao.jpg
+
+newmtl 4b05d840-e59e-4ebd-a641-e26ef0cf1a2b
+Kd 1.000 1.000 1.000
+Ks 0.502 0.502 0.502
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/j_10c_interior_c.jpg
+map_Ks textures/j_10c_interior_n_s.jpg
+map_normal textures/j_10c_interior_n_n.jpg
+map_ao textures/j_10c_interior_n_ao.jpg
+
+newmtl cd1cb322-6c84-4d3a-b127-5a81201fd02b
+Kd 1.000 1.000 1.000
+Ks 0.502 0.502 0.502
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/j_10a_inside_c.jpg
+map_Ks textures/j_10a_inside_n_s.jpg
+map_normal textures/j_10a_inside_n_n.jpg
+map_ao textures/j_10a_inside_n_ao.jpg
+map_d textures/j_10a_inside_c_a.png
+
+newmtl 94e0f1ef-0eb2-4dd1-adf2-e2686e36288e
+Kd 0.000 0.000 0.000
+Ks 1.000 1.000 1.000
+Ns 255
+Ke 0.000 0.000 0.000
+d 0.17
+
+newmtl 8ada8f68-2acc-41cc-b789-7c1856fa31ff
+Kd 0.000 0.000 0.000
+Ks 1.000 1.000 1.000
+Ns 255
+Ke 0.000 0.000 0.000
+d 0.9
+
+newmtl f3d705d0-ef01-43af-af8b-00884be53a82
+Kd 0.000 0.000 0.000
+Ks 1.000 1.000 1.000
+Ns 255
+Ke 0.000 0.000 0.000
+d 0.1
+
+newmtl f48fecf0-bfe0-4e2d-8ca8-569b435cca97
+Kd 0.000 0.000 0.000
+Ks 1.000 1.000 1.000
+Ns 255
+Ke 0.000 0.000 0.000
+d 0.1
+
