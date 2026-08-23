@@ -40,6 +40,7 @@ namespace AeroSim.AeroPhysics
         // nav
         public Vector3 targetDir = Vector3.forward;
         private Vector3 controllingInput;
+        private Vector3 actualInput;
 
         [Header("Modules")]
         public EngineModule engine;
@@ -173,9 +174,12 @@ namespace AeroSim.AeroPhysics
             float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);
             controllingInput = new Vector3(clampedX, clampedY, clampedZ);
 
+            float speedFactor = Mathf.Clamp(165 / Mathf.Max(velocity.magnitude, 1f), 0.2f, 1.0f); // 165 -> reference speed
+            actualInput = controllingInput * speedFactor;
+
             foreach (AeroSurface surface in surfaces)
             {
-                surface.UpdateInput(controllingInput);
+                surface.UpdateInput(actualInput);
             }
         }
 

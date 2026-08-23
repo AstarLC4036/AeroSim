@@ -67,6 +67,7 @@ namespace AeroSim.AircraftModules
         protected float lockTimer;
         protected float lockingTimer;
         public LockState lockState = LockState.None;
+        protected Vector3 seekerDirection;
 
         public Vector3 Velocity => velo * transform.forward;
 
@@ -96,6 +97,7 @@ namespace AeroSim.AircraftModules
         {
             lastPos += delta;
             previousPosition += delta;
+            targetPos += delta;
         }
 
         void FixedUpdate()

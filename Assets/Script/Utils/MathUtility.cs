@@ -23,6 +23,10 @@ namespace AeroSim.Utility
             {
                 angle -= 360;
             }
+            if(angle < -180)
+            {
+                angle += 360;
+            }
 
             return angle;
         }

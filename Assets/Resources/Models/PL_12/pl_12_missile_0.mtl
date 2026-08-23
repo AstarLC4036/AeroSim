@@ -1,0 +1,4 @@
+newmtl pl_12_missile
+	illum 3
+	map_Kd textures/pl_12_missile_c.png
+	map_bump textures/pl_12_missile_n.png

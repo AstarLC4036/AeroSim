@@ -9,12 +9,14 @@ namespace AeroSim.UI
         public float scale;
         public Transform center;
         public Transform cursor;
+        public Transform yawCursor;
 
         public void Update()
         {
             Vector3 rawInput = Aircraft.main.ControllingInput;
             Vector3 input = new Vector2(rawInput.z, rawInput.y);
             cursor.position = center.position + input * scale;
+            yawCursor.position = center.position + new Vector3(rawInput.x * scale, -scale, 0);
         }
     }
 }
