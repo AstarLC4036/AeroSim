@@ -39,12 +39,7 @@ namespace AeroSim.InputSystem
             }
         }
 
-        //private static FlightController instance;
-        //public static FlightController Instance => instance;
-
         public float sensitivity = 0.5f;
-        //public static Vector3 input = Vector3.zero;
-        //public float returnCoeff = 1.5f;
 
         [Header("Aim Ring(PID)")]
         public PID rollPID;
@@ -55,40 +50,16 @@ namespace AeroSim.InputSystem
         public PID yawRatePID;
         public Vector2 pitchRateLimit;
         public Vector2 yawRateLimit;
-        //public float kpRoll;
-        //public float kdRoll;
-        //public float kpPitch;
-        //public float kiPitch;
-        //public float kdPitch;
-        //public float kpYaw;
-        //public float kdYaw;
-        //public float kpTurnYaw;
-        //public float kpAdverseYaw;
-        //public float kpSideslieYaw;
-
-        //public AnimationCurve maxRollAngle;
-
-        //public float kpRollOut;
-        //public float maxRollRate;
-        //public float kpRollRate;
-        //public float kiRollRate;
-        //public float kdRollRate;
-        //[SerializeField]
-        //private float rollRateIntegral;
-        //private float pitchIntegral;
 
         [Header("Stablilization")]
         public float levelModeThresholdDeg;
         public float beginRollThresholdDeg;
-        public float levelModeBlendDeg;
-        public float yawThresholdDeg = 3f;
         public float rollGain;
         public float rollLevelStableGain;
-        public float referenceSpeed;
         public float generalFactor;
         public Vector3 damper;
 
-        [Header("Averge Input")]
+        [Header("Filter")]
         public int avgSize;
         private Vector3[] previousValues;
         private int previousValueIndex;
@@ -130,7 +101,7 @@ namespace AeroSim.InputSystem
 
             if(aircraft.isControlling)
             {
-                if (!Input.GetKey(Keybindings.holdControlInput) && !CameraController.Instance.enableStable)
+                if (!Input.GetKey(Keybindings.holdControlInput) && !CameraController.Instance.currentView.enableStable && !CameraController.Instance.currentView.targetingPodView)
                 {
                     Vector3 mouseDelta = Input.mousePositionDelta;
                     aircraft.targetDir = RotateRound(aircraft.targetDir, Vector3.zero, Camera.main.transform.up, mouseDelta.x * sensitivity * Time.deltaTime);
@@ -178,9 +149,6 @@ namespace AeroSim.InputSystem
             float desiredRollRate = rollPID.Update(dt, targetRoll, rollRate);
             // - Final command
             float rollCmd = rollRatePID.Update(dt, desiredRollRate - rollRate);
-
-            float blend = 1 - Mathf.Clamp01((errorDeg - levelModeThresholdDeg) / levelModeBlendDeg);
-            float rollLevelStableCmd = currentRollAngle;
 
             // Yaw
             float desiredYawRate = Mathf.Clamp(yawPID.Update(dt, yawError, yawRate), yawRateLimit.x * Mathf.Deg2Rad, yawRateLimit.y * Mathf.Deg2Rad);
@@ -271,6 +239,41 @@ namespace AeroSim.InputSystem
         //    float clampedY = Mathf.Clamp(input.y, -1, 1);
         //    FlightController.input = new Vector3(clampedX, clampedY);
         //}
+
+        //private static FlightController instance;
+        //public static FlightController Instance => instance;
+
+        //public static Vector3 input = Vector3.zero;
+        //public float returnCoeff = 1.5f;
+
+        //public float kpRoll;
+        //public float kdRoll;
+        //public float kpPitch;
+        //public float kiPitch;
+        //public float kdPitch;
+        //public float kpYaw;
+        //public float kdYaw;
+        //public float kpTurnYaw;
+        //public float kpAdverseYaw;
+        //public float kpSideslieYaw;
+
+        //public AnimationCurve maxRollAngle;
+
+        //public float kpRollOut;
+        //public float maxRollRate;
+        //public float kpRollRate;
+        //public float kiRollRate;
+        //public float kdRollRate;
+        //[SerializeField]
+        //private float rollRateIntegral;
+        //private float pitchIntegral;
+
+        //public float levelModeBlendDeg;
+        //public float yawThresholdDeg = 3f;
+        //public float referenceSpeed;
+
+        //float blend = 1 - Mathf.Clamp01((errorDeg - levelModeThresholdDeg) / levelModeBlendDeg);
+        //float rollLevelStableCmd = currentRollAngle;
 
         //float hsSpeedFactor = Mathf.Clamp(referenceSpeed / Mathf.Max(currentSpeed, 1f), 0.2f, 1.0f);
         //float lsSpeedFactor = Mathf.Clamp(Mathf.Max(currentSpeed, 1f) / referenceSpeed, 0.2f, 1.0f);

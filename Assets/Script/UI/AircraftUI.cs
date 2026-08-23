@@ -12,6 +12,7 @@ namespace AeroSim.UI
         private static AircraftUI instance;
         public static AircraftUI Instance => instance;
 
+        public GameObject targetingPodView;
         public TMP_Text throttleText;
         public TMP_Text altText;
         public TMP_Text spdText;
@@ -34,6 +35,7 @@ namespace AeroSim.UI
 
         public Material lineMaterial;
         public static Material LineMaterial => Instance.lineMaterial;
+        public static bool isTargetingViewEnabled => Instance.targetingPodView.activeSelf;
 
         private void Awake()
         {
@@ -64,6 +66,11 @@ namespace AeroSim.UI
         public static void DisplayRWRMsgBGS(bool display = true)
         {
             Instance.DisplayRWRMsgBG(display);
+        }
+
+        public static void DisplayTargetingPodView(bool display = true)
+        {
+            Instance.targetingPodView.SetActive(display);
         }
 
         public static bool IsRWRLabelActived()

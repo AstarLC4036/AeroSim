@@ -46,6 +46,7 @@ namespace AeroSim.AeroPhysics
         public EngineModule engine;
         public RadarModule radar;
         public DatalinkModule datalink;
+        public TargetingPodModule targetingPod;
         public RWRModule rwr;
         public MAWModule maw;
         public MissileModule mslManager;
@@ -87,6 +88,8 @@ namespace AeroSim.AeroPhysics
             radar.Init(this);
             datalink = GetComponent<DatalinkModule>();
             datalink.Init(this);
+            if(targetingPod != null)
+            targetingPod.Init(this);
             rwr = GetComponent<RWRModule>();
             rwr.Init(this);
             maw = GetComponent<MAWModule>();

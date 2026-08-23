@@ -33,6 +33,38 @@ Transform:
   - {fileID: 3621392747005663854}
   m_Father: {fileID: 9136451404453529456}
   m_LocalEulerAnglesHint: {x: 20.9, y: 0, z: 0}
+--- !u!1 &1822559639710945689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 953609844097614084}
+  m_Layer: 0
+  m_Name: model
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &953609844097614084
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822559639710945689}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 9136451404453529456}
+  m_Father: {fileID: 1142091162961609167}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &3415401258294750849
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,7 +292,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -311,7 +343,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 9136451404453529456}
+  - {fileID: 953609844097614084}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &977046313046222139
@@ -331,14 +363,19 @@ MonoBehaviour:
   elevationGimbal: {fileID: 3621392747005663854}
   rollGimbal: {fileID: 0}
   podCameraGimbal: {fileID: 469243462432717001}
-  podCamera: {fileID: 8399415113760233684}
+  podCamera: {fileID: 5703812993613121024}
   maxAzimuth: 80
-  minElevation: -60
+  minElevation: 5
   maxElevation: 60
-  rotationSpeed: 2
-  smoothing: 5
+  rotationSpeed: 50
+  smoothing: 10
   currentAzimuth: 0
   currentElevation: 0
+  currentFov: 0
+  defaultFov: 40
+  zoomFov: 10
+  fovSmoothing: 5
+  targetDir: {x: 0, y: 0, z: 1}
 --- !u!1 &7427359300880071511
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,7 +408,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3049397895984572713}
-  m_Father: {fileID: 1142091162961609167}
+  m_Father: {fileID: 953609844097614084}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1161261745855414248
 MeshFilter:

@@ -1,5 +1,6 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.Render;
+using AeroSim.UI;
 using AeroSim.Utils;
 using System;
 using System.Collections;
@@ -15,21 +16,23 @@ namespace AeroSim.InputSystem
         public static CameraController Instance => instance;
 
         [Serializable]
-        public struct CameraView
+        public class CameraView
         {
             public Vector3 offset;
             public Vector3 deltaPos;
             public bool followRotation;
+            public bool targetingPodView;
             public bool enableIRView;
             public bool enableStable;
 
-            public CameraView(Vector3 offset, Vector3 deltaPos, bool followRotation, bool enableIRView, bool enableStable)
+            public CameraView(Vector3 offset, Vector3 deltaPos, bool followRotation, bool enableIRView, bool enableStable, bool enableTargetingPodView)
             {
                 this.offset = offset;
                 this.deltaPos = deltaPos;
                 this.followRotation = followRotation;
                 this.enableIRView = enableIRView;
                 this.enableStable = enableStable;
+                this.targetingPodView = enableTargetingPodView;
             }
         }
 
@@ -37,11 +40,7 @@ namespace AeroSim.InputSystem
 
         public float sensitivity = 1;
         public float aimLerpParam = 0.1f;
-        public Vector3 offset = Vector3.zero;
-        public Vector3 deltaPos = new Vector3(0, 0, 0);
-        public bool followRotation = false;
-        public bool enableIRView = false;
-        public bool enableStable = false;
+        public CameraView currentView;
         public Transform target;
 
         public Volume mainVolume;
@@ -83,7 +82,7 @@ namespace AeroSim.InputSystem
 
         private void OnOriginChange(Vector3 delta)
         {
-            if(enableStable && isStableTargetAvaliable)
+            if(currentView.enableStable && isStableTargetAvaliable)
             {
                 trackPoint += delta;
             }
@@ -92,28 +91,26 @@ namespace AeroSim.InputSystem
         public void SetView(int viewIndex)
         {
             CameraView view = views[viewIndex];
-            offset = view.offset;
-            deltaPos = view.deltaPos;
-            followRotation = view.followRotation;
-            enableIRView = view.enableIRView;
-            enableStable = view.enableStable;
+            currentView = view;
             currentViewIndex = viewIndex;
 
             isStableTargetAvaliable = false;
 
-            if(enableIRView && IREffect != null)
+            if(view.enableIRView && IREffect != null)
             {
                 IREffect.enabled.value = true;
             }
-            if(!enableIRView && IREffect != null)
+            if(!view.enableIRView && IREffect != null)
             {
                 IREffect.enabled.value = false;
             }
+
+            AircraftUI.DisplayTargetingPodView(view.targetingPodView);
         }
 
         void Update()
         {
-            if (Input.GetKey(Keybindings.holdControlInput) || enableStable)
+            if (Input.GetKey(Keybindings.holdControlInput) || currentView.enableStable)
             {
                 Vector3 mouseDelta = Input.mousePositionDelta;
 
@@ -135,7 +132,7 @@ namespace AeroSim.InputSystem
                     {
                         isMoveingView = false;
 
-                        if (enableStable)
+                        if (currentView.enableStable)
                         {
                             RaycastHit hit;
                             if (Physics.Raycast(transform.position, transform.forward, out hit, 40 * 1000))
@@ -204,26 +201,26 @@ namespace AeroSim.InputSystem
 
         void LateUpdate()
         {
-            transform.position = target.position + deltaPos.z * fwd + Vector3.up * deltaPos.y + target.forward * offset.z + target.right * offset.x + target.up * offset.y;
+            transform.position = target.position + currentView.deltaPos.z * fwd + Vector3.up * currentView.deltaPos.y + target.forward * currentView.offset.z + target.right * currentView.offset.x + target.up * currentView.offset.y;
 
-            if (!Input.GetKey(Keybindings.holdControlInput) && !enableStable)
+            if (!Input.GetKey(Keybindings.holdControlInput) && !currentView.enableStable)
             {
                 fwd = Vector3.Lerp(fwd, Aircraft.main.targetDir, aimLerpParam * Time.fixedDeltaTime);
             }
-            else if (enableStable && isStableTargetAvaliable && !isMoveingView)
+            else if (currentView.enableStable && isStableTargetAvaliable && !isMoveingView)
             {
                 fwd = (trackPoint - transform.position).normalized;
             }
 
-            transform.LookAt(transform.position + fwd, followRotation ? target.up : Vector3.up);
+            transform.LookAt(transform.position + fwd, currentView.followRotation ? target.up : Vector3.up);
         }
 
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawSphere(target.position + offset, 0.5f);
+            Gizmos.DrawSphere(target.position + currentView.offset, 0.5f);
             Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(target.position + offset + new Vector3(0, deltaPos.y, deltaPos.x), 0.5f);
+            Gizmos.DrawSphere(target.position + currentView.offset + new Vector3(0, currentView.deltaPos.y, currentView.deltaPos.x), 0.5f);
         }
     }
 }

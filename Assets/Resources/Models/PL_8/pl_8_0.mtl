@@ -1,0 +1,7 @@
+newmtl pl_8
+	illum 3
+	map_Kd textures/pl_8_c.dds
+	map_bump textures/pl_8_n.dds
+newmtl dynamic_glass_chrome
+	illum 3
+	d 0.8

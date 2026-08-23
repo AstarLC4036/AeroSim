@@ -120,6 +120,9 @@ namespace AeroSim.UI
 
         void UpdateRWRObjects()
         {
+            if (AircraftUI.isTargetingViewEnabled)
+                return;
+
             // update rwr display
             Vector3 fwd = parentAircraft.transform.forward;
             float rwrRotateAngle = Mathf.Atan2(fwd.x, fwd.z);

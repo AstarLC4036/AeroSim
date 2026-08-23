@@ -29,10 +29,6 @@ namespace AeroSim.AircraftModules
         [SerializeField]
         public RadarMFD radarDrawer;
 
-        public RawImage radarDisplay;
-        public RawImage statusDisplay;
-        //public Texture2D testTex;
-
         private Aircraft parentAircraft;
 
         public void Init(Aircraft aircraft)
@@ -72,7 +68,7 @@ namespace AeroSim.AircraftModules
                 mfdProperties.Add(block);
                 mfd.renderer.GetPropertyBlock(block, mfd.targetMaterialIndex);
                 block.SetVector("_BaseMap_ST", new Vector4(mfd.tiling.x, mfd.tiling.y, mfd.offset.x, mfd.offset.y));
-                block.SetTexture("_BaseMap", GetMFDTexture(mfd.type));
+                block.SetTexture("_BaseMap", GetMFDTexture(mfd));
                 mfd.renderer.SetPropertyBlock(block, mfd.targetMaterialIndex);
             }
         }
@@ -88,13 +84,14 @@ namespace AeroSim.AircraftModules
             }
         }
 
-        private Texture2D GetMFDTexture(MFDType type)
+        private Texture2D GetMFDTexture(ScreenProperty display)
         {
+            MFDType type = display.type;
             switch (type)
             {
                 case (MFDType.None):
                     Texture2D tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                    tex.SetPixel(0, 0, new Color(25, 25, 25, 255));
+                    tex.SetPixel(0, 0, display.bgColor);
                     return tex;
                 default :
                     return GetMFDDrawer(type).CanvasTexture;

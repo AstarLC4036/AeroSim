@@ -1,9 +1,13 @@
-Shader "PostEffect/Test"
+Shader "PostEffect/IR"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Strength ("Strength", int) = 1
+        _BlackHot ("Block Hot", Range(0,1)) = 0
+        _Contrast ("Contrast", Range(0.5,3)) = 1.2
+        _NoiseAmount ("Noise", Range(0,1)) = 0.05
+        _NoiseDelta ("Noise Delta", Range(0,100)) = 20
     }
     SubShader
     {
@@ -23,6 +27,11 @@ Shader "PostEffect/Test"
             sampler2D _MainTex;
             sampler2D _CameraDepthTexture;
             int _Strength;
+            float _BlackHot;
+            float _Contrast;
+            float _NoiseAmount;
+            float _NoiseDelta;
+            //float4 _Time;
             //float4 _ZBufferParams;
 
             float GetLinearDepth(float2 uv)
@@ -58,8 +67,6 @@ Shader "PostEffect/Test"
 
             float4 frag (v2f i) : SV_Target
             {
-                //TODO: make better IR
-                float4 color = tex2D(_MainTex, i.uv);
                 // float depth = tex2D(_CameraDepthTexture, i.uv).r;;
                 // float3 depthCol = lerp(color, float3(1,1,1), clamp(1 - depth * _Strength, 0, 1));
                 // //color.rgb = depthCol;
@@ -80,10 +87,29 @@ Shader "PostEffect/Test"
                 // //     return newCol;
                 // // }
                 // color.rgb = depthCol;
-                float grayscale = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;
-                //float4 newCol;
-                float4 newCol = float4(lerp(color.rgb, grayscale, _Strength / 100.0), 1);
-                return newCol;
+                // float grayscale = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;
+                // //float4 newCol;
+                // float4 newCol = float4(lerp(color.rgb, grayscale, _Strength / 100.0), 1);
+                // return newCol;
+
+                //TODO: make better IR
+                float4 color = tex2D(_MainTex, i.uv);
+                float brightness = dot(color.rgb, float3(0.299, 0.587, 0.114));
+
+                // 白热：亮度越高越白
+                float ir = saturate((brightness - 0.3) * _Contrast);  // 对比度拉伸
+                ir = pow(ir, 1.5);  // 非线性增强
+
+                // 黑热：反相
+                if (_BlackHot > 0.5)
+                    ir = 1.0 - ir;
+
+                // 添加噪点
+                float noise = frac(sin(dot(i.uv * 100, float2(12.9898, 78.233))) * 43758.5453 + _Time.y * _NoiseDelta);
+                ir += (noise - 0.5) * _NoiseAmount;
+                ir = saturate(ir);
+
+                return float4(ir, ir, ir, 1.0);
             }
 
             ENDHLSL

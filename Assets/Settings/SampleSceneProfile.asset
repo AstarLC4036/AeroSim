@@ -94,6 +94,18 @@ MonoBehaviour:
   strength:
     m_OverrideState: 1
     m_Value: 100
+  blackhot:
+    m_OverrideState: 1
+    m_Value: 0
+  contrast:
+    m_OverrideState: 1
+    m_Value: 1.5
+  noise:
+    m_OverrideState: 1
+    m_Value: 0.02
+  noiseDelta:
+    m_OverrideState: 1
+    m_Value: 20
 --- !u!114 &-4868662932838349906
 MonoBehaviour:
   m_ObjectHideFlags: 3

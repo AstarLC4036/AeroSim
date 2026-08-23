@@ -340,6 +340,9 @@ namespace AeroSim.UI
             //float posX = radarPosDelta.x / Screen.width;
             //float posY = radarPosDelta.y / Screen.width;
 
+            if (AircraftUI.isTargetingViewEnabled)
+                return;
+
             // Basic screen cursor
             if (Aircraft.main.Velocity.magnitude > 0.1)
             {

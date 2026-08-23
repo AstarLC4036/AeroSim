@@ -71,8 +71,6 @@ namespace AeroSim.UI
             parentAircraft = aircraft;
             radar = aircraft.radar;
 
-            drawTargets.Add(aircraft.mfdDisplay.radarDisplay);
-
             InitCanavs();
 
             isInited = true;
