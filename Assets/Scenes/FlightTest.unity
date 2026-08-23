@@ -20058,7 +20058,11 @@ MonoBehaviour:
   beginRollThresholdDeg: 0
   levelModeBlendDeg: 0
   yawThresholdDeg: 3
+  rollGain: 0
+  rollLevelStableGain: 0
+  referenceSpeed: 0
   generalFactor: 0
+  damper: {x: 0, y: 0, z: 0}
   avgSize: 0
 --- !u!4 &979841188
 Transform:
@@ -61736,6 +61740,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
+      propertyPath: damper.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: rollGain
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
       propertyPath: yawPID.kd
       value: 0
       objectReference: {fileID: 0}
@@ -61757,12 +61771,12 @@ PrefabInstance:
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: rollPID.kd
-      value: 0.6
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: rollPID.kp
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -61772,7 +61786,7 @@ PrefabInstance:
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: pitchPID.kp
-      value: -3
+      value: -12
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -61787,7 +61801,22 @@ PrefabInstance:
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: generalFactor
-      value: 0.6
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: referenceSpeed
+      value: 165
+      objectReference: {fileID: 0}
+    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: rollRatePID.kd
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: rollRatePID.kp
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -61808,6 +61837,16 @@ PrefabInstance:
         type: 3}
       propertyPath: levelModeBlendDeg
       value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: rollLevelStableGain
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: beginRollThresholdDeg
+      value: 0.998
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}

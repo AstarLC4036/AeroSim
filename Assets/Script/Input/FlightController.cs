@@ -77,12 +77,16 @@ namespace AeroSim.InputSystem
         //private float rollRateIntegral;
         //private float pitchIntegral;
 
-        [Header("Level Stablilization")]
+        [Header("Stablilization")]
         public float levelModeThresholdDeg;
         public float beginRollThresholdDeg;
         public float levelModeBlendDeg;
         public float yawThresholdDeg = 3f;
+        public float rollGain;
+        public float rollLevelStableGain;
+        public float referenceSpeed;
         public float generalFactor;
+        public Vector3 damper;
 
         [Header("Averge Input")]
         public int avgSize;
@@ -140,18 +144,18 @@ namespace AeroSim.InputSystem
         /// </summary>
         public Vector3 AimRingControl(Vector3 targetDir, float dt)
         {
-            Vector3 localTargetDir = aircraft.transform.InverseTransformDirection(targetDir);
+            Vector3 localTargetDir = aircraft.transform.InverseTransformDirection(targetDir).normalized;
             Vector3 targetHorziontal = Vector3.ProjectOnPlane(targetDir, Vector3.up).normalized;
             Vector3 forwardHorziontal = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
 
-            // error calculation (in radains)
+            // Error Calculation (in radains)
             float targetRollAngle = CovertAngle(Mathf.Atan2(localTargetDir.y, localTargetDir.x) * Mathf.Rad2Deg - 90);
             float rollError = Mathf.Atan2(localTargetDir.x, localTargetDir.z);
             float pitchError = Mathf.Atan2(localTargetDir.y, Mathf.Sqrt(localTargetDir.x * localTargetDir.x + localTargetDir.z * localTargetDir.z));
             float yawError = Vector3.SignedAngle(forwardHorziontal, targetHorziontal, Vector3.up) * Mathf.Deg2Rad;
             float errorDeg = Vector3.Angle(Vector3.forward, localTargetDir);
 
-            // aircarft status
+            // Aircarft Status
             Vector3 localAngularVelo = aircraft.transform.InverseTransformDirection(aircraft.Rb.angularVelocity);
             float rollRate = localAngularVelo.z;
             float pitchRate = localAngularVelo.x;
@@ -159,34 +163,34 @@ namespace AeroSim.InputSystem
             float currentRollAngle = CovertAngle(transform.eulerAngles.z) * Mathf.Deg2Rad;
             float currentSpeed = aircraft.Velocity.magnitude;
 
-            // Factor balance
-            float speedFactor = Mathf.Clamp(165 / Mathf.Max(currentSpeed, 1f), 0.2f, 1.0f); // 165 -> reference speed
-            Vector3 factors = new Vector3(speedFactor, 1, speedFactor);
-            pitchRatePID.factors = pitchPID.factors = rollPID.factors = factors;
+            // Factors
+            Vector3 factors = new Vector3(generalFactor, 1, generalFactor);
+            yawRatePID.factors = yawPID.factors = pitchRatePID.factors = pitchPID.factors = rollRatePID.factors = rollPID.factors = factors;
 
             // Pitch
             float desiredPitchRate = Mathf.Clamp(pitchPID.Update(dt, pitchError, pitchRate), pitchRateLimit.x * Mathf.Deg2Rad, pitchRateLimit.y * Mathf.Deg2Rad);
             float pitchCmd = pitchRatePID.Update(dt, desiredPitchRate - pitchRate);
 
-            // Level Stablilization
-            float blend = 1 - Mathf.Clamp01((errorDeg - levelModeThresholdDeg) / levelModeBlendDeg);
-            //float finalRollError = Mathf.Lerp(-targetRollAngle * Mathf.Deg2Rad, currentRollAngle, blend);
-            float finalRollError = Mathf.Lerp(rollError, currentRollAngle, blend);
             // Roll
-            float baseRollCmd = rollPID.Update(dt, finalRollError, rollRate);
-            
+            // - Level Stablilization
+            // 感谢群友的指导，群友的恩情还不完
+            float targetRoll = Mathf.Lerp(localTargetDir.x, CovertAngle(transform.localEulerAngles.z) * Mathf.Deg2Rad, Mathf.Clamp01(localTargetDir.z - beginRollThresholdDeg) * rollLevelStableGain) * rollGain;
+            float desiredRollRate = rollPID.Update(dt, targetRoll, rollRate);
+            // - Final command
+            float rollCmd = rollRatePID.Update(dt, desiredRollRate - rollRate);
+
+            float blend = 1 - Mathf.Clamp01((errorDeg - levelModeThresholdDeg) / levelModeBlendDeg);
+            float rollLevelStableCmd = currentRollAngle;
+
             // Yaw
             float desiredYawRate = Mathf.Clamp(yawPID.Update(dt, yawError, yawRate), yawRateLimit.x * Mathf.Deg2Rad, yawRateLimit.y * Mathf.Deg2Rad);
             float yawCmd = yawRatePID.Update(dt, desiredYawRate - yawRate);
 
-            //float baseYawCmd = yawPID.Update(dt, yawError, yawRate);
-            //float slideYawCmd = yawRatePID.Update(dt, yawRateError);
-            //float blendYawCmd = baseRollCmd * 0.4f + Mathf.Lerp(baseYawCmd, slideYawCmd, Mathf.Clamp01(yawError / yawThresholdDeg)) * 0.6f;
-
-            Vector3 inputResult = new Vector3(yawCmd, pitchCmd, baseRollCmd);
+            Vector3 inputResult = new Vector3(yawCmd, pitchCmd, rollCmd);
+            inputResult += Vector3.Scale(localAngularVelo, damper);
             Vector3 filteredResult = UpdateAvgInput(inputResult);
 
-            Debug.Log($"desired pitch rate: {desiredPitchRate}, pitch: {pitchCmd}, roll target {targetRollAngle}, stable blend {blend}, error deg: {errorDeg}, result {inputResult}");
+            //Debug.Log($"desired pitch rate: {desiredPitchRate}, pitch: {pitchCmd}, roll target {targetRollAngle}, stable blend {blend}, error deg: {errorDeg}, result {inputResult}");
 
             return filteredResult;
         }
@@ -213,6 +217,8 @@ namespace AeroSim.InputSystem
 
             return avg;
         }
+
+        // rubbish bin blow this line
 
         ///// <summary>
         ///// 通过给定的方向计算输入
@@ -265,6 +271,18 @@ namespace AeroSim.InputSystem
         //    float clampedY = Mathf.Clamp(input.y, -1, 1);
         //    FlightController.input = new Vector3(clampedX, clampedY);
         //}
+
+        //float hsSpeedFactor = Mathf.Clamp(referenceSpeed / Mathf.Max(currentSpeed, 1f), 0.2f, 1.0f);
+        //float lsSpeedFactor = Mathf.Clamp(Mathf.Max(currentSpeed, 1f) / referenceSpeed, 0.2f, 1.0f);
+        //Vector3 factors = new Vector3(hsSpeedFactor * lsSpeedFactor, 1, hsSpeedFactor * lsSpeedFactor);
+
+        //float finalRollError = Mathf.Lerp(-targetRollAngle * Mathf.Deg2Rad, currentRollAngle, blend);
+        //float finalRollError = Mathf.Lerp(rollError, currentRollAngle, blend);
+        //float baseRollCmd = rollPID.Update(dt, finalRollError, rollRate);
+
+        //float baseYawCmd = yawPID.Update(dt, yawError, yawRate);
+        //float slideYawCmd = yawRatePID.Update(dt, yawRateError);
+        //float blendYawCmd = baseRollCmd * 0.4f + Mathf.Lerp(baseYawCmd, slideYawCmd, Mathf.Clamp01(yawError / yawThresholdDeg)) * 0.6f;
 
         ////   level stablilization
         //float currentRollAngle = Vector3.SignedAngle(aircraft.transform.up, Vector3.up, aircraft.transform.forward);
