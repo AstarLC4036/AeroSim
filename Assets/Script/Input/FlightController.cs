@@ -104,8 +104,8 @@ namespace AeroSim.InputSystem
                 if (!Input.GetKey(Keybindings.holdControlInput) && !CameraController.Instance.currentView.enableStable && !CameraController.Instance.currentView.targetingPodView)
                 {
                     Vector3 mouseDelta = Input.mousePositionDelta;
-                    aircraft.targetDir = RotateRound(aircraft.targetDir, Vector3.zero, Camera.main.transform.up, mouseDelta.x * sensitivity * Time.deltaTime);
-                    aircraft.targetDir = RotateRound(aircraft.targetDir, Vector3.zero, Camera.main.transform.right, -mouseDelta.y * sensitivity * Time.deltaTime);
+                    aircraft.targetDir = RotateRound(aircraft.targetDir, Vector3.zero, Camera.main.transform.up, mouseDelta.x / Time.deltaTime * sensitivity);
+                    aircraft.targetDir = RotateRound(aircraft.targetDir, Vector3.zero, Camera.main.transform.right, -mouseDelta.y / Time.deltaTime * sensitivity);
                 }
             }
         }
@@ -151,7 +151,7 @@ namespace AeroSim.InputSystem
             float rollCmd = rollRatePID.Update(dt, desiredRollRate - rollRate);
 
             // Yaw
-            float desiredYawRate = Mathf.Clamp(yawPID.Update(dt, yawError, yawRate), yawRateLimit.x * Mathf.Deg2Rad, yawRateLimit.y * Mathf.Deg2Rad);
+            float desiredYawRate = Mathf.Clamp(yawPID.Update(dt, rollError, yawRate), yawRateLimit.x * Mathf.Deg2Rad, yawRateLimit.y * Mathf.Deg2Rad);
             float yawCmd = yawRatePID.Update(dt, desiredYawRate - yawRate);
 
             Vector3 inputResult = new Vector3(yawCmd, pitchCmd, rollCmd);

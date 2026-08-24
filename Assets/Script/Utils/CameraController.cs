@@ -156,8 +156,8 @@ namespace AeroSim.InputSystem
 
                 //fwd = transform.forward;
 
-                fwd = RotateRound(fwd, Vector3.zero, transform.up, mouseDelta.x * sensitivity * Time.deltaTime);
-                fwd = RotateRound(fwd, Vector3.zero, transform.right, -mouseDelta.y * sensitivity * Time.deltaTime);
+                fwd = RotateRound(fwd, Vector3.zero, transform.up, mouseDelta.x / Time.deltaTime  * sensitivity );
+                fwd = RotateRound(fwd, Vector3.zero, transform.right, -mouseDelta.y / Time.deltaTime * sensitivity );
             }
 
             if (Input.GetKeyDown(Keybindings.changeView))

@@ -13,6 +13,7 @@ namespace AeroSim.Utils
         public GameObject[] activeObjects;
         public ParticleSystem[] particleSystems;
         public VisualEffect[] visualEffects;
+        public AudioSource[] audioSources;
         public bool IsPlaying => isPlaying;
 
         private bool isPlaying = false;
@@ -44,6 +45,14 @@ namespace AeroSim.Utils
                     effect.Play();
                 }
             }
+
+            if (audioSources != null && audioSources.Length > 0)
+            {
+                foreach (AudioSource audio in audioSources)
+                {
+                    audio.Play();
+                }
+            }
         }
 
         public void Stop()
@@ -71,6 +80,14 @@ namespace AeroSim.Utils
                 foreach (VisualEffect effect in visualEffects)
                 {
                     effect.Stop();
+                }
+            }
+
+            if (audioSources != null && audioSources.Length > 0)
+            {
+                foreach (AudioSource audio in audioSources)
+                {
+                    audio.Stop();
                 }
             }
         }

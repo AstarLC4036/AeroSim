@@ -367,14 +367,14 @@ MonoBehaviour:
   maxAzimuth: 80
   minElevation: 5
   maxElevation: 60
-  rotationSpeed: 50
+  rotationSpeed: 0.003
   smoothing: 10
   currentAzimuth: 0
   currentElevation: 0
   currentFov: 0
   defaultFov: 40
   zoomFov: 10
-  fovSmoothing: 5
+  fovSmoothing: 20
   targetDir: {x: 0, y: 0, z: 1}
 --- !u!1 &7427359300880071511
 GameObject:

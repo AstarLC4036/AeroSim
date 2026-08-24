@@ -9,6 +9,27 @@ namespace AeroSim.Utils
 {
     public class WireframeMeshFactory
     {
+        public static Mesh CreateQuad(float size = 1)
+        {
+            Mesh mesh = new Mesh();
+            mesh.vertices = new Vector3[]
+            {
+                new Vector3(-size/2, -size/2, 0),
+                new Vector3(size/2, -size/2, 0),
+                new Vector3(-size/2, size/2, 0),
+                new Vector3(size/2, size/2, 0)
+            };
+            mesh.triangles = new int[] { 0, 2, 1, 1, 2, 3 };
+            mesh.uv = new Vector2[]
+            {
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(1, 1)
+            };
+            return mesh;
+        }
+
         private static void AddQuad(List<Vector3> vertices, List<int> triangles, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3)
         {
             int startIndex = vertices.Count;

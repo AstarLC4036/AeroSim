@@ -9,9 +9,12 @@ namespace AeroSim.Audio
         public static AudioManager Instance => instance;
 
         public AudioSource rwrAudio;
+        public AudioSource mslAudio;
         public AudioClip rwrScan;
         public AudioClip rwrLock;
         public AudioClip rwrMsl;
+        public AudioClip irSearch;
+        public AudioClip irLock;
 
         public static bool IsPlayingLock => Instance.rwrAudio.clip == Instance.rwrLock && Instance.rwrAudio.isPlaying;
         public static bool IsPlayingMsl => Instance.rwrAudio.clip == Instance.rwrMsl && Instance.rwrAudio.isPlaying;
@@ -68,6 +71,26 @@ namespace AeroSim.Audio
         {
             if (Instance.rwrAudio.isPlaying)
                 Instance.rwrAudio.Stop();
+        }
+
+        public static void MissileIRSearch()
+        {
+            Instance.mslAudio.clip = Instance.irSearch;
+            Instance.mslAudio.loop = true;
+            Instance.mslAudio.Play();
+        }
+
+        public static void MissileIRLock()
+        {
+            Instance.mslAudio.clip = Instance.irLock;
+            Instance.mslAudio.loop = true;
+            Instance.mslAudio.Play();
+        }
+
+        public static void MissileStop()
+        {
+            if (Instance.mslAudio.isPlaying)
+                Instance.mslAudio.Stop();
         }
     }
 }

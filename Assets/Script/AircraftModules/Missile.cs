@@ -50,8 +50,10 @@ namespace AeroSim.AircraftModules
         public float duration = 5f;
         public float burntTime = 0;
         public float thrust = 1000;
+        public float maxRange = 13;
         public float lockTime = 0.5f;
         public float lockTimeout = 0.5f;
+        public float boresightAngle = 30f;
         public MissileSize size = MissileSize.Small;
         public MissileType type = MissileType.None;
         public bool hasDatalink = false;
@@ -60,6 +62,7 @@ namespace AeroSim.AircraftModules
         public EffectController explosionEffect;
         [SerializeField]
         protected bool isIgnited = false;
+        protected bool isLaunched = false;
         [SerializeField]
         protected Rigidbody rb;
 
@@ -67,7 +70,6 @@ namespace AeroSim.AircraftModules
         protected float lockTimer;
         protected float lockingTimer;
         public LockState lockState = LockState.None;
-        protected Vector3 seekerDirection;
 
         public Vector3 Velocity => velo * transform.forward;
 
@@ -82,6 +84,7 @@ namespace AeroSim.AircraftModules
 
         public bool IsBurning => isIgnited && burntTime < duration;
         public bool IsIgnited => isIgnited;
+        public bool IsLaunched => isLaunched;
         public Vector3 TargetPosition => targetPos;
 
         Vector3 desiredDirection;
@@ -125,6 +128,14 @@ namespace AeroSim.AircraftModules
 
         }
 
+        public void SetTarget(Transform target)
+        {
+            this.target = target;
+
+            if(target != null)
+                targetPos = target.position;
+        }
+
         protected virtual void UpdateState()
         {
             if (target != null)
@@ -133,6 +144,18 @@ namespace AeroSim.AircraftModules
 
                 targetVelo = (targetPos - lastPos) / Time.fixedDeltaTime;
                 lastPos = targetPos;
+
+                if (targetAircraft == null)
+                {
+                    Component component;
+                    target.gameObject.TryGetComponent(typeof(Aircraft), out component);
+                    if (component != null)
+                        targetAircraft = (Aircraft)component;
+                }
+            }
+            else if(targetAircraft != null)
+            {
+                targetAircraft = null;
             }
         }
 
@@ -228,21 +251,21 @@ namespace AeroSim.AircraftModules
             //transform.LookAt(transform.position + trackVelo.normalized);
             */
 
-            Vector3 relativePosition = targetPos - transform.position;
-            float range = relativePosition.magnitude;
-            Vector3 losDirection = relativePosition.normalized;
-            Vector3 relativeVelocity = targetVelo - velo * transform.forward;
-            Vector3 losRate = Vector3.Cross(relativeVelocity, losDirection) / range;
+            Vector3 relativePosition = targetPos - transform.position; // 相对坐标
+            float range = relativePosition.magnitude; // 距离
+            Vector3 losDirection = relativePosition.normalized; // 方向
+            Vector3 relativeVelocity = targetVelo - velo * transform.forward; // 相对速度
+            Vector3 losRate = Vector3.Cross(relativeVelocity, losDirection) / range; // 视线角速率
             //float closingVelocity = -Vector3.Dot(relativeVelocity, losDirection);
 
-            Vector3 commandAccel = 4 * Vector3.Cross(velo * transform.forward, losRate);
+            Vector3 commandAccel = 4 * Vector3.Cross(velo * transform.forward, losRate); // 指令加速度
             //Vector3 localAccel = transform.InverseTransformDirection(commandAccel);
-            Vector3 desiredVelo = transform.forward * velo + commandAccel * Time.fixedDeltaTime;
+            Vector3 desiredVelo = transform.forward * velo + commandAccel * Time.fixedDeltaTime; // 期望速度
             desiredDirection = desiredVelo.normalized * 10;
             transform.LookAt(transform.position + desiredDirection);
         }
 
-        public void Ignite()
+        public virtual void Ignite()
         {
             if(parentAircraft != null)
                 velo = parentAircraft.Velocity.magnitude;
@@ -252,6 +275,8 @@ namespace AeroSim.AircraftModules
             flameEffect.Play();
             GameObject.Destroy(connetor);
             rb.isKinematic = true;
+
+            isLaunched = true;
         }
 
         public void Explode(RaycastHit hit)
@@ -281,23 +306,16 @@ namespace AeroSim.AircraftModules
             }
         }
 
-        public void Lock(Transform target)
+        public virtual void ActiveSeeker()
         {
-            this.target = target;
             lockState = LockState.Locking;
             lockTimer = lockTime;
-
-            targetPos = target.position;
+            lockingTimer = 0;
 
             if (hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
             {
                 parentAircraft.datalink.RegisterDatalink(this);
             }
-
-            Component component;
-            target.gameObject.TryGetComponent(typeof(Aircraft), out component);
-            if (component != null)
-                targetAircraft = (Aircraft)component;
         }
 
         public void DirectLock(Transform target)
@@ -317,7 +335,7 @@ namespace AeroSim.AircraftModules
                 targetAircraft = (Aircraft)component;
         }
 
-        public void OnDrawGizmos()
+        protected virtual void OnDrawGizmos()
         {
             //Gizmos.DrawLine(transform.position, transform.position + trackVelo.normalized);
             if (target != null)

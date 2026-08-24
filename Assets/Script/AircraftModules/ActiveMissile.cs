@@ -1,4 +1,5 @@
-﻿using AeroSim.Utility;
+﻿using AeroSim.AeroPhysics;
+using AeroSim.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,11 @@ namespace AeroSim.AircraftModules
         private void Awake()
         {
             type = MissileType.Active;
+        }
+
+        public override void ActiveSeeker()
+        {
+            base.ActiveSeeker();
         }
 
         protected override void UpdateState()

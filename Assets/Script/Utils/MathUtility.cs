@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace AeroSim.Utility
 {
@@ -50,7 +51,26 @@ namespace AeroSim.Utility
         {
             Vector3 targetDir = targetPos - position;
             float angle = Vector3.Angle(targetDir, forward);
-            return angle <= fov;
+            float z = Vector3.Dot(targetDir, forward);
+            return angle <= fov && z >= 0;
+        }
+
+        public static Vector3 ClampTargetDir(Vector3 localTargetDir, float minYaw, float maxYaw, float minPitch, float maxPitch)
+        {
+            float yaw = Mathf.Atan2(localTargetDir.x, localTargetDir.z) * Mathf.Rad2Deg;
+            float pitch = Mathf.Asin(Mathf.Clamp(localTargetDir.y, -1f, 1f)) * Mathf.Rad2Deg;
+
+            yaw = Mathf.Clamp(yaw, minYaw, maxYaw);
+            pitch = Mathf.Clamp(-pitch, minPitch, maxPitch);
+
+            Vector3 clampedLocalDir = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
+
+            return clampedLocalDir;
+        }
+
+        public static Vector3 ClampTargetDir(Transform transform, Vector3 targetDir, float minYaw, float maxYaw, float minPitch, float maxPitch)
+        {
+            return transform.TransformDirection(ClampTargetDir(transform.InverseTransformDirection(targetDir), minYaw, maxYaw, minPitch, maxPitch));
         }
     }
 }

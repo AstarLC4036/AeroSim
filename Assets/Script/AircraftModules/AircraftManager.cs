@@ -1,6 +1,7 @@
 ﻿using AeroSim.AeroPhysics;
 using System.Collections.Generic;
 using UnityEngine;
+using AeroSim.General;
 
 namespace AeroSim.AircraftModules
 {
@@ -13,6 +14,8 @@ namespace AeroSim.AircraftModules
         public static List<Aircraft> Aircrafts => Instance.aircrafts;
         public List<Missile> missles = new List<Missile>();
         public static List<Missile> Missles => Instance.missles;
+        public List<IRSource> irSources = new List<IRSource>();
+        public static List<IRSource> IRSources => Instance.irSources;
 
         public Transform mslParent;
 
@@ -24,6 +27,7 @@ namespace AeroSim.AircraftModules
         void Start()
         {
             aircrafts.AddRange((Aircraft[])FindObjectsByType(typeof(Aircraft), FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID));
+            irSources.AddRange((IRSource[])FindObjectsByType(typeof(IRSource), FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID));
         }
 
         // Update is called once per frame

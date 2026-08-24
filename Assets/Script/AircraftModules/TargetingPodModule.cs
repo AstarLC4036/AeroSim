@@ -64,13 +64,13 @@ namespace AeroSim.AircraftModules
 
         void HandleInput()
         {
-            Vector3 mouseInput = Input.mousePositionDelta;
+            Vector3 mouseDelta = Input.mousePositionDelta / Time.deltaTime;
 
             //targetAzimuth += mouseInput.x * rotationSpeed;
             //targetElevation += mouseInput.y * rotationSpeed * -1;
 
-            targetDir = RotateRound(targetDir, Vector3.zero, podCamera.transform.up, mouseInput.x * rotationSpeed * Time.deltaTime);
-            targetDir = RotateRound(targetDir, Vector3.zero, podCamera.transform.right, -mouseInput.y * rotationSpeed * Time.deltaTime);
+            targetDir = RotateRound(targetDir, Vector3.zero, podCamera.transform.up, mouseDelta.x * rotationSpeed);
+            targetDir = RotateRound(targetDir, Vector3.zero, podCamera.transform.right, -mouseDelta.y * rotationSpeed);
 
             targetDir = ClampTargetDir(targetDir);
 

@@ -4,6 +4,7 @@ using AeroSim.Utility;
 using AeroSim.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 using static AeroSim.AircraftModules.RadarModule;
 
@@ -13,9 +14,20 @@ namespace AeroSim.UI
     {
         public class HUDMeshData
         {
-            public Mesh mesh;
+            public enum Shape
+            {
+                Circle = 0,
+                Rect = 1,
+            }
+
             private Vector3 direction;
-            public Space space;
+            private Color color;
+            public Shape shape;
+            public float width;
+            public float height;
+            public float radius;
+            public bool isDisplaying = true;
+            public MaterialPropertyBlock mpb;
 
             public Vector3 Direction
             {
@@ -23,20 +35,26 @@ namespace AeroSim.UI
                 set { direction = value.normalized; }
             }
 
-            public HUDMeshData(Mesh mesh, Vector3 direction)
+            public Color Color
             {
-                direction = direction.normalized;
-                this.mesh = mesh;
-                this.direction = direction;
-                space = Space.World;
+                get { return  color; }
+                set { color = value; mpb.SetColor("_Color", color); }
             }
 
-            public HUDMeshData(Mesh mesh, Vector3 direction, Space space)
+            public HUDMeshData(Vector3 direction, Shape shape, Color color)
             {
                 direction = direction.normalized;
-                this.mesh = mesh;
                 this.direction = direction;
-                this.space = space;
+                this.shape = shape;
+                this.color = color;
+                mpb = new MaterialPropertyBlock();
+                mpb.SetFloat("_ShapeType", (int)shape);
+                mpb.SetVector("_Center", new Vector4(0.5f, 0.5f, 0, 0));
+                mpb.SetFloat("_Radius", 0.495f);
+                mpb.SetVector("_RectSize", new Vector4(1, 1, 0, 0));
+                mpb.SetFloat("_Thickness", 0.003f);
+                mpb.SetFloat("_Softness", 0.001f);
+                mpb.SetColor("_Color", color);
             }
         }
 
@@ -47,7 +65,8 @@ namespace AeroSim.UI
         public Texture2D aimDirPointer;
         public Texture2D dirPointer;
         public Texture2D mslPointer;
-        public Texture2D activeMslLockIndicator;
+        public Texture2D mslLockIndicatorA;
+        public Texture2D mslLockIndicatorB;
         public RectTransform hudParent;
         public Material hudMaterial;
         public int hudLayer;
@@ -75,10 +94,17 @@ namespace AeroSim.UI
         public float mslCursorSize = 50;
         public float lockRingSize = 50;
 
-        [Header("Properties")]
+        [Header("HUD Settings")]
         public List<HUDMeshData> hudMeshes = new List<HUDMeshData>();
         public float hudDistance = 0;
+        public float mslBlinkCycle = 0.5f;
+        private float mslBlinkTimer = 0f;
+        private bool enableMslBlink = false;
         private HUDMeshData radarRangeMesh;
+        private HUDMeshData mslBoresightMesh;
+        private HUDMeshData mslSeekerMesh;
+        private Mesh quad;
+        private Material hudMat;
 
         private RadarModule radar;
         private MSARadar msaRadar;
@@ -117,6 +143,14 @@ namespace AeroSim.UI
                 font = AircraftUI.RwrFont,
                 richText = true
             };
+
+            quad = WireframeMeshFactory.CreateQuad(1);
+            Shader hudShader = Shader.Find("Custom/HollowShapes");
+            hudMat = new Material(hudShader);
+
+            mslBoresightMesh = new HUDMeshData(Vector3.forward, HUDMeshData.Shape.Circle, Color.white) { isDisplaying = false };
+            mslSeekerMesh = new HUDMeshData(Vector3.forward, HUDMeshData.Shape.Circle, Color.white) { isDisplaying = false };
+            RenderPipelineManager.beginCameraRendering += DrawHUDMesh;
         }
 
         public void SetRadar(RadarModule radar)
@@ -135,8 +169,7 @@ namespace AeroSim.UI
                 {
                     RemoveHUDMesh(radarRangeMesh);
                 }
-                radarRangeMesh = CreateHUDRect(radar.currentScanAngleX, radar.currentScanAngleY, Vector3.forward);
-                radarRangeMesh.space = Space.Self;
+                radarRangeMesh = CreateHUDRect(radar.currentScanAngleX, radar.currentScanAngleY, Vector3.forward, Color.green);
             }
             else if (radar.radarType == RadarModule.RadarType.AESA)
             {
@@ -147,8 +180,7 @@ namespace AeroSim.UI
                 {
                     RemoveHUDMesh(radarRangeMesh);
                 }
-                radarRangeMesh = CreateHUDRect(radar.currentScanAngleX, radar.currentScanAngleY, Vector3.forward);
-                radarRangeMesh.space = Space.Self;
+                radarRangeMesh = CreateHUDRect(radar.currentScanAngleX, radar.currentScanAngleY, Vector3.forward, Color.green);
             }
         }
 
@@ -157,11 +189,13 @@ namespace AeroSim.UI
         /// </summary>
         /// <param name="angle">Angle in degrees</param>
         /// <returns>Referenced mesh data</returns>
-        public HUDMeshData CreateHUDCircle(float angle, Vector3 direction)
+        public HUDMeshData CreateHUDCircle(float angle, Vector3 direction, Color color)
         {
             float radius = Mathf.Tan(angle * Mathf.Deg2Rad) * hudDistance;
-            Mesh mesh = WireframeMeshFactory.CreateThickCircle(radius, 0.1f);
-            HUDMeshData data = new HUDMeshData(mesh, direction);
+            HUDMeshData data = new HUDMeshData(direction, HUDMeshData.Shape.Circle, color) { radius = radius };
+            float thickness = 0.003f * (30 / angle);
+            data.mpb.SetFloat("_Thickness", thickness); //0.03f -> reference thickness
+            data.mpb.SetFloat("_Radius", 0.45f - thickness * 2); 
             hudMeshes.Add(data);
             return data;
         }
@@ -172,12 +206,11 @@ namespace AeroSim.UI
         /// <param name="w">Width (Angle in degrees)</param>
         /// <param name="h">Height (Angle in degrees)</param>
         /// <returns>Referenced mesh data</returns>
-        public HUDMeshData CreateHUDRect(float w, float h, Vector3 direction)
+        public HUDMeshData CreateHUDRect(float w, float h, Vector3 direction, Color color)
         {
             float width = Mathf.Tan(w * Mathf.Deg2Rad) * hudDistance;
             float height = Mathf.Tan(h * Mathf.Deg2Rad) * hudDistance;
-            Mesh mesh = WireframeMeshFactory.CreateThickRectangle(width, height, 0.1f);
-            HUDMeshData data = new HUDMeshData(mesh, direction);
+            HUDMeshData data = new HUDMeshData(direction, HUDMeshData.Shape.Rect, color) { width = width, height = height };
             hudMeshes.Add(data);
             return data;
         }
@@ -284,8 +317,7 @@ namespace AeroSim.UI
             }
             hudParent.position = radarPosDelta;
 
-            //UpdateHUDMesh();
-            //DrawHUDMesh();
+            UpdateHUDMesh(Time.deltaTime);
 
             //pitchLadderBars.ForEach((Bar bar) => {
             //    float rollAngle = currentAircraft.transform.eulerAngles.x;
@@ -308,30 +340,117 @@ namespace AeroSim.UI
             //});
         }
 
-        void UpdateHUDMesh()
+        //private void LateUpdate()
+        //{
+        //    DrawHUDMesh();
+        //}
+
+        void UpdateHUDMesh(float dt)
         {
-            switch(radar.radarMode)
+            if(radar.radarMode == RadarMode.SRC || radar.radarMode == RadarMode.TWS)
             {
-                case RadarMode.SRC:
-                    break;
+                radarRangeMesh.Direction = radar.transform.forward;
+                if(!radarRangeMesh.isDisplaying)
+                {
+                    radarRangeMesh.isDisplaying = true;
+                }
+            }
+            else if (radarRangeMesh.isDisplaying)
+            {
+                radarRangeMesh.isDisplaying = false;
+            }
+
+            if(enableMslBlink)
+            {
+                mslBlinkTimer += dt;
+                if (mslBlinkTimer >= mslBlinkCycle)
+                {
+                    mslBlinkTimer = 0;
+                    mslBoresightMesh.isDisplaying = !mslBoresightMesh.isDisplaying;
+                }
+            }
+
+
+            if (Aircraft.main.mslManager != null && Aircraft.main.mslManager.currentMissle != null && !Aircraft.main.mslManager.currentMissle.IsIgnited)
+            {
+                Missile msl = Aircraft.main.mslManager.currentMissle;
+                if (Aircraft.main.mslManager.currentMissle.lockState == Missile.LockState.Locking)
+                {
+                    if (msl.type == Missile.MissileType.IR)
+                    {
+                        if(!mslSeekerMesh.isDisplaying)
+                            mslSeekerMesh = CreateHUDCircle(((IRMissile)msl).seekerFov, msl.transform.forward, Color.white);
+
+                        mslSeekerMesh.Direction = ((IRMissile)msl).seekerDirection;
+
+                        if (mslSeekerMesh.isDisplaying && mslSeekerMesh.Color != Color.white)
+                            mslSeekerMesh.Color = Color.white;
+                    }
+
+                    // HUD Mesh
+                    if (!mslBoresightMesh.isDisplaying)
+                        mslBoresightMesh = CreateHUDCircle(msl.boresightAngle, msl.transform.forward, Color.white);
+
+                    if (enableMslBlink)
+                        enableMslBlink = false;
+
+                    if (mslBoresightMesh.isDisplaying && mslBoresightMesh.Color != Color.white)
+                        mslBoresightMesh.Color = Color.white;
+
+                    mslBoresightMesh.Direction = msl.transform.forward;
+                }
+                else if (Aircraft.main.mslManager.currentMissle.lockState == Missile.LockState.Locked)
+                {
+                    // HUD Mesh
+                    if (mslSeekerMesh.isDisplaying && mslSeekerMesh.Color != Color.red)
+                        mslSeekerMesh.Color = Color.red;
+                    if (mslBoresightMesh.isDisplaying && mslBoresightMesh.Color != Color.red)
+                        mslBoresightMesh.Color = Color.red;
+                    if (!enableMslBlink)
+                        enableMslBlink = true;
+
+                    if (msl.type == Missile.MissileType.IR)
+                    {
+                        mslSeekerMesh.Direction = ((IRMissile)msl).seekerDirection;
+                    }
+
+                    mslBoresightMesh.Direction = msl.transform.forward;
+                }
+                else
+                {
+                    // Reset HUD Mesh
+                    if (mslBoresightMesh.isDisplaying || mslSeekerMesh.isDisplaying)
+                    {
+                        mslBoresightMesh.isDisplaying = false;
+                        mslSeekerMesh.isDisplaying = false;
+                    }
+                    if (enableMslBlink)
+                    {
+                        enableMslBlink = false;
+                        mslBlinkTimer = 0;
+                    }
+                }
             }
         }
 
-        void DrawHUDMesh()
+        void DrawHUDMesh(ScriptableRenderContext context, Camera camera)
         {
             Camera cam = Camera.main;
             Vector3 position = cam.transform.position;
             Quaternion rotation = cam.transform.rotation;
             foreach(HUDMeshData data in hudMeshes)
             {
-                if (data.space == Space.Self)
-                {
-                    Graphics.DrawMesh(data.mesh, position + data.Direction * hudDistance, rotation, hudMaterial, hudLayer);
-                }
-                else if(data.space == Space.World)
-                {
-                    Graphics.DrawMesh(data.mesh, position + data.Direction * hudDistance, rotation, hudMaterial, hudLayer);
-                }
+                if (!data.isDisplaying)
+                    continue;
+
+                Vector3 pos = position + data.Direction * hudDistance;
+                Quaternion rot = Quaternion.LookRotation(position - pos);
+                Vector3 scale;
+                if (data.shape == HUDMeshData.Shape.Rect)
+                    scale = new Vector3(data.width * 2, data.height * 2, 1);
+                else
+                    scale = new Vector3(data.radius * 2, data.radius * 2, 1);
+                Graphics.DrawMesh(quad, Matrix4x4.TRS(pos, rot, scale), hudMat, 0, cam, 0, data.mpb);
             }
         }
 
@@ -439,69 +558,73 @@ namespace AeroSim.UI
                     }
                 }
 
-                if(Aircraft.main.mslManager != null && Aircraft.main.mslManager.currentMissle != null && Aircraft.main.mslManager.currentMissle.lockState == Missile.LockState.Locked)
+                if (Aircraft.main.mslManager != null && Aircraft.main.mslManager.currentMissle != null && !Aircraft.main.mslManager.currentMissle.IsIgnited)
                 {
-                    Vector3 mslPosOnScreen = Camera.main.WorldToScreenPoint(Aircraft.main.mslManager.currentMissle.TargetPosition);
-                    if (mslPosOnScreen.z > 0)
+                    Missile msl = Aircraft.main.mslManager.currentMissle;
+                    if (msl.lockState == Missile.LockState.Locked && msl.type == Missile.MissileType.Active)
                     {
-                        GUI.DrawTexture(new Rect(
-                            mslPosOnScreen.x - lockRingSize / 2,
-                            Screen.height - mslPosOnScreen.y - lockRingSize / 2,
-                            lockRingSize, lockRingSize),
-                            activeMslLockIndicator);
+                        Vector3 mslPosOnScreen = Camera.main.WorldToScreenPoint(msl.TargetPosition);
+                        if (mslPosOnScreen.z > 0)
+                        {
+                            GUI.DrawTexture(new Rect(
+                                mslPosOnScreen.x - lockRingSize / 2,
+                                Screen.height - mslPosOnScreen.y - lockRingSize / 2,
+                                lockRingSize, lockRingSize),
+                                mslLockIndicatorB);
+                        }
                     }
                 }
 
-                if (!radar.IsTracking)
-                {
-                    GL.PushMatrix();
-                    GL.LoadOrtho();
+                    //if (!radar.IsTracking)
+                    //{
+                    //    GL.PushMatrix();
+                    //    GL.LoadOrtho();
 
-                    lineMaterial.SetPass(0);
+                    //    lineMaterial.SetPass(0);
 
-                    GL.Begin(GL.LINE_STRIP);
-                    GL.Color(Color.green);
+                    //    GL.Begin(GL.LINE_STRIP);
+                    //    GL.Color(Color.green);
 
-                    //only works in a limited condition that scan area is a square
-                    /*
-                    float rollSine = Mathf.Sin((rollAngle + 45) * Mathf.Deg2Rad);
-                    float rollCosine = Mathf.Cos((rollAngle + 45) * Mathf.Deg2Rad);
+                    //    //only works in a limited condition that scan area is a square
+                    //    /*
+                    //    float rollSine = Mathf.Sin((rollAngle + 45) * Mathf.Deg2Rad);
+                    //    float rollCosine = Mathf.Cos((rollAngle + 45) * Mathf.Deg2Rad);
 
-                    GL.Vertex3(0.5f + aesaPosX * rollCosine, 0.5f - aesaPosY * rollSine, 0);
-                    GL.Vertex3(0.5f - aesaPosX * rollSine, 0.5f - aesaPosY * rollCosine, 0);
-                    GL.Vertex3(0.5f - aesaPosX * rollCosine, 0.5f + aesaPosY * rollSine, 0);
-                    GL.Vertex3(0.5f + aesaPosX * rollSine, 0.5f + aesaPosY * rollCosine, 0);
-                    GL.Vertex3(0.5f + aesaPosX * rollCosine, 0.5f - aesaPosY * rollSine, 0);
-                    */
+                    //    GL.Vertex3(0.5f + aesaPosX * rollCosine, 0.5f - aesaPosY * rollSine, 0);
+                    //    GL.Vertex3(0.5f - aesaPosX * rollSine, 0.5f - aesaPosY * rollCosine, 0);
+                    //    GL.Vertex3(0.5f - aesaPosX * rollCosine, 0.5f + aesaPosY * rollSine, 0);
+                    //    GL.Vertex3(0.5f + aesaPosX * rollSine, 0.5f + aesaPosY * rollCosine, 0);
+                    //    GL.Vertex3(0.5f + aesaPosX * rollCosine, 0.5f - aesaPosY * rollSine, 0);
+                    //    */
 
-                    /*
-                    float angleX = Mathf.Atan2(aesaRadar.scanAngleY, aesaRadar.scanAngleX) * Mathf.Rad2Deg;
+                    //    /*
+                    //    float angleX = Mathf.Atan2(aesaRadar.scanAngleY, aesaRadar.scanAngleX) * Mathf.Rad2Deg;
 
-                    float semiDiagonalLen = Mathf.Sqrt(aesaPosX * aesaPosX + aesaPosY * aesaPosY);
+                    //    float semiDiagonalLen = Mathf.Sqrt(aesaPosX * aesaPosX + aesaPosY * aesaPosY);
 
-                    float rollSine1 = Mathf.Sin((rollAngle + angleX) * Mathf.Deg2Rad);
-                    float rollCosine1 = Mathf.Cos((rollAngle + angleX) * Mathf.Deg2Rad);
+                    //    float rollSine1 = Mathf.Sin((rollAngle + angleX) * Mathf.Deg2Rad);
+                    //    float rollCosine1 = Mathf.Cos((rollAngle + angleX) * Mathf.Deg2Rad);
 
-                    float rollSine2 = Mathf.Sin((rollAngle + 180 - angleX) * Mathf.Deg2Rad);
-                    float rollCosine2 = Mathf.Cos((rollAngle + 180 - angleX) * Mathf.Deg2Rad);
+                    //    float rollSine2 = Mathf.Sin((rollAngle + 180 - angleX) * Mathf.Deg2Rad);
+                    //    float rollCosine2 = Mathf.Cos((rollAngle + 180 - angleX) * Mathf.Deg2Rad);
 
-                    GL.Vertex3(posX + semiDiagonalLen * rollCosine1, posY - semiDiagonalLen * rollSine1, 0);
-                    GL.Vertex3(posX + semiDiagonalLen * rollCosine2, posY - semiDiagonalLen * rollSine2, 0);
-                    GL.Vertex3(posX - semiDiagonalLen * rollCosine1, posY + semiDiagonalLen * rollSine1, 0);
-                    GL.Vertex3(posX - semiDiagonalLen * rollCosine2, posY + semiDiagonalLen * rollSine2, 0);
-                    GL.Vertex3(posX + semiDiagonalLen * rollCosine1, posY - semiDiagonalLen * rollSine1, 0);
-                    */
+                    //    GL.Vertex3(posX + semiDiagonalLen * rollCosine1, posY - semiDiagonalLen * rollSine1, 0);
+                    //    GL.Vertex3(posX + semiDiagonalLen * rollCosine2, posY - semiDiagonalLen * rollSine2, 0);
+                    //    GL.Vertex3(posX - semiDiagonalLen * rollCosine1, posY + semiDiagonalLen * rollSine1, 0);
+                    //    GL.Vertex3(posX - semiDiagonalLen * rollCosine2, posY + semiDiagonalLen * rollSine2, 0);
+                    //    GL.Vertex3(posX + semiDiagonalLen * rollCosine1, posY - semiDiagonalLen * rollSine1, 0);
+                    //    */
 
-                    GL.Vertex3(aesaRadarLT.position.x / Screen.width, aesaRadarLT.position.y / Screen.height, 0);
-                    GL.Vertex3(aesaRadarRT.position.x / Screen.width, aesaRadarRT.position.y / Screen.height, 0);
-                    GL.Vertex3(aesaRadarRB.position.x / Screen.width, aesaRadarRB.position.y / Screen.height, 0);
-                    GL.Vertex3(aesaRadarLB.position.x / Screen.width, aesaRadarLB.position.y / Screen.height, 0);
-                    GL.Vertex3(aesaRadarLT.position.x / Screen.width, aesaRadarLT.position.y / Screen.height, 0);
+                    //    GL.Vertex3(aesaRadarLT.position.x / Screen.width, aesaRadarLT.position.y / Screen.height, 0);
+                    //    GL.Vertex3(aesaRadarRT.position.x / Screen.width, aesaRadarRT.position.y / Screen.height, 0);
+                    //    GL.Vertex3(aesaRadarRB.position.x / Screen.width, aesaRadarRB.position.y / Screen.height, 0);
+                    //    GL.Vertex3(aesaRadarLB.position.x / Screen.width, aesaRadarLB.position.y / Screen.height, 0);
+                    //    GL.Vertex3(aesaRadarLT.position.x / Screen.width, aesaRadarLT.position.y / Screen.height, 0);
 
-                    GL.End();
-                    GL.PopMatrix();
+                    //    GL.End();
+                    //    GL.PopMatrix();
+                    //}
                 }
             }
-        }
     }
 }

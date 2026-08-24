@@ -1,0 +1,4 @@
+newmtl decor_fox_girl_decor_fox_girl
+	illum 3
+	map_Kd textures/decor_fox_girl_c.dds
+	map_bump textures/decor_fox_girl_n.dds

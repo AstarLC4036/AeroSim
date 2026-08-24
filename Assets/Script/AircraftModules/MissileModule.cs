@@ -12,7 +12,7 @@ namespace AeroSim.AircraftModules
         public List<Missile> rightMSLs = new List<Missile>();
         public Missile currentMissle;
         public Missile launchedMissle;
-        public Transform target;
+        public Transform target = null;
 
         private bool currentSideFlag = false; //false => left; true => right
 
@@ -28,7 +28,7 @@ namespace AeroSim.AircraftModules
             if (Input.GetKeyDown(Keybindings.fireMain) && parentAircraft.isControlling)
             {
                 if (currentMissle.lockState == Missile.LockState.None)
-                    Lock();
+                    ActiveSeeker();
                 else if (currentMissle.lockState == Missile.LockState.Locked)
                     Fire();
             }
@@ -91,16 +91,26 @@ namespace AeroSim.AircraftModules
             }
         }
 
-        public void Lock()
+        public void ActiveSeeker()
         {
-            currentMissle.Lock(target);
+            if (currentMissle.type == Missile.MissileType.IR)
+            {
+                currentMissle.ActiveSeeker();
+            }
+            else if (currentMissle.type == Missile.MissileType.Active && target != null)
+            {
+                currentMissle.ActiveSeeker();
+                currentMissle.SetTarget(target);
+            }
         }
 
         public void Fire()
         {
-            if (currentMissle != null && target != null)
+            if (currentMissle.type == Missile.MissileType.Active && target == null)
+                return;
+
+            if (currentMissle != null)
             {
-                //currentMissle.Lock(target);
                 currentMissle.Ignite();
                 launchedMissle = currentMissle;
                 if (currentSideFlag)
