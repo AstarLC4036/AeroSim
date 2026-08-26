@@ -72,5 +72,30 @@ namespace AeroSim.Utility
         {
             return transform.TransformDirection(ClampTargetDir(transform.InverseTransformDirection(targetDir), minYaw, maxYaw, minPitch, maxPitch));
         }
+
+        /// <summary>
+        /// 在方向向量上叠加角度抖动
+        /// </summary>
+        /// <param name="direction">原始方向（应归一化）</param>
+        /// <param name="amplitudeDeg">抖动幅度（度）</param>
+        /// <param name="frequency">抖动频率</param>
+        /// <param name="up">参考上方向（用于构造正交基）</param>
+        /// <returns>抖动后的方向（未归一化）</returns>
+        public static Vector3 ApplyAngularJitter(Vector3 direction, float amplitudeDeg, float frequency, Vector3 up)
+        {
+            direction = direction.normalized;
+            up = Vector3.ProjectOnPlane(up, direction).normalized;
+            Vector3 right = Vector3.Cross(direction, up).normalized;
+
+            // 生成两个正交方向的 Perlin 噪声
+            float noisePitch = (Mathf.PerlinNoise(Time.time * frequency, 0f) - 0.5f) * amplitudeDeg;
+            float noiseYaw = (Mathf.PerlinNoise(0f, Time.time * frequency) - 0.5f) * amplitudeDeg;
+
+            // 绕 up 轴旋转（偏航），绕 right 轴旋转（俯仰）
+            Quaternion yawRot = Quaternion.AngleAxis(noiseYaw, up);
+            Quaternion pitchRot = Quaternion.AngleAxis(noisePitch, right);
+
+            return (yawRot * pitchRot) * direction;
+        }
     }
 }

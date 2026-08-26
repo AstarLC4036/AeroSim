@@ -1,5 +1,6 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.InputSystem;
+using AeroSim.Utility;
 using AeroSim.Utils;
 using System;
 using System.Collections;
@@ -40,6 +41,9 @@ namespace AeroSim.AircraftModules
         protected Vector3 targetPos;
         protected Vector3 targetVelo;
         protected Vector3 lastPos;
+        protected Vector3 targetDir;
+        protected float targetDst;
+
         protected float velo;
 
         [Header("Base Properties")]
@@ -54,6 +58,8 @@ namespace AeroSim.AircraftModules
         public float lockTime = 0.5f;
         public float lockTimeout = 0.5f;
         public float boresightAngle = 30f;
+        public float jitterAmplitude;
+        public float jitterFreqency;
         public MissileSize size = MissileSize.Small;
         public MissileType type = MissileType.None;
         public bool hasDatalink = false;
@@ -105,7 +111,7 @@ namespace AeroSim.AircraftModules
 
         void FixedUpdate()
         {
-            UpdateState();
+            UpdateState(Time.fixedDeltaTime);
             UpdateLock(Time.fixedDeltaTime);
 
             if (isIgnited)
@@ -136,7 +142,7 @@ namespace AeroSim.AircraftModules
                 targetPos = target.position;
         }
 
-        protected virtual void UpdateState()
+        protected virtual void UpdateState(float dt)
         {
             if (target != null)
             {
@@ -144,6 +150,9 @@ namespace AeroSim.AircraftModules
 
                 targetVelo = (targetPos - lastPos) / Time.fixedDeltaTime;
                 lastPos = targetPos;
+
+                targetDir = MathUtility.ApplyAngularJitter((target.position - transform.position).normalized, jitterAmplitude, jitterFreqency, transform.up);
+                targetDst = Vector3.Distance(transform.position, targetPos);
 
                 if (targetAircraft == null)
                 {
@@ -251,9 +260,9 @@ namespace AeroSim.AircraftModules
             //transform.LookAt(transform.position + trackVelo.normalized);
             */
 
-            Vector3 relativePosition = targetPos - transform.position; // 相对坐标
-            float range = relativePosition.magnitude; // 距离
-            Vector3 losDirection = relativePosition.normalized; // 方向
+            //Vector3 relativePosition = targetPos - transform.position; // 相对坐标
+            float range = targetDst; // 距离
+            Vector3 losDirection = targetDir; // 方向
             Vector3 relativeVelocity = targetVelo - velo * transform.forward; // 相对速度
             Vector3 losRate = Vector3.Cross(relativeVelocity, losDirection) / range; // 视线角速率
             //float closingVelocity = -Vector3.Dot(relativeVelocity, losDirection);

@@ -26,9 +26,9 @@ namespace AeroSim.AircraftModules
             base.ActiveSeeker();
         }
 
-        protected override void UpdateState()
+        protected override void UpdateState(float dt)
         {
-            targetVelo = (targetPos - lastPos) / Time.fixedDeltaTime;
+            targetVelo = (targetPos - lastPos) / dt;
             lastPos = targetPos;
         }
 

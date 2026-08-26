@@ -41,7 +41,7 @@ namespace AeroSim.AircraftModules
             prewarmTimer = 0;
         }
 
-        protected override void UpdateState()
+        protected override void UpdateState(float dt)
         {
             if (lockState == LockState.Locking)
             {
@@ -49,11 +49,18 @@ namespace AeroSim.AircraftModules
             }
             else if (target != null && lockState == LockState.Locked)
             {
-                if (MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov))
+                float dst = Vector3.Distance(transform.position, target.position);
+                if (MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) && dst <= maxRange * 1000)
                 {
-                    targetPos = target.position;
-                    seekerDirection = (targetPos - seekerTransform.position).normalized;
+                    seekerDirection = MathUtility.ApplyAngularJitter((target.position - seekerTransform.position).normalized, jitterAmplitude, jitterFreqency, transform.up);
+                    //seekerDirection = (targetPos - seekerTransform.position).normalized;
                     seekerDirection = MathUtility.ClampTargetDir(transform, seekerDirection, yawLimits.x, yawLimits.y, pitchLimits.x, pitchLimits.y);
+
+                    targetPos = target.position;
+                    targetDir = seekerDirection;
+                    targetDst = Vector3.Distance(transform.position, targetPos);
+                    targetVelo = (seekerTransform.position + targetDir * targetDst - lastPos) / dt;
+                    lastPos = targetPos;
                 }
             }
         }
@@ -78,7 +85,7 @@ namespace AeroSim.AircraftModules
                 foreach (var irSrc in AircraftManager.IRSources)
                 {
                     float dst = Vector3.Distance(seekerTransform.position, irSrc.transform.position);
-                    if (dst < maxRange * 1000 && MathUtility.ConeDetect(seekerTransform.position, seekerDirection, irSrc.transform.position, seekerFov))
+                    if (dst <= maxRange * 1000 && MathUtility.ConeDetect(seekerTransform.position, seekerDirection, irSrc.transform.position, seekerFov))
                     {
                         if (!irList.Exists(x => x == irSrc))
                         {
@@ -155,7 +162,7 @@ namespace AeroSim.AircraftModules
             }
             else if (target != null && lockState == LockState.Locked && !IsLaunched)
             {
-                if (!MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov))
+                if (!MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) || targetDst > maxRange * 1000)
                 {
                     lockState = LockState.Locking;
                     lockingTimer = 0;

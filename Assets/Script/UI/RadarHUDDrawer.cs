@@ -221,9 +221,17 @@ namespace AeroSim.UI
                         var (posX, posY) = TransformWorldToRadar(aircraft.transform.position);
                         Vector2Int acPos = new Vector2Int(posX, posY);
 
-                        drawer.DrawRectCenter(posX, posY, 7, 2, new Color32(0, 255, 0, 255));
+                        if (radar.radarMode == RadarModule.RadarMode.SRC)
+                            drawer.DrawRectCenter(posX, posY, 7, 2, new Color32(0, 255, 0, 255));
+                        else if (radar.radarMode == RadarModule.RadarMode.TWS)
+                        {
+                            Vector3 localVector = radar.transform.InverseTransformDirection(aircraft.Velocity);
+                            Vector3 normVector = Vector3.Normalize(new Vector3(localVector.x, 0, localVector.z));
+                            drawer.DrawCircle(posX, posY, 10, Color.green, 3);
+                            drawer.DrawLine(posX + (int)(normVector.x * 10), posY + (int)(normVector.y * 10), posX + (int)(normVector.x * 30), posY + (int)(normVector.z * 30), Color.green);
+                        }
 
-                        if(aircraft == selectedAircraft)
+                        if (aircraft == selectedAircraft)
                         {
                             cursorDisplayPosition = acPos;
                         }

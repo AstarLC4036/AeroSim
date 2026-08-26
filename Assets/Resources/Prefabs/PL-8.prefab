@@ -10033,6 +10033,8 @@ MonoBehaviour:
   lockTime: 0.8
   lockTimeout: 15
   boresightAngle: 30
+  jitterAmplitude: 0.3
+  jitterFreqency: 15
   size: 0
   type: 1
   hasDatalink: 0

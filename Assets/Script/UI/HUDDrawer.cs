@@ -503,8 +503,9 @@ namespace AeroSim.UI
                         }
                         else //locked aircraft
                         {
-                            Vector3 targetVeloOnScreen = Camera.main.WorldToScreenPoint(aircraft.transform.position + Vector3.down * 3 + aircraft.Velocity.normalized);
-                            Vector2 targetVeloNorm = (targetVeloOnScreen - targetPosOnScreen).normalized;
+                            //Vector3 targetVeloOnScreen = Camera.main.WorldToScreenPoint(aircraft.transform.position + Vector3.down * 3 + aircraft.Velocity.normalized);
+                            Vector3 targetVelo = radar.transform.InverseTransformDirection(aircraft.Velocity);
+                            Vector3 targetVeloNorm = new Vector3(targetVelo.x, 0, targetVelo.z).normalized;
                             Vector3 targetPosScrPercent = new Vector3(targetPosOnScreen.x / Screen.width, targetPosOnScreen.y / Screen.height, targetPosOnScreen.z);
                             float rectX = lockRectSize / Screen.width;
                             float rectY = lockRectSize / Screen.height;
