@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{876ce98b-123e-465c-9954-1bd223fb8e80}">
 		<property name="assetPath">
 			<value>con_scan_capture-001.wav</value>
