@@ -101,7 +101,7 @@ namespace AeroSim.InputSystem
 
             if(aircraft.isControlling)
             {
-                if (!Input.GetKey(Keybindings.holdControlInput) && !CameraController.Instance.currentView.enableStable && !CameraController.Instance.currentView.targetingPodView)
+                if (!Input.GetKey(Keybindings.holdControlInput) && CameraController.CurrentView.view != CameraController.CameraView.ViewType.Pod)
                 {
                     Vector3 mouseDelta = Input.mousePositionDelta;
                     aircraft.targetDir = RotateRound(aircraft.targetDir, Vector3.zero, Camera.main.transform.up, mouseDelta.x / Time.deltaTime * sensitivity);

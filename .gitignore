@@ -9,6 +9,10 @@
 [Mm]emoryCaptures/
 [Rr]ecordings/
 
+# Don't remove FMOD Build folder
+!**/fmod/main/Build
+!**/fmod/main/Build/**
+
 # IDE and generated project files
 .vs/
 .vscode/

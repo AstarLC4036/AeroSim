@@ -54,7 +54,7 @@ namespace AeroSim.AircraftModules
 
         void Update()
         {
-            if(parentAircraft != null && parentAircraft.isControlling)
+            if(parentAircraft != null && parentAircraft.isControlling && CameraController.CurrentView.view == CameraController.CameraView.ViewType.Pod)
                 HandleInput();
 
             ClampTargetAngles();

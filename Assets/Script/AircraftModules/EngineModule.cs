@@ -4,7 +4,6 @@ using AeroSim.InputSystem;
 using AeroSim.Utils;
 using System.Collections;
 using UnityEngine;
-using FMODUnity;
 
 namespace AeroSim.AircraftModules
 {
@@ -21,7 +20,6 @@ namespace AeroSim.AircraftModules
         public float minPitch;
         public float maxStrength;
         public float minStrength;
-        private StudioEventEmitter fmodEmitter;
         [Header("Effect")]
         public EffectController flameEffect;
         public Transform flameMainEffect;
@@ -39,8 +37,16 @@ namespace AeroSim.AircraftModules
         // Use this for initialization
         void Start()
         {
-            audioController = transform.GetComponentInChildren<EngineAudio>();
-            fmodEmitter = transform.GetComponentInChildren<StudioEventEmitter>();
+            if(audioController != null)
+            {
+                audioController.engine = this;
+            }
+            else
+            {
+                Debug.Log("This engine has no audio source.");
+            }
+            //audioController = transform.GetComponentInChildren<EngineAudio>();
+            //fmodEmitter = transform.GetComponentInChildren<StudioEventEmitter>();
         }
 
         // Update is called once per frame
@@ -60,7 +66,6 @@ namespace AeroSim.AircraftModules
                 parentAircraft.Rb.AddForce(transform.forward * thurst);
 
             float thrustPercent = Mathf.Clamp01(thurst / maxThurst);
-            bool isWep = isEngineToggled && thurst > maxThurst;
 
             if (flameMainEffect != null)
             {
@@ -70,16 +75,6 @@ namespace AeroSim.AircraftModules
 
                 Vector3 scale = flameMainEffect.localScale;
                 flameMainEffect.localScale = new Vector3(scale.x, scale.y, flameScale);
-            }
-
-            if (fmodEmitter != null)
-            {
-                float wep = isWep ? 1f : 0f;
-                float inner = CameraController.Instance != null && CameraController.Instance.CurrentViewIndex != 0 ? 1f : 0f;
-
-                fmodEmitter.SetParameter("Throttle", thrustPercent);
-                fmodEmitter.SetParameter("WEP", wep);
-                fmodEmitter.SetParameter("Inner", inner);
             }
         }
 
