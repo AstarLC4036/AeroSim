@@ -1,0 +1,25 @@
+# Unity generated files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# IDE and generated project files
+.vs/
+.vscode/
+*.csproj
+*.sln
+.vsconfig
+
+# Local tools and upgrade output
+UpgradeLog.htm
+fmod_editor.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

@@ -30,7 +30,14 @@ namespace AeroSim.Audio
         void Start()
         {
             audioSource = GetComponent<AudioSource>();
-            listener = FindFirstObjectByType<AudioListener>().transform;
+            AudioListener audioListener = FindFirstObjectByType<AudioListener>();
+            if (audioListener == null)
+            {
+                enabled = false;
+                return;
+            }
+
+            listener = audioListener.transform;
         }
 
         void Update()

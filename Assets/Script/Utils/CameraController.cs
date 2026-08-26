@@ -56,6 +56,7 @@ namespace AeroSim.InputSystem
         private bool isMoveingView = false;
         private Vector3 fwd = new Vector3(0,0,1);
         private int currentViewIndex = 0;
+        public int CurrentViewIndex => currentViewIndex;
         private Vector3 trackPoint;
         private bool isStableTargetAvaliable = false;
 
