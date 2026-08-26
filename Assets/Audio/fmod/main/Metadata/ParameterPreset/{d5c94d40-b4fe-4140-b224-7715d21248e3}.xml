@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="ParameterPreset" id="{d5c94d40-b4fe-4140-b224-7715d21248e3}">
+		<property name="name">
+			<value>WEP</value>
+		</property>
+		<relationship name="folder">
+			<destination>{4090a246-c19b-4588-bf72-69d76c72a83f}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{b0ad06d2-4476-4c6c-8990-95ca963d0b35}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{b0ad06d2-4476-4c6c-8990-95ca963d0b35}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

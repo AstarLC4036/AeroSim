@@ -4,6 +4,7 @@ using AeroSim.InputSystem;
 using AeroSim.Utils;
 using System.Collections;
 using UnityEngine;
+using FMODUnity;
 
 namespace AeroSim.AircraftModules
 {
@@ -20,7 +21,7 @@ namespace AeroSim.AircraftModules
         public float minPitch;
         public float maxStrength;
         public float minStrength;
-
+        private StudioEventEmitter fmodEmitter;
         [Header("Effect")]
         public EffectController flameEffect;
         public Transform flameMainEffect;
@@ -30,13 +31,16 @@ namespace AeroSim.AircraftModules
         {
             base.Init(aircraft);
             isEngineToggled = true;
-            flameEffect.Play();
+
+            if (flameEffect != null)
+                flameEffect.Play();
         }
 
         // Use this for initialization
         void Start()
         {
             audioController = transform.GetComponentInChildren<EngineAudio>();
+            fmodEmitter = transform.GetComponentInChildren<StudioEventEmitter>();
         }
 
         // Update is called once per frame
@@ -55,22 +59,27 @@ namespace AeroSim.AircraftModules
             if (thurst != 0 && isEngineToggled)
                 parentAircraft.Rb.AddForce(transform.forward * thurst);
 
-            if(audioController != null)
-            {
-                float thurstPercent = thurst / maxThurst;
-                float thurstPercentClamped = Mathf.Clamp01(thurstPercent);
-                audioController.volume = Mathf.Lerp(minStrength, maxStrength, thurstPercentClamped);
-                audioController.pitch = Mathf.Lerp(minPitch, maxPitch, thurstPercentClamped);
+            float thrustPercent = Mathf.Clamp01(thurst / maxThurst);
+            bool isWep = isEngineToggled && thurst > maxThurst;
 
-                if(thurstPercent <= 1)
-                {
-                    flameMainEffect.localScale = new Vector3(flameMainEffect.localScale.x, flameMainEffect.localScale.y, Mathf.Lerp(0, defaultMaxThurstScale, thurstPercent));
-                }
-                else
-                {
-                    float scaleParam = (thurstPercent - 1) / 0.1f;
-                    flameMainEffect.localScale = new Vector3(flameMainEffect.localScale.x, flameMainEffect.localScale.y, Mathf.Lerp(defaultMaxThurstScale, 1, scaleParam));
-                }
+            if (flameMainEffect != null)
+            {
+                float flameScale = thurst <= maxThurst
+                    ? Mathf.Lerp(defaultMaxThurstScale * 0.4f, defaultMaxThurstScale, thrustPercent)
+                    : Mathf.Lerp(defaultMaxThurstScale, 1, (thurst - maxThurst) / (maxThurst * 0.1f));
+
+                Vector3 scale = flameMainEffect.localScale;
+                flameMainEffect.localScale = new Vector3(scale.x, scale.y, flameScale);
+            }
+
+            if (fmodEmitter != null)
+            {
+                float wep = isWep ? 1f : 0f;
+                float inner = CameraController.Instance != null && CameraController.Instance.CurrentViewIndex != 0 ? 1f : 0f;
+
+                fmodEmitter.SetParameter("Throttle", thrustPercent);
+                fmodEmitter.SetParameter("WEP", wep);
+                fmodEmitter.SetParameter("Inner", inner);
             }
         }
 
@@ -95,4 +104,5 @@ namespace AeroSim.AircraftModules
             }
         }
     }
+
 }

@@ -14,8 +14,11 @@ namespace AeroSim.Audio
         // Update is called once per frame
         void FixedUpdate()
         {
-            audioStrength.baseVolume = volume;
-            audioPitch.defaultPitch = pitch;
+            if (audioStrength != null)
+                audioStrength.baseVolume = volume;
+
+            if (audioPitch != null)
+                audioPitch.defaultPitch = pitch;
         }
     }
 }
