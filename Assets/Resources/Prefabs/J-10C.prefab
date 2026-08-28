@@ -1406,7 +1406,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moduleName: KD-88
-  missiles: []
 --- !u!114 &9055159062083649601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23695,8 +23694,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   engine: {fileID: 0}
   engineEmitter: {fileID: 6358065477125811768}
-  volume: 1
-  pitch: 1
+  referenceMaxVolume: 0
+  referenceMinVolume: -65
+  referenceVolume: 0
+  referenceDistance: 20
 --- !u!114 &6358065477125811768
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -145,8 +145,9 @@ namespace AeroSim.UI
 
             if(isDatalinkAvaliable)
             {
-                foreach(Missile missile in parentAircraft.datalink.missiles)
+                foreach(var mslAndTarget in parentAircraft.datalink.mslTrackInfo)
                 {
+                    Missile missile = mslAndTarget.Item1;
                     var (posX, posY) = TransformWorldToRadar(missile.transform.position, areaSize);
                     var (posTX, posTY) = TransformWorldToRadar(missile.target.position, areaSize);
 

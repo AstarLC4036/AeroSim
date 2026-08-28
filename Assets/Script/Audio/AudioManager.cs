@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FMODUnity;
+using System.Collections;
 using UnityEngine;
 
 namespace AeroSim.Audio
@@ -7,6 +8,9 @@ namespace AeroSim.Audio
     {
         private static AudioManager instance;
         public static AudioManager Instance => instance;
+
+        public StudioListener fmodListener;
+        public static StudioListener FmodListener => instance.fmodListener;
 
         public AudioSource rwrAudio;
         public AudioSource mslAudio;
@@ -23,6 +27,7 @@ namespace AeroSim.Audio
         public void Awake()
         {
             instance = this;
+            fmodListener = FindAnyObjectByType<StudioListener>();
         }
 
         // Update is called once per frame

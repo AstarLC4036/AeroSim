@@ -43,17 +43,16 @@ namespace AeroSim.AircraftModules
 
         protected override void UpdateState(float dt)
         {
-            if (lockState == LockState.Locking)
+            if (lockState == MissileState.Locking)
             {
                 seekerDirection = seekerTransform.forward;
             }
-            else if (target != null && lockState == LockState.Locked)
+            else if (target != null && lockState == MissileState.Locked)
             {
                 float dst = Vector3.Distance(transform.position, target.position);
                 if (MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) && dst <= maxRange * 1000)
                 {
                     seekerDirection = MathUtility.ApplyAngularJitter((target.position - seekerTransform.position).normalized, jitterAmplitude, jitterFreqency, transform.up);
-                    //seekerDirection = (targetPos - seekerTransform.position).normalized;
                     seekerDirection = MathUtility.ClampTargetDir(transform, seekerDirection, yawLimits.x, yawLimits.y, pitchLimits.x, pitchLimits.y);
 
                     targetPos = target.position;
@@ -62,12 +61,14 @@ namespace AeroSim.AircraftModules
                     targetVelo = (seekerTransform.position + targetDir * targetDst - lastPos) / dt;
                     lastPos = targetPos;
                 }
+
+                seekerTransform.rotation = Quaternion.LookRotation(seekerDirection, Vector3.up);
             }
         }
 
         protected override void UpdateLock(float dt)
         {
-            if (lockState == LockState.Locking)
+            if (lockState == MissileState.Locking)
             {
                 if (prewarmTimer < prewarmTime && !isPrewarmCompleted)
                 {
@@ -144,7 +145,7 @@ namespace AeroSim.AircraftModules
                     {
                         lockingTimer = 0;
                         lockTimer = lockTime;
-                        lockState = LockState.Locked;
+                        lockState = MissileState.Locked;
                         lastPos = target.transform.position;
 
                         if(!IsLaunched && parentAircraft.isControlling)
@@ -153,18 +154,18 @@ namespace AeroSim.AircraftModules
 
                     if (lockingTimer > lockTimeout)
                     {
-                        lockState = LockState.None;
+                        lockState = MissileState.None;
                         target = null;
                         lockingTimer = 0;
                         lockTimer = lockTime;
                     }
                 }
             }
-            else if (target != null && lockState == LockState.Locked && !IsLaunched)
+            else if (target != null && lockState == MissileState.Locked && !IsLaunched)
             {
                 if (!MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) || targetDst > maxRange * 1000)
                 {
-                    lockState = LockState.Locking;
+                    lockState = MissileState.Locking;
                     lockingTimer = 0;
                     lockTimer = lockTime;
                     target = null;
@@ -185,16 +186,20 @@ namespace AeroSim.AircraftModules
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(seekerTransform.position, seekerTransform.position + seekerDirection * 10);
-            Gizmos.color = Color.white;
-            //Handles.DrawWireDisc(transform.position, transform.forward, 0);
-            // draw search cone
-            Handles.DrawWireDisc(seekerTransform.position + seekerTransform.forward * 10, seekerTransform.forward, 10 * Mathf.Tan(seekerFov * Mathf.Deg2Rad));
-            Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward + seekerTransform.up * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
-            Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward - seekerTransform.up * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
-            Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward + seekerTransform.right * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
-            Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward - seekerTransform.right * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
+
+            if (lockState != MissileState.None)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(seekerTransform.position, seekerTransform.position + seekerDirection * 10);
+                Gizmos.color = Color.white;
+                //Handles.DrawWireDisc(transform.position, transform.forward, 0);
+                // draw search cone
+                Handles.DrawWireDisc(seekerTransform.position + seekerTransform.forward * 10, seekerTransform.forward, 10 * Mathf.Tan(seekerFov * Mathf.Deg2Rad));
+                Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward + seekerTransform.up * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
+                Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward - seekerTransform.up * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
+                Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward + seekerTransform.right * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
+                Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward - seekerTransform.right * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
+            }
         }
     }
 }

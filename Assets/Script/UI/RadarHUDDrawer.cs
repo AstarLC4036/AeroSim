@@ -227,7 +227,7 @@ namespace AeroSim.UI
                         {
                             Vector3 localVector = radar.transform.InverseTransformDirection(aircraft.Velocity);
                             Vector3 normVector = Vector3.Normalize(new Vector3(localVector.x, 0, localVector.z));
-                            drawer.DrawCircle(posX, posY, 10, Color.green, 3);
+                            drawer.DrawCircle(posX, posY, 8, Color.green, 3);
                             drawer.DrawLine(posX + (int)(normVector.x * 10), posY + (int)(normVector.y * 10), posX + (int)(normVector.x * 30), posY + (int)(normVector.z * 30), Color.green);
                         }
 
@@ -297,8 +297,9 @@ namespace AeroSim.UI
             if (isDatalinkAvaliable)
             {
                 // Missiles
-                foreach (Missile msl in datalink.missiles)
+                foreach (var mslAndTarget in datalink.mslTrackInfo)
                 {
+                    Missile msl = mslAndTarget.Item1;
                     var (posX, posY) = TransformWorldToRadar(msl.transform.position);
                     var (posTX, posTY) = TransformWorldToRadar(msl.target.position);
 
@@ -335,8 +336,8 @@ namespace AeroSim.UI
 
         private void DrawCursor(int x0, int y0)
         {
-            drawer.DrawRectCenter(x0 - 14, y0, 1, 7, new Color32(0, 255, 0, 255));
-            drawer.DrawRectCenter(x0 + 14, y0, 1, 7, new Color32(0, 255, 0, 255));
+            drawer.DrawRectCenter(x0 - 14, y0, 1, 12, new Color32(0, 255, 0, 255));
+            drawer.DrawRectCenter(x0 + 14, y0, 1, 12, new Color32(0, 255, 0, 255));
         }
 
         private void DrawCursor(Vector2Int pos)

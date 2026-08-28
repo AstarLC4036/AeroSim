@@ -39,7 +39,7 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639233738000000000
+  lastModified: 639235618364374365
   FileSizes: []
   Exists: 1
 --- !u!114 &-5437177343942480124
@@ -95,10 +95,10 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639233738000000000
+  lastModified: 639235618364395190
   FileSizes:
   - Name: 
-    Value: 938
+    Value: 988
   Exists: 1
 --- !u!114 &-3642360278734224667
 MonoBehaviour:
@@ -117,6 +117,30 @@ MonoBehaviour:
   StudioPath: bank:/Aircraft
   lastModified: 639233675329293734
   FileSizes: []
+  Exists: 1
+--- !u!114 &-3256540294838656897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/engine/Volume
+  m_EditorClassIdentifier: 
+  Name: Volume
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 1
+  ID:
+    data1: 2451181760
+    data2: 1806640420
+  Type: 0
+  IsGlobal: 0
+  Labels: []
   Exists: 1
 --- !u!114 &-2619629982084776114
 MonoBehaviour:
@@ -190,7 +214,7 @@ MonoBehaviour:
   StringsBanks:
   - {fileID: -4193965246906987305}
   cacheVersion: 131860
-  cacheTime: 639233738000000000
+  cacheTime: 639235618364395190
   SerializableEventsDict:
   - key: event:/engine
     index: 0
@@ -239,7 +263,7 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Aircraft.bank
   Name: Aircraft
   StudioPath: bank:/Aircraft
-  lastModified: 639233738000000000
+  lastModified: 639235618364294179
   FileSizes: []
   Exists: 1
 --- !u!114 &3332321885544617805
@@ -293,6 +317,7 @@ MonoBehaviour:
   - {fileID: 3332321885544617805}
   - {fileID: -8281979574855915431}
   - {fileID: -1723130226290701448}
+  - {fileID: -3256540294838656897}
   MinDistance: 1
   MaxDistance: 20
   Length: 0

@@ -2279,7 +2279,7 @@ PrefabInstance:
     - target: {fileID: 267013602960182808, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -4377,7 +4377,7 @@ PrefabInstance:
     - target: {fileID: 267013602960182808, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -6711,10 +6711,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5d888ccc8c3c464a9c2b9e552da7d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewOffset: {x: 0, y: 0, z: 0}
-  offsetDamper: 40
-  velocityDamper: 4
-  maxOffsetDelta: 0.1
   views:
   - offset: {x: 0, y: 0, z: 0}
     deltaPos: {x: 0, y: 10, z: -27}
@@ -20319,7 +20315,7 @@ PrefabInstance:
     - target: {fileID: 267013602960182808, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}

@@ -11,11 +11,12 @@ namespace AeroSim.AircraftModules
 {
     public class Missile : MonoBehaviour
     {
-        public enum LockState
+        public enum MissileState
         {
             None,
             Locking,
-            Locked
+            Locked,
+            Memory
         }
 
         public enum MissileSize
@@ -42,30 +43,39 @@ namespace AeroSim.AircraftModules
         protected Vector3 targetVelo;
         protected Vector3 lastPos;
         protected Vector3 targetDir;
+        protected Vector3 prevVelo;
         protected float targetDst;
 
         protected float velo;
+        protected float currentTurnRate;
+        protected Vector3 desiredDirection;
 
-        [Header("Base Properties")]
-        //Vector3 trackVelo;
+        [Header("Performence")]
         public float accTime = 1f;
         public float accleration = 200;
         public float dragCoeff = 0.01f;
+        public float maxTurnRate;
+        public float maxTurnAcceleration;
         public float duration = 5f;
         public float burntTime = 0;
         public float thrust = 1000;
+        [Header("Tracking")]
         public float maxRange = 13;
         public float lockTime = 0.5f;
         public float lockTimeout = 0.5f;
+        public float datalinkTimeout = 0;
         public float boresightAngle = 30f;
         public float jitterAmplitude;
         public float jitterFreqency;
+        [Header("Base peroperties")]
         public MissileSize size = MissileSize.Small;
         public MissileType type = MissileType.None;
         public bool hasDatalink = false;
         public LayerMask targetLayer;
+        [Header("Effect")]
         public EffectController flameEffect;
         public EffectController explosionEffect;
+
         [SerializeField]
         protected bool isIgnited = false;
         protected bool isLaunched = false;
@@ -75,7 +85,8 @@ namespace AeroSim.AircraftModules
         protected Vector3 previousPosition;
         protected float lockTimer;
         protected float lockingTimer;
-        public LockState lockState = LockState.None;
+        protected float dataLinkTimer;
+        public MissileState lockState = MissileState.None;
 
         public Vector3 Velocity => velo * transform.forward;
 
@@ -93,8 +104,6 @@ namespace AeroSim.AircraftModules
         public bool IsLaunched => isLaunched;
         public Vector3 TargetPosition => targetPos;
 
-        Vector3 desiredDirection;
-
         // Use this for initialization
         void Start()
         {
@@ -102,7 +111,7 @@ namespace AeroSim.AircraftModules
             OriginKeeper.onOriginChange += OnOriginChange;
         }
 
-        void OnOriginChange(Vector3 delta)
+        protected virtual void OnOriginChange(Vector3 delta)
         {
             lastPos += delta;
             previousPosition += delta;
@@ -116,7 +125,7 @@ namespace AeroSim.AircraftModules
 
             if (isIgnited)
             {
-                UpdatePosition();
+                UpdatePosition(Time.fixedDeltaTime);
 
                 // tracking
                 if (burntTime >= accTime)
@@ -129,6 +138,10 @@ namespace AeroSim.AircraftModules
             UpdateTransmit();
         }
 
+        /// <summary>
+        /// Set target position.
+        /// </summary>
+        /// <param name="position">Target position</param>
         public virtual void SendTargetData(Vector3 position)
         {
 
@@ -142,6 +155,10 @@ namespace AeroSim.AircraftModules
                 targetPos = target.position;
         }
 
+        /// <summary>
+        /// Update tracking state.
+        /// </summary>
+        /// <param name="dt">Delta time</param>
         protected virtual void UpdateState(float dt)
         {
             if (target != null)
@@ -168,6 +185,9 @@ namespace AeroSim.AircraftModules
             }
         }
 
+        /// <summary>
+        ///  Update RWR transmittion
+        /// </summary>
         protected virtual void UpdateTransmit()
         {
             if (isIgnited)
@@ -180,6 +200,9 @@ namespace AeroSim.AircraftModules
             }
         }
 
+        /// <summary>
+        /// Detect whether the missile hits target.
+        /// </summary>
         protected virtual void UpdateHit()
         {
             RaycastHit hitInfo;
@@ -197,13 +220,31 @@ namespace AeroSim.AircraftModules
             }
         }
 
-        protected virtual void UpdatePosition()
+        protected virtual void UpdatePosition(float dt)
         {
             if (isIgnited && burntTime < duration)
             {
                 burntTime += Time.fixedDeltaTime;
                 //rb.AddForce(transform.forward * thrust * Time.fixedDeltaTime);
                 velo += accleration * Time.fixedDeltaTime;
+
+
+                if (desiredDirection != Vector3.zero)
+                {
+                    float angleToTarget = Vector3.Angle(transform.forward, desiredDirection);
+
+                    // target angular velocity
+                    float desiredTurnRate = Mathf.Clamp(angleToTarget / Time.deltaTime, 0f, maxTurnRate);
+
+                    // angular velocity
+                    currentTurnRate = Mathf.MoveTowards(
+                        currentTurnRate, desiredTurnRate, maxTurnAcceleration * Time.deltaTime);
+
+                    // rotation
+                    Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);
+                    transform.rotation = Quaternion.RotateTowards(
+                        transform.rotation, targetRotation, currentTurnRate * Time.deltaTime);
+                }
             }
             else if (burntTime > duration)
             {
@@ -212,7 +253,7 @@ namespace AeroSim.AircraftModules
                 flameEffect.Stop();
             }
 
-            velo -= velo * dragCoeff;
+            velo -= velo * velo * dragCoeff / (2 * rb.mass) * dt;
             if (Mathf.Abs(velo) < 0.1f)
             {
                 velo = 0;
@@ -222,15 +263,19 @@ namespace AeroSim.AircraftModules
             transform.position += transform.forward * velo * Time.fixedDeltaTime;
         }
 
+        /// <summary>
+        /// Update lock state.
+        /// </summary>
+        /// <param name="dt">Delta time</param>
         protected virtual void UpdateLock(float dt)
         {
-            if(lockState == LockState.Locking)
+            if(lockState == MissileState.Locking)
             {
                 lockTimer -= dt;
                 if(lockTimer < 0)
                 {
                     lockTimer = 0;
-                    lockState = LockState.Locked;
+                    lockState = MissileState.Locked;
                     lastPos = target.transform.position;
                 }
             }
@@ -271,7 +316,6 @@ namespace AeroSim.AircraftModules
             //Vector3 localAccel = transform.InverseTransformDirection(commandAccel);
             Vector3 desiredVelo = transform.forward * velo + commandAccel * Time.fixedDeltaTime; // 期望速度
             desiredDirection = desiredVelo.normalized * 10;
-            transform.LookAt(transform.position + desiredDirection);
         }
 
         public virtual void Ignite()
@@ -317,26 +361,16 @@ namespace AeroSim.AircraftModules
 
         public virtual void ActiveSeeker()
         {
-            lockState = LockState.Locking;
+            lockState = MissileState.Locking;
             lockTimer = lockTime;
             lockingTimer = 0;
-
-            if (hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
-            {
-                parentAircraft.datalink.RegisterDatalink(this);
-            }
         }
 
         public void DirectLock(Transform target)
         {
             this.target = target;
             lastPos = target.transform.position;
-            lockState = LockState.Locked;
-
-            if (hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
-            {
-                parentAircraft.datalink.RegisterDatalink(this);
-            }
+            lockState = MissileState.Locked;
 
             Component component;
             target.gameObject.TryGetComponent(typeof(Aircraft), out component);

@@ -22,6 +22,33 @@ namespace AeroSim.AircraftModules
             defaultModes = new RadarMode[] { RadarMode.TWS, RadarMode.ACM, RadarMode.HMD };
         }
 
+        public override bool TargetDetect(Vector3 position, bool isLocal = false)
+        {
+            if (!isLocal)
+            {
+                Vector3 localPos = transform.InverseTransformPoint(position);
+                float maxDistX = localPos.z * Mathf.Tan(currentScanAngleX * Mathf.Deg2Rad);
+                float maxDistY = localPos.z * Mathf.Tan(currentScanAngleY * Mathf.Deg2Rad);
+                return localPos.x >= -maxDistX
+                   && localPos.x <= maxDistX
+                   && localPos.y >= -maxDistY
+                   && localPos.y <= maxDistY
+                   && localPos.z >= 0
+                   && localPos.magnitude < maxScanRange * 1000;
+            }
+            else
+            {
+                float maxDistX = position.z * Mathf.Tan(currentScanAngleX * Mathf.Deg2Rad);
+                float maxDistY = position.z * Mathf.Tan(currentScanAngleY * Mathf.Deg2Rad);
+                return position.x >= -maxDistX
+                   && position.x <= maxDistX
+                   && position.y >= -maxDistY
+                   && position.y <= maxDistY
+                   && position.z >= 0
+                   && position.magnitude < maxScanRange * 1000;
+            }
+        }
+
         public override void UpdateScan()
         {
             base.UpdateScan();
@@ -42,14 +69,7 @@ namespace AeroSim.AircraftModules
                         localPos = transform.InverseTransformPoint(aircraft.transform.position);
                     }
 
-                    float maxDistX = localPos.z * Mathf.Tan(currentScanAngleX * Mathf.Deg2Rad);
-                    float maxDistY = localPos.z * Mathf.Tan(currentScanAngleY * Mathf.Deg2Rad);
-                    if (localPos.x >= -maxDistX
-                       && localPos.x <= maxDistX
-                       && localPos.y >= -maxDistY
-                       && localPos.y <= maxDistY
-                       && localPos.z >= 0
-                       && localPos.magnitude < maxScanRange * 1000)
+                    if (TargetDetect(localPos, true))
                     {
                         if (!scannedAircrafts.Exists(x => x == aircraft))
                             scannedAircrafts.Add(aircraft);
@@ -87,15 +107,7 @@ namespace AeroSim.AircraftModules
             }
             else
             {
-                Vector3 localPos = transform.InverseTransformPoint(lockedAircraft.transform.position);
-                float maxDistX = localPos.z * Mathf.Tan(currentScanAngleX * Mathf.Deg2Rad);
-                float maxDistY = localPos.z * Mathf.Tan(currentScanAngleY * Mathf.Deg2Rad);
-                if (localPos.x >= -maxDistX
-                   && localPos.x <= maxDistX
-                   && localPos.y >= -maxDistY
-                   && localPos.y <= maxDistY
-                   && localPos.z >= 0
-                   && localPos.magnitude < maxScanRange * 1000)
+                if (TargetDetect(lockedAircraft.transform.position))
                 {
                     if (!scannedAircrafts.Exists(x => x == lockedAircraft))
                         scannedAircrafts.Add(lockedAircraft);

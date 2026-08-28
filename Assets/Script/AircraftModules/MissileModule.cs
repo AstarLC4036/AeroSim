@@ -27,9 +27,9 @@ namespace AeroSim.AircraftModules
         {
             if (Input.GetKeyDown(Keybindings.fireMain) && parentAircraft.isControlling)
             {
-                if (currentMissle.lockState == Missile.LockState.None)
+                if (currentMissle.lockState == Missile.MissileState.None)
                     ActiveSeeker();
-                else if (currentMissle.lockState == Missile.LockState.Locked)
+                else if (currentMissle.lockState == Missile.MissileState.Locked)
                     Fire();
             }
 
@@ -101,13 +101,20 @@ namespace AeroSim.AircraftModules
             {
                 currentMissle.ActiveSeeker();
                 currentMissle.SetTarget(target);
+
+                if(currentMissle.hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
+                {
+                    parentAircraft.datalink.RegisterDatalink(currentMissle, target);
+                }
             }
         }
 
         public void Fire()
         {
-            if (currentMissle.type == Missile.MissileType.Active && target == null)
+            if (currentMissle.lockState != Missile.MissileState.Locked)
+            {
                 return;
+            }
 
             if (currentMissle != null)
             {
