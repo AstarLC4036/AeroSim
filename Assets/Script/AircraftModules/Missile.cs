@@ -234,16 +234,16 @@ namespace AeroSim.AircraftModules
                     float angleToTarget = Vector3.Angle(transform.forward, desiredDirection);
 
                     // target angular velocity
-                    float desiredTurnRate = Mathf.Clamp(angleToTarget / Time.deltaTime, 0f, maxTurnRate);
+                    float desiredTurnRate = Mathf.Clamp(angleToTarget / dt, 0f, maxTurnRate);
 
                     // angular velocity
                     currentTurnRate = Mathf.MoveTowards(
-                        currentTurnRate, desiredTurnRate, maxTurnAcceleration * Time.deltaTime);
+                        currentTurnRate, desiredTurnRate, maxTurnAcceleration * dt);
 
                     // rotation
                     Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);
                     transform.rotation = Quaternion.RotateTowards(
-                        transform.rotation, targetRotation, currentTurnRate * Time.deltaTime);
+                        transform.rotation, targetRotation, currentTurnRate * dt);
                 }
             }
             else if (burntTime > duration)

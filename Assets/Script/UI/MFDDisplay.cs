@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Rendering.CameraUI;
 
 namespace AeroSim.UI
 {
@@ -16,17 +17,71 @@ namespace AeroSim.UI
         TargetingPod,
     }
 
-    //no what the fuck!?
     /// <summary>
     /// Component version of <see cref="MFDDrawer"/>, for UI on the screen.
     /// </summary>
     public class MFDDisplay : MonoBehaviour
     {
         public List<RawImage> drawTargets = new List<RawImage>();
+        public MFDGraphicHelper drawer;
+        public RenderTexture canvasTexture;
+        public Vector2Int size = new Vector2Int(256, 256);
+        public Color32 bgColor = new Color32(25, 25, 25, 255);
+
+        public void InitCanvas()
+        {
+            canvasTexture = new RenderTexture(size.x, size.y, 0, RenderTextureFormat.ARGB32) {
+                enableRandomWrite = true,
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Point
+            };
+            canvasTexture.Create();
+            drawer = new MFDGraphicHelper(canvasTexture, size.x, size.y);
+
+            foreach (RawImage rawImage in drawTargets)
+            {
+                rawImage.texture = canvasTexture;
+            }
+        }
+
+        protected virtual void Update()
+        {
+            UpdateCanvas();
+        }
+
+        public virtual void ProcessCanvas()
+        {
+            // Draw here
+        }
+
+        public virtual void UpdateCanvas()
+        {
+            drawer.DrawRectFill(0, 0, size.x, size.y, bgColor);
+            ProcessCanvas();
+            ApplyTexture();
+        }
+
+        public void ApplyTexture()
+        {
+            drawer.Submit();
+        }
+
+        public void Dispose()
+        {
+            drawer.Dispose();
+        }
+
+        private void OnApplicationQuit()
+        {
+            Dispose();
+        }
+
+        /*
+        public List<RawImage> drawTargets = new List<RawImage>();
         public int resolution = 260;
         protected Texture2D canvasTex;
         protected Color32[] pixels;
-        protected MFDGraphicHelper32 drawer;
+        protected MFDGraphicHelper drawer;
 
         public Color32 bgColor = new Color32(0, 185, 0, 128);
 
@@ -42,7 +97,7 @@ namespace AeroSim.UI
             Array.Fill(pixels, bgColor);
             canvasTex.SetPixels32(pixels);
 
-            drawer = new MFDGraphicHelper32(pixels, resolution, resolution);
+            drawer = new MFDGraphicHelper(resolution, resolution);
 
             canvasTex.wrapMode = TextureWrapMode.Clamp;
             canvasTex.filterMode = FilterMode.Point;
@@ -70,6 +125,7 @@ namespace AeroSim.UI
             canvasTex.SetPixels32(pixels);
             canvasTex.Apply();
         }
+        */
     }
 
     /// <summary>
@@ -78,6 +134,46 @@ namespace AeroSim.UI
     [Serializable]
     public class MFDDrawer
     {
+        public MFDGraphicHelper drawer;
+        public RenderTexture canvasTexture;
+        public Vector2Int size = new Vector2Int(256, 256);
+        public Color32 bgColor = new Color32(25, 25, 25, 255);
+
+        public void InitCanvas()
+        {
+            canvasTexture = new RenderTexture(size.x, size.y, 0, RenderTextureFormat.ARGB32)
+            {
+                enableRandomWrite = true,
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Point
+            };
+            canvasTexture.Create();
+            drawer = new MFDGraphicHelper(canvasTexture, size.x, size.y);
+        }
+
+        public virtual void ProcessCanvas()
+        {
+            // Draw here
+        }
+
+        public virtual void UpdateCanvas()
+        {
+            drawer.DrawRectFill(0, 0, size.x, size.y, bgColor);
+            ProcessCanvas();
+            ApplyTexture();
+        }
+
+        public void ApplyTexture()
+        {
+            drawer.Submit();
+        }
+
+        public void Dispose()
+        {
+            drawer.Dispose();
+        }
+
+        /*
         public Vector2Int size = new Vector2Int(256, 256);
         protected Texture2D canvasTex;
         protected Color32[] pixels;
@@ -119,5 +215,6 @@ namespace AeroSim.UI
             canvasTex.SetPixels32(pixels);
             canvasTex.Apply();
         }
+        */
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,260 @@ using UnityEngine;
 
 namespace AeroSim.UI
 {
-    public class MFDGraphicHelper32
+    public class MFDGraphicHelper
     {
+        private static MFDGraphicHelper instance;
+        public static MFDGraphicHelper Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new MFDGraphicHelper();
+                return instance;
+            }
+        }
+
+        public enum DrawCommandType
+        {
+            Line = 0,
+            DashedLine = 1,
+            Circle = 2,
+            RectOutline = 3,
+            RectFill = 4,
+            Texture = 5
+        }
+
+        public struct DrawCommand
+        {
+            public int type;
+            public Vector4 param1;
+            public Vector4 param2;
+            public Vector4 color;
+            public int dashLength;
+            public int gapLength;
+            public int layer;
+        }
+
+        public ComputeShader mfdCompute;
+        private RenderTexture outputRT;
+        private ComputeBuffer commandBuffer;
+        private List<DrawCommand> commands = new List<DrawCommand>();
+        private Texture2DArray mfdArray;
+        private RenderTexture radarTexture;
+        private int kernelIndex;
+        private int width;
+        private int height;
+
+        public int Width => width;
+        public int Height => height;
+
+        public MFDGraphicHelper(ComputeShader mfdCompute, RenderTexture texture, int width, int height)
+        {
+            this.mfdCompute = mfdCompute;
+            this.width = width;
+            this.height = height;
+
+            kernelIndex = mfdCompute.FindKernel("DrawMFD");
+            outputRT = texture;
+
+            mfdCompute.SetTexture(kernelIndex, "_Result", outputRT);
+            mfdCompute.SetInt("_Width", width);
+            mfdCompute.SetInt("_Height", height);
+            mfdCompute.SetTexture(kernelIndex, "_SourceTex", outputRT);
+        }
+
+        public MFDGraphicHelper(RenderTexture texture, int width, int height)
+        {
+            mfdCompute = MFDGraphicHelperSettings.MfdShader;
+            this.width = width;
+            this.height = height;
+
+            kernelIndex = mfdCompute.FindKernel("DrawMFD");
+            outputRT = texture;
+
+            mfdCompute.SetTexture(kernelIndex, "_Result", outputRT);
+            mfdCompute.SetInt("_Width", width);
+            mfdCompute.SetInt("_Height", height);
+            mfdCompute.SetTexture(kernelIndex, "_SourceTex", outputRT);
+        }
+
+        public MFDGraphicHelper()
+        {
+
+        }
+
+        public void InitMFDDrawers(int width, int height, int layers)
+        {
+            mfdArray = new Texture2DArray(width, height, layers, TextureFormat.ARGB32, false, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Point };
+        }
+
+        public void RegistTexture(RenderTexture tex, int layer)
+        {
+            Graphics.CopyTexture(tex, 0, mfdArray, layer);
+        }
+
+        public void SetRadarTexture(RenderTexture tex)
+        {
+            radarTexture = tex;
+        }
+
+        public void UpdateShaderParam()
+        {
+            kernelIndex = mfdCompute.FindKernel("DrawMFD");
+            mfdCompute.SetTexture(kernelIndex, "_Result", outputRT);
+            mfdCompute.SetInt("_Width", width);
+            mfdCompute.SetInt("_Height", height);
+            mfdCompute.SetTexture(kernelIndex, "_SourceTex", outputRT);
+        }
+
+        public void DrawLine(Vector2 a, Vector2 b, Color color, int layer = 0)
+        {
+            DrawLine(a.x, a.y, b.x, b.y, color, layer);
+        }
+
+        public void DrawLine(float x0, float y0, float x1, float y1, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 0,
+                param1 = new Vector4(x0, y0, x1, y1),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        public void DrawDashedLine(Vector2 a, Vector2 b, Color color, int dashedlength = 4, int gapLength = 6, int layer = 0)
+        {
+            DrawDashedLine(a.x, a.y, b.x, b.y, color, dashedlength, gapLength);
+        }
+
+        public void DrawDashedLine(float x0, float y0, float x1, float y1, Color color, int dashLength = 4, int gapLength = 6, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 5,
+                param1 = new Vector4(x0, y0, x1, y1),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                dashLength = dashLength,
+                gapLength = gapLength,
+                layer = layer
+            });
+        }
+
+        public void DrawCircle(Vector2 center, float radius, float thickness, Color color, int layer = 0)
+        {
+            DrawCircle(center.x, center.y, radius, thickness, color);
+        }
+
+        public void DrawCircle(float x0, float y0, float radius, float thickness, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 2,
+                param1 = new Vector4(x0, y0, radius, thickness),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        public void DrawRectOutlineCenter(Vector2 center, Vector2 size, float thickness, Color color, int layer = 0)
+        {
+            DrawRectOutlineCenter(center.x, center.y, size.x, size.y, thickness, color);
+        }
+
+        public void DrawRectOutlineCenter(float x0, float y0, float w0, float h0, float thickness, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 3,
+                param1 = new Vector4(x0, y0, w0, h0),
+                param2 = new Vector4(thickness, 0, 0, 0),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        public void DrawRectOutline(Vector2 center, Vector2 size, float thickness, Color color, int layer = 0)
+        {
+            DrawRectOutline(center.x, center.y, size.x, size.y, thickness, color);
+        }
+
+        public void DrawRectOutline(float x0, float y0, float w0, float h0, float thickness, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 3,
+                param1 = new Vector4(x0 + w0 / 2, y0 + h0 / 2, w0 / 2, h0 / 2),
+                param2 = new Vector4(thickness, 0, 0, 0),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        public void DrawRectFillCenter(Vector2 center, Vector2 size, Color color, int layer = 0)
+        {
+            DrawRectFillCenter(center.x, center.y, size.x, size.y, color);
+        }
+
+        public void DrawRectFillCenter(float x0, float y0, float w0, float h0, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 4,
+                param1 = new Vector4(x0, y0, w0, h0),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        public void DrawRectFill(Vector2 center, Vector2 size, Color color, int layer = 0)
+        {
+            DrawRectFill(center.x, center.y, size.x, size.y, color);
+        }
+
+        public void DrawRectFill(float x0, float y0, float w0, float h0, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 4,
+                param1 = new Vector4(x0 + w0 / 2, y0 + h0 / 2, w0 / 2, h0 / 2),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        public void Submit()
+        {
+            mfdCompute.SetTexture(kernelIndex, "_Result", outputRT);
+            mfdCompute.SetInt("_Width", width);
+            mfdCompute.SetInt("_Height", height);
+            mfdCompute.SetTexture(kernelIndex, "_SourceTex", outputRT);
+
+            if (commands.Count == 0) return;
+
+            if (commandBuffer == null || commandBuffer.count < commands.Count)
+            {
+                commandBuffer?.Release();
+                commandBuffer = new ComputeBuffer(Mathf.Max(commands.Count, 64),
+                    System.Runtime.InteropServices.Marshal.SizeOf(typeof(DrawCommand)));
+            }
+
+            commandBuffer.SetData(commands);
+            mfdCompute.SetBuffer(kernelIndex, "_Commands", commandBuffer);
+            mfdCompute.SetInt("_CommandCount", commands.Count);
+            mfdCompute.Dispatch(kernelIndex, width / 8, height / 8, 1);
+
+            commands.Clear();
+        }
+
+        public void Dispose()
+        {
+            commandBuffer?.Release();
+            commandBuffer = null;
+        }
+
+        // old cpu version
+        /*
         private Color32[] pixels;
         private int height;
         private int width;
@@ -277,5 +530,6 @@ namespace AeroSim.UI
 
             return y * height + x;
         }
+        */
     }
 }

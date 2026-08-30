@@ -15,7 +15,7 @@ public class RadarDrawerEditor : Editor
 
         if(GUILayout.Button("Update Image"))
         {
-            drawer.InitCanavs();
+            drawer.InitCanvas();
             drawer.UpdateCanvas();
         }
     }
