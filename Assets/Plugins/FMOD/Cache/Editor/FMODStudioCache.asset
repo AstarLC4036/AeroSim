@@ -1,5 +1,29 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8987555350109387269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/msl_launch/dist
+  m_EditorClassIdentifier: 
+  Name: dist
+  StudioPath: 
+  Min: 0
+  Max: 10
+  Default: 0
+  ID:
+    data1: 3056098441
+    data2: 3600252399
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &-8281979574855915431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24,6 +48,35 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &-6547499281205125963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/msl_launch
+  m_EditorClassIdentifier: 
+  Path: event:/msl_launch
+  Guid:
+    Data1: 507580612
+    Data2: 1220915413
+    Data3: 308228486
+    Data4: -981789086
+  Banks:
+  - {fileID: 1183586304176978361}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 2932350167665549742}
+  - {fileID: -8987555350109387269}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &-6168637905536723244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39,9 +92,9 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639237712082409065
+  lastModified: 639235618364374365
   FileSizes: []
-  Exists: 0
+  Exists: 1
 --- !u!114 &-5437177343942480124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,6 +113,57 @@ MonoBehaviour:
   lastModified: 639233675329354029
   FileSizes: []
   Exists: 1
+--- !u!114 &-5360262192105973563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/msl_flight/mach
+  m_EditorClassIdentifier: 
+  Name: mach
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2907424955
+    data2: 274653565
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &-4914593333746297946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/rwr_scan
+  m_EditorClassIdentifier: 
+  Path: event:/rwr_scan
+  Guid:
+    Data1: -172472073
+    Data2: 1306464130
+    Data3: -1887977542
+    Data4: 164351942
+  Banks:
+  - {fileID: -539519499582093801}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 120
 --- !u!114 &-4203807877551022969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,10 +199,10 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639233737995287254
+  lastModified: 639238005522590017
   FileSizes:
   - Name: 
-    Value: 938
+    Value: 1408
   Exists: 1
 --- !u!114 &-3642360278734224667
 MonoBehaviour:
@@ -142,6 +246,30 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &-2541555256037117245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/engine/dist
+  m_EditorClassIdentifier: 
+  Name: dist
+  StudioPath: 
+  Min: 0
+  Max: 10
+  Default: 0
+  ID:
+    data1: 3056098441
+    data2: 3600252399
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &-1723130226290701448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,6 +294,48 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &-944152275655594013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/seeker_scan/blank
+  m_EditorClassIdentifier: 
+  Name: blank
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2846286456
+    data2: 462634448
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &-539519499582093801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/CombatUI.bank
+  m_EditorClassIdentifier: 
+  Path: Assets/Audio/fmod/main/Build/Desktop/CombatUI.bank
+  Name: CombatUI
+  StudioPath: bank:/CombatUI
+  lastModified: 639238005522570010
+  FileSizes: []
+  Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,19 +352,67 @@ MonoBehaviour:
   - {fileID: -4193965246906987305}
   - {fileID: 1183586304176978361}
   - {fileID: -6168637905536723244}
-  - {fileID: 8685632345400485027}
+  - {fileID: -539519499582093801}
   EditorEvents:
   - {fileID: 3550904626056539776}
+  - {fileID: 3883732154195583522}
+  - {fileID: -6547499281205125963}
+  - {fileID: 8739476080834733230}
+  - {fileID: 44477123413855831}
+  - {fileID: 4402453616846562763}
+  - {fileID: 6352135963291469518}
+  - {fileID: -4914593333746297946}
   EditorParameters: []
   MasterBanks:
   - {fileID: -6168637905536723244}
   StringsBanks:
   - {fileID: -4193965246906987305}
   cacheVersion: 131860
-  cacheTime: 639233777618329160
+  cacheTime: 639238005522590017
   SerializableEventsDict:
   - key: event:/engine
     index: 0
+  - key: event:/msl_flight
+    index: 1
+  - key: event:/msl_launch
+    index: 2
+  - key: event:/seeker_scan
+    index: 3
+  - key: event:/rwr_track
+    index: 4
+  - key: event:/seeker_track
+    index: 5
+  - key: event:/rwr_msl
+    index: 6
+  - key: event:/rwr_scan
+    index: 7
+--- !u!114 &44477123413855831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/rwr_track
+  m_EditorClassIdentifier: 
+  Path: event:/rwr_track
+  Guid:
+    Data1: 925115246
+    Data2: 1180215146
+    Data3: 1731729282
+    Data4: -137493024
+  Banks:
+  - {fileID: -539519499582093801}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 408
 --- !u!114 &820947333350387991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,6 +443,30 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &874005281706562048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/seeker_track/blank
+  m_EditorClassIdentifier: 
+  Name: blank
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2846286456
+    data2: 462634448
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &1183586304176978361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,8 +482,32 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Aircraft.bank
   Name: Aircraft
   StudioPath: bank:/Aircraft
-  lastModified: 639233737995226741
+  lastModified: 639238005522570010
   FileSizes: []
+  Exists: 1
+--- !u!114 &2932350167665549742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/msl_launch/Inner
+  m_EditorClassIdentifier: 
+  Name: Inner
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 927717711
+    data2: 1636039071
+  Type: 0
+  IsGlobal: 0
+  Labels: []
   Exists: 1
 --- !u!114 &3332321885544617805
 MonoBehaviour:
@@ -294,6 +560,65 @@ MonoBehaviour:
   - {fileID: 3332321885544617805}
   - {fileID: -8281979574855915431}
   - {fileID: -1723130226290701448}
+  - {fileID: -2541555256037117245}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &3883732154195583522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/msl_flight
+  m_EditorClassIdentifier: 
+  Path: event:/msl_flight
+  Guid:
+    Data1: 1052129409
+    Data2: 1201043622
+    Data3: 287907219
+    Data4: -1693245221
+  Banks:
+  - {fileID: 1183586304176978361}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 8439386983587834458}
+  - {fileID: 6009559897295882839}
+  - {fileID: -5360262192105973563}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &4402453616846562763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/seeker_track
+  m_EditorClassIdentifier: 
+  Path: event:/seeker_track
+  Guid:
+    Data1: 1703401595
+    Data2: 1246337312
+    Data3: -341924710
+    Data4: 500203651
+  Banks:
+  - {fileID: -539519499582093801}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 874005281706562048}
   MinDistance: 1
   MaxDistance: 20
   Length: 0
@@ -321,6 +646,57 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &6009559897295882839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/msl_flight/dist
+  m_EditorClassIdentifier: 
+  Name: dist
+  StudioPath: 
+  Min: 0
+  Max: 10
+  Default: 0
+  ID:
+    data1: 3056098441
+    data2: 3600252399
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &6352135963291469518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/rwr_msl
+  m_EditorClassIdentifier: 
+  Path: event:/rwr_msl
+  Guid:
+    Data1: -1142224687
+    Data2: 1290179834
+    Data3: 922803350
+    Data4: -1420315634
+  Banks:
+  - {fileID: -539519499582093801}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 210
 --- !u!114 &7743342770985938294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,6 +721,30 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &8439386983587834458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/msl_flight/Inner
+  m_EditorClassIdentifier: 
+  Name: Inner
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 927717711
+    data2: 1636039071
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &8685632345400485027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,3 +763,31 @@ MonoBehaviour:
   lastModified: 639233777618329160
   FileSizes: []
   Exists: 1
+--- !u!114 &8739476080834733230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/seeker_scan
+  m_EditorClassIdentifier: 
+  Path: event:/seeker_scan
+  Guid:
+    Data1: -1142587809
+    Data2: 1279445937
+    Data3: 1974663845
+    Data4: -1824142602
+  Banks:
+  - {fileID: -539519499582093801}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -944152275655594013}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0

@@ -13,7 +13,8 @@ namespace AeroSim.Audio
         public static StudioListener FmodListener => instance.fmodListener;
 
         public AudioSource rwrAudio;
-        public AudioSource mslAudio;
+        public StudioEventEmitter irMslScanAudio;
+        public StudioEventEmitter irMslTrackAudio;
         public AudioClip rwrScan;
         public AudioClip rwrLock;
         public AudioClip rwrMsl;
@@ -80,22 +81,20 @@ namespace AeroSim.Audio
 
         public static void MissileIRSearch()
         {
-            Instance.mslAudio.clip = Instance.irSearch;
-            Instance.mslAudio.loop = true;
-            Instance.mslAudio.Play();
+            Instance.irMslTrackAudio.Stop();
+            Instance.irMslScanAudio.Play();
         }
 
         public static void MissileIRLock()
         {
-            Instance.mslAudio.clip = Instance.irLock;
-            Instance.mslAudio.loop = true;
-            Instance.mslAudio.Play();
+            Instance.irMslScanAudio.Stop();
+            Instance.irMslTrackAudio.Play();
         }
 
         public static void MissileStop()
         {
-            if (Instance.mslAudio.isPlaying)
-                Instance.mslAudio.Stop();
+            Instance.irMslScanAudio.Stop();
+            Instance.irMslTrackAudio.Stop();
         }
     }
 }

@@ -38,13 +38,14 @@ namespace AeroSim.Audio
             float thrustPercent = Mathf.Clamp01(engine.thurst / engine.maxThurst);
             bool isWep = engine.isEngineToggled && engine.thurst > engine.maxThurst;
 
-            float volumeParam = 1;
+            //float volumeParam = 1;
+            float dstToListener = 10000;
             if (AudioManager.FmodListener != null)
             {
-                float dstToListener = Vector3.Distance(transform.position, AudioManager.FmodListener.transform.position);
+                dstToListener = Vector3.Distance(transform.position, AudioManager.FmodListener.transform.position);
 
-                float volume = referenceVolume - 20 * Mathf.Log10(dstToListener / referenceDistance);
-                volumeParam = Mathf.Clamp01((1 / (referenceMaxVolume - referenceMinVolume)) * (volume - referenceMinVolume));
+                //float volume = referenceVolume - 20 * Mathf.Log10(dstToListener / referenceDistance);
+                //volumeParam = Mathf.Clamp01((1 / (referenceMaxVolume - referenceMinVolume)) * (volume - referenceMinVolume));
             }
 
             if (engineEmitter != null)
@@ -55,7 +56,8 @@ namespace AeroSim.Audio
                 engineEmitter.SetParameter("Throttle", thrustPercent);
                 engineEmitter.SetParameter("WEP", wep);
                 engineEmitter.SetParameter("Inner", isCockpitView ? 1 : 0);
-                engineEmitter.SetParameter("Volume", volumeParam);
+                //engineEmitter.SetParameter("Volume", volumeParam);
+                engineEmitter.SetParameter("dist", dstToListener / 1000);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMODUnity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace AeroSim.Utils
         public ParticleSystem[] particleSystems;
         public VisualEffect[] visualEffects;
         public AudioSource[] audioSources;
+        public StudioEventEmitter[] fmodEmitters;
         public bool IsPlaying => isPlaying;
 
         private bool isPlaying = false;
@@ -53,6 +55,14 @@ namespace AeroSim.Utils
                     audio.Play();
                 }
             }
+
+            if (fmodEmitters != null && fmodEmitters.Length > 0)
+            {
+                foreach (StudioEventEmitter audio in fmodEmitters)
+                {
+                    audio.Play();
+                }
+            }
         }
 
         public void Stop()
@@ -86,6 +96,14 @@ namespace AeroSim.Utils
             if (audioSources != null && audioSources.Length > 0)
             {
                 foreach (AudioSource audio in audioSources)
+                {
+                    audio.Stop();
+                }
+            }
+
+            if (fmodEmitters != null && fmodEmitters.Length > 0)
+            {
+                foreach (StudioEventEmitter audio in fmodEmitters)
                 {
                     audio.Stop();
                 }
