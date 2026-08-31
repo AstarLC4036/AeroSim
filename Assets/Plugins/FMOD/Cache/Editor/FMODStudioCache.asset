@@ -39,7 +39,7 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639235618364374365
+  lastModified: 639237712082409065
   FileSizes: []
   Exists: 1
 --- !u!114 &-5437177343942480124
@@ -95,7 +95,7 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639235618364395190
+  lastModified: 639237712082414304
   FileSizes:
   - Name: 
     Value: 988
@@ -214,7 +214,7 @@ MonoBehaviour:
   StringsBanks:
   - {fileID: -4193965246906987305}
   cacheVersion: 131860
-  cacheTime: 639235618364395190
+  cacheTime: 639237712082414304
   SerializableEventsDict:
   - key: event:/engine
     index: 0
@@ -263,7 +263,7 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Aircraft.bank
   Name: Aircraft
   StudioPath: bank:/Aircraft
-  lastModified: 639235618364294179
+  lastModified: 639237712082403972
   FileSizes: []
   Exists: 1
 --- !u!114 &3332321885544617805

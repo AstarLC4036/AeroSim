@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.03.00">
+<objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{7fcf7b5f-8835-4e75-8d30-b741b9bc9ca6}">
 		<property name="assetPath">
 			<value>jet_wep_start-001.wav</value>

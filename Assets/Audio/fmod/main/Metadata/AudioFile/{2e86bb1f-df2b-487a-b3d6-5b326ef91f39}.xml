@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.03.00">
+<objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{2e86bb1f-df2b-487a-b3d6-5b326ef91f39}">
 		<property name="assetPath">
 			<value>max.wav</value>

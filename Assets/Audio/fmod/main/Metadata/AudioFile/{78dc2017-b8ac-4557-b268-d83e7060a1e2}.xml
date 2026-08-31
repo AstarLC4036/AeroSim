@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.03.00">
+<objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{78dc2017-b8ac-4557-b268-d83e7060a1e2}">
 		<property name="assetPath">
 			<value>afterburner-006.wav</value>
