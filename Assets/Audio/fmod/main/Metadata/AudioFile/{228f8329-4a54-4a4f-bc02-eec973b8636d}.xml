@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{228f8329-4a54-4a4f-bc02-eec973b8636d}">
+		<property name="assetPath">
+			<value>missile_start_interior-003.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.81454166666666672</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{cebcfd5b-48ef-4604-99f4-73c6fde92a72}</destination>
+		</relationship>
+	</object>
+</objects>

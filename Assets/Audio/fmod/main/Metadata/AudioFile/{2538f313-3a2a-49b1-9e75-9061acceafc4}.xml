@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{2538f313-3a2a-49b1-9e75-9061acceafc4}">
+		<property name="assetPath">
+			<value>radio_click_06.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>22.0499992</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.3749659863945578</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{cebcfd5b-48ef-4604-99f4-73c6fde92a72}</destination>
+		</relationship>
+	</object>
+</objects>
