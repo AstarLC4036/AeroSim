@@ -84,24 +84,37 @@ namespace AeroSim.AircraftModules
             }
         }
 
-        private Texture2D GetMFDTexture(ScreenProperty display)
+        private RenderTexture GetMFDTexture(ScreenProperty display)
         {
             MFDType type = display.type;
             switch (type)
             {
                 case (MFDType.None):
-                    Texture2D tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                    tex.SetPixel(0, 0, display.bgColor);
-                    return tex;
+                    RenderTexture newTex = new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32)
+                    {
+                        enableRandomWrite = true,
+                        wrapMode = TextureWrapMode.Clamp,
+                        filterMode = FilterMode.Point
+                    };
+                    newTex.Create();
+                    return newTex;
                 default :
-                    return GetMFDDrawer(type).CanvasTexture;
+                    return GetMFDDrawer(type).canvasTexture;
             }
         }
 
         public void Update()
         {
-            if(parentAircraft.isControlling)
+            if (parentAircraft.isControlling)
+            {
                 radarDrawer.UpdateCanvas();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            if(parentAircraft.isControlling)
+                radarDrawer.Dispose();
         }
     }
 }

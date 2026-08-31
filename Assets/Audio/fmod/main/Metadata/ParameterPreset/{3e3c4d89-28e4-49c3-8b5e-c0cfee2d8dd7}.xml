@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{3e3c4d89-28e4-49c3-8b5e-c0cfee2d8dd7}">
+		<property name="name">
+			<value>Throttle</value>
+		</property>
+		<relationship name="folder">
+			<destination>{4090a246-c19b-4588-bf72-69d76c72a83f}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{1da2d724-f05e-4aa7-812a-21ea51cda423}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{1da2d724-f05e-4aa7-812a-21ea51cda423}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{289b2287-78ff-4ae1-a7ac-3d5892ebdc5d}</destination>
+		</relationship>
+	</object>
+	<object class="RandomizerModulator" id="{289b2287-78ff-4ae1-a7ac-3d5892ebdc5d}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>cursorPosition</value>
+		</property>
+	</object>
+</objects>

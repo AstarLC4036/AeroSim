@@ -18,46 +18,61 @@ namespace AeroSim.InputSystem
         [Serializable]
         public class CameraView
         {
+            public enum ViewType
+            {
+                External,
+                Cockpit,
+                Pod
+            }
+
             public Vector3 offset;
             public Vector3 deltaPos;
             public bool followRotation;
-            public bool targetingPodView;
-            public bool enableIRView;
-            public bool enableStable;
+            //public bool targetingPodView;
+            public ViewType view;
+            //public bool enableIRView;
+            //public bool enableStable;
 
-            public CameraView(Vector3 offset, Vector3 deltaPos, bool followRotation, bool enableIRView, bool enableStable, bool enableTargetingPodView)
+            public CameraView(Vector3 offset, Vector3 deltaPos, bool followRotation, ViewType view, bool enableTargetingPodView)
             {
                 this.offset = offset;
                 this.deltaPos = deltaPos;
                 this.followRotation = followRotation;
-                this.enableIRView = enableIRView;
-                this.enableStable = enableStable;
-                this.targetingPodView = enableTargetingPodView;
+                this.view = view;
+                //this.enableIRView = enableIRView;
+                //this.enableStable = enableStable;
+                //this.targetingPodView = enableTargetingPodView;
             }
         }
 
+        [Header("Views")]
         public CameraView[] views;
 
+        [Header("Control")]
         public float sensitivity = 1;
         public float aimLerpParam = 0.1f;
         public CameraView currentView;
         public Transform target;
-
-        public Volume mainVolume;
-        private IREffect IREffect;
-
         public float defaultFov = 60;
         public float focusFov = 30;
         public bool isFocusing = false;
 
-        private float avgMouseDelta = 0;
-        private float mouseDeltaTimer = 0;
+        [Header("Post Processing")]
+        public Volume mainVolume;
+        private IREffect IREffect;
+
+        // 已作废，迁移。
+        //private float avgMouseDelta = 0;
+        //private float mouseDeltaTimer = 0;
         public float calcAvgTime = 0.5f;
         private bool isMoveingView = false;
-        private Vector3 fwd = new Vector3(0,0,1);
-        private int currentViewIndex = 0;
         private Vector3 trackPoint;
         private bool isStableTargetAvaliable = false;
+
+        private Vector3 fwd = new Vector3(0,0,1);
+        private int currentViewIndex = 0;
+        public int CurrentViewIndex => currentViewIndex;
+        public static CameraView CurrentView => instance.currentView;
 
         private void Awake()
         {
@@ -82,10 +97,10 @@ namespace AeroSim.InputSystem
 
         private void OnOriginChange(Vector3 delta)
         {
-            if(currentView.enableStable && isStableTargetAvaliable)
-            {
-                trackPoint += delta;
-            }
+            //if(currentView.enableStable && isStableTargetAvaliable)
+            //{
+            //    trackPoint += delta;
+            //}
         }
 
         public void SetView(int viewIndex)
@@ -96,24 +111,26 @@ namespace AeroSim.InputSystem
 
             isStableTargetAvaliable = false;
 
-            if(view.enableIRView && IREffect != null)
-            {
-                IREffect.enabled.value = true;
-            }
-            if(!view.enableIRView && IREffect != null)
-            {
-                IREffect.enabled.value = false;
-            }
+            //if(view.enableIRView && IREffect != null)
+            //{
+            //    IREffect.enabled.value = true;
+            //}
+            //if(!view.enableIRView && IREffect != null)
+            //{
+            //    IREffect.enabled.value = false;
+            //}
 
-            AircraftUI.DisplayTargetingPodView(view.targetingPodView);
+            AircraftUI.DisplayTargetingPodView(view.view == CameraView.ViewType.Pod);
         }
 
         void Update()
         {
-            if (Input.GetKey(Keybindings.holdControlInput) || currentView.enableStable)
+            // Update control
+            if (Input.GetKey(Keybindings.holdControlInput) && currentView.view != CameraView.ViewType.Pod)
             {
                 Vector3 mouseDelta = Input.mousePositionDelta;
 
+                /*
                 avgMouseDelta += mouseDelta.magnitude;
                 mouseDeltaTimer += Time.deltaTime;
 
@@ -153,6 +170,7 @@ namespace AeroSim.InputSystem
                 {
                     isMoveingView = true;
                 }
+                */
 
                 //fwd = transform.forward;
 
@@ -203,11 +221,11 @@ namespace AeroSim.InputSystem
         {
             transform.position = target.position + currentView.deltaPos.z * fwd + Vector3.up * currentView.deltaPos.y + target.forward * currentView.offset.z + target.right * currentView.offset.x + target.up * currentView.offset.y;
 
-            if (!Input.GetKey(Keybindings.holdControlInput) && !currentView.enableStable)
+            if (!Input.GetKey(Keybindings.holdControlInput))
             {
                 fwd = Vector3.Lerp(fwd, Aircraft.main.targetDir, aimLerpParam * Time.fixedDeltaTime);
             }
-            else if (currentView.enableStable && isStableTargetAvaliable && !isMoveingView)
+            else if (isStableTargetAvaliable && !isMoveingView)
             {
                 fwd = (trackPoint - transform.position).normalized;
             }

@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 namespace AeroSim.UI
 {
+    [Serializable]
     public class RadarHUDDrawer : MFDDisplay
     {
         private static RadarHUDDrawer instance;
@@ -71,7 +72,7 @@ namespace AeroSim.UI
             parentAircraft = aircraft;
             radar = aircraft.radar;
 
-            InitCanavs();
+            InitCanvas();
 
             isInited = true;
 
@@ -88,7 +89,7 @@ namespace AeroSim.UI
         private void Awake()
         {
             instance = this;
-            cursorPosition = new Vector2(resolution / 2, resolution / 2);
+            cursorPosition = new Vector2(size.x / 2, size.y / 2);
             cursorDisplayPosition = new Vector2Int((int)cursorPosition.x, (int)cursorPosition.y);
         }
 
@@ -158,7 +159,7 @@ namespace AeroSim.UI
                 UpdateCursorPos();
             }
 
-            cursorPosition = new Vector2(Mathf.Clamp(cursorPosition.x, 0, resolution), Mathf.Clamp(cursorPosition.y, 0, resolution));
+            cursorPosition = new Vector2(Mathf.Clamp(cursorPosition.x, 0, size.x), Mathf.Clamp(cursorPosition.y, 0, size.y));
         }
 
         private void UpdateCursorPos()
@@ -173,33 +174,33 @@ namespace AeroSim.UI
             {
                 Vector3 radarFwd = radar.transform.forward;
                 Vector3 hmdDir = radar.hmdPointer.forward;
-                int posX = resolution / 2 + (int)((Mathf.Atan2(hmdDir.x, hmdDir.z) - Mathf.Atan2(radarFwd.x, radarFwd.z)) * Mathf.Rad2Deg / radar.maxScanAngleX * (resolution / 2));
-                int width = (int)(radar.currentScanAngleX / radar.maxScanAngleX * (resolution / 2));
-                drawer.DrawLine(posX - width, 0, posX - width, resolution, scanRangeOutlineColor);
-                drawer.DrawLine(posX + width, 0, posX + width, resolution, scanRangeOutlineColor);
+                int posX = size.x / 2 + (int)((Mathf.Atan2(hmdDir.x, hmdDir.z) - Mathf.Atan2(radarFwd.x, radarFwd.z)) * Mathf.Rad2Deg / radar.maxScanAngleX * (size.x / 2));
+                int width = (int)(radar.currentScanAngleX / radar.maxScanAngleX * (size.x / 2));
+                drawer.DrawLine(posX - width, 0, posX - width, size.y, scanRangeOutlineColor);
+                drawer.DrawLine(posX + width, 0, posX + width, size.y, scanRangeOutlineColor);
             }
             else
             {
                 // Draw grid
-                int girdGapHeight = (int)(gridAngleY / radar.displayAngleY * (resolution / 2));
-                int girdGapWidth = (int)(gridAngleX / radar.displayAngleX * (resolution / 2));
+                int girdGapHeight = (int)(gridAngleY / radar.displayAngleY * (size.y / 2));
+                int girdGapWidth = (int)(gridAngleX / radar.displayAngleX * (size.x / 2));
 
                 for (int i = 0; i <= (int)(radar.currentScanAngleX * 2 / gridAngleX); i++)
                 {
-                    drawer.DrawLine(i * girdGapWidth, 0, i * girdGapWidth, resolution, new Color32(0, 255, 0, 255));
+                    drawer.DrawLine(i * girdGapWidth, 0, i * girdGapWidth, size.y, new Color32(0, 255, 0, 255));
                 }
                 for (int i = 0; i <= (int)(radar.currentScanAngleY * 2 / gridAngleY); i++)
                 {
-                    drawer.DrawLine(0, i * girdGapHeight, resolution, i * girdGapHeight, new Color32(0, 255, 0, 255));
+                    drawer.DrawLine(0, i * girdGapHeight, size.x, i * girdGapHeight, new Color32(0, 255, 0, 255));
 
-                    drawer.DrawLine((int)(radar.currentScanAngleX / radar.displayAngleX * resolution) - 1, 0, (int)(radar.currentScanAngleX / radar.displayAngleX * resolution) - 1, resolution, new Color32(0, 255, 0, 255));
-                    drawer.DrawLine(0, (int)(radar.currentScanAngleY / radar.displayAngleY * resolution) - 1, resolution, (int)(radar.currentScanAngleY / radar.displayAngleY * resolution) - 1, new Color32(0, 255, 0, 255));
+                    drawer.DrawLine((int)(radar.currentScanAngleX / radar.displayAngleX * size.x) - 1, 0, (int)(radar.currentScanAngleX / radar.displayAngleX * size.x) - 1, size.y, new Color32(0, 255, 0, 255));
+                    drawer.DrawLine(0, (int)(radar.currentScanAngleY / radar.displayAngleY * size.y) - 1, size.x, (int)(radar.currentScanAngleY / radar.displayAngleY * size.y) - 1, new Color32(0, 255, 0, 255));
                 }
             }
 
             // Draw vertical angle sign
-            drawer.DrawRectCenter(5, resolution * 3 / 4, 5, 2, new Color32(0, 255, 0, 196));
-            drawer.DrawRectCenter(5, resolution / 4, 5, 2, new Color32(0, 255, 0, 196));
+            drawer.DrawRectFillCenter(5, size.y * 3 / 4, 5, 2, new Color32(0, 255, 0, 196));
+            drawer.DrawRectFillCenter(5, size.y / 4, 5, 2, new Color32(0, 255, 0, 196));
 
             // Different target draw mode
             if (!radar.IsTracking) // TWS, SRC etc mode
@@ -222,12 +223,12 @@ namespace AeroSim.UI
                         Vector2Int acPos = new Vector2Int(posX, posY);
 
                         if (radar.radarMode == RadarModule.RadarMode.SRC)
-                            drawer.DrawRectCenter(posX, posY, 7, 2, new Color32(0, 255, 0, 255));
+                            drawer.DrawRectFillCenter(posX, posY, 7, 2, new Color32(0, 255, 0, 255));
                         else if (radar.radarMode == RadarModule.RadarMode.TWS)
                         {
                             Vector3 localVector = radar.transform.InverseTransformDirection(aircraft.Velocity);
                             Vector3 normVector = Vector3.Normalize(new Vector3(localVector.x, 0, localVector.z));
-                            drawer.DrawCircle(posX, posY, 10, Color.green, 3);
+                            drawer.DrawCircle(posX, posY, 8, 3, Color.green);
                             drawer.DrawLine(posX + (int)(normVector.x * 10), posY + (int)(normVector.y * 10), posX + (int)(normVector.x * 30), posY + (int)(normVector.z * 30), Color.green);
                         }
 
@@ -282,7 +283,7 @@ namespace AeroSim.UI
                 Vector3 radarVeloPos = parentAircraft.transform.InverseTransformPoint(radar.lockedAircraft.transform.position + radar.lockedAircraft.Velocity * 100);
                 Vector3 localVelo = (radarVeloPos - radarPos).normalized;
 
-                drawer.DrawCircle(posX, posY, 6, new Color32(0, 255, 0, 255), 2);
+                drawer.DrawCircle(posX, posY, 6, 2, new Color(0, 1, 0, 1));
                 drawer.DrawLine(
                     posX,
                     posY,
@@ -297,12 +298,13 @@ namespace AeroSim.UI
             if (isDatalinkAvaliable)
             {
                 // Missiles
-                foreach (Missile msl in datalink.missiles)
+                foreach (var mslAndTarget in datalink.mslTrackInfo)
                 {
+                    Missile msl = mslAndTarget.Item1;
                     var (posX, posY) = TransformWorldToRadar(msl.transform.position);
                     var (posTX, posTY) = TransformWorldToRadar(msl.target.position);
 
-                    drawer.DrawRectCenter(posX, posY, 4, 4, Color.green);
+                    drawer.DrawRectFillCenter(posX, posY, 4, 4, Color.green);
                     if(msl.IsIgnited)
                         drawer.DrawLine(posX, posY, posTX, posTY, Color.green);
                     else
@@ -335,8 +337,8 @@ namespace AeroSim.UI
 
         private void DrawCursor(int x0, int y0)
         {
-            drawer.DrawRectCenter(x0 - 14, y0, 1, 7, new Color32(0, 255, 0, 255));
-            drawer.DrawRectCenter(x0 + 14, y0, 1, 7, new Color32(0, 255, 0, 255));
+            drawer.DrawRectFillCenter(x0 - 14, y0, 1, 12, new Color32(0, 255, 0, 255));
+            drawer.DrawRectFillCenter(x0 + 14, y0, 1, 12, new Color32(0, 255, 0, 255));
         }
 
         private void DrawCursor(Vector2Int pos)
@@ -349,8 +351,8 @@ namespace AeroSim.UI
             Vector3 localPos = parentAircraft.transform.InverseTransformPoint(worldPos);
             float dst = Vector3.Distance(parentAircraft.transform.position, worldPos);
             float angle = Mathf.Atan2(localPos.x, localPos.z) * Mathf.Rad2Deg;
-            int posX = (int)(resolution / 2 + Mathf.Clamp(angle / radar.displayAngleX, -1, 1) * resolution * 0.5f);
-            int posY = (int)(Mathf.Clamp01(dst / maxDrawDistance / 1000) * resolution);
+            int posX = (int)(size.x / 2 + Mathf.Clamp(angle / radar.displayAngleX, -1, 1) * size.x * 0.5f);
+            int posY = (int)(Mathf.Clamp01(dst / maxDrawDistance / 1000) * size.y);
 
             return (posX, posY);
         }

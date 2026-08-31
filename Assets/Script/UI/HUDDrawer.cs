@@ -374,7 +374,7 @@ namespace AeroSim.UI
             if (Aircraft.main.mslManager != null && Aircraft.main.mslManager.currentMissle != null && !Aircraft.main.mslManager.currentMissle.IsIgnited)
             {
                 Missile msl = Aircraft.main.mslManager.currentMissle;
-                if (Aircraft.main.mslManager.currentMissle.lockState == Missile.LockState.Locking)
+                if (Aircraft.main.mslManager.currentMissle.lockState == Missile.MissileState.Locking)
                 {
                     if (msl.type == Missile.MissileType.IR)
                     {
@@ -399,7 +399,7 @@ namespace AeroSim.UI
 
                     mslBoresightMesh.Direction = msl.transform.forward;
                 }
-                else if (Aircraft.main.mslManager.currentMissle.lockState == Missile.LockState.Locked)
+                else if (Aircraft.main.mslManager.currentMissle.lockState == Missile.MissileState.Locked)
                 {
                     // HUD Mesh
                     if (mslSeekerMesh.isDisplaying && mslSeekerMesh.Color != Color.red)
@@ -562,7 +562,7 @@ namespace AeroSim.UI
                 if (Aircraft.main.mslManager != null && Aircraft.main.mslManager.currentMissle != null && !Aircraft.main.mslManager.currentMissle.IsIgnited)
                 {
                     Missile msl = Aircraft.main.mslManager.currentMissle;
-                    if (msl.lockState == Missile.LockState.Locked && msl.type == Missile.MissileType.Active)
+                    if (msl.lockState == Missile.MissileState.Locked && msl.type == Missile.MissileType.Active)
                     {
                         Vector3 mslPosOnScreen = Camera.main.WorldToScreenPoint(msl.TargetPosition);
                         if (mslPosOnScreen.z > 0)

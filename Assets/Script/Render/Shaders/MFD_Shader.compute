@@ -1,0 +1,152 @@
+#pragma kernel DrawMFD
+
+RWTexture2D<float4> _Result;
+uint _Width;
+uint _Height;
+
+// 绘制命令
+struct DrawCommand
+{
+    int type;           // 0=Line, 1=DashedLine, 2=Circle, 3=RectOutline, 4=RectFill, 5=Texture
+    float4 param1;      // x0,y0,x1,y1 或 cx,cy,radius,thickness
+    float4 param2;      // 额外参数（矩形宽高，纹理区域等）
+    float4 color;
+    int dashLength;
+    int gapLength;
+    int layer;
+};
+
+StructuredBuffer<DrawCommand> _Commands;
+int _CommandCount;
+
+// 纹理绘制
+Texture2D<float4> _SourceTex;
+SamplerState sampler_SourceTex;
+
+// 辅助函数
+float DistanceToLine(float2 p, float2 a, float2 b)
+{
+    float2 ab = b - a;
+    float2 ap = p - a;
+    float t = clamp(dot(ap, ab) / max(dot(ab, ab), 0.0001), 0.0, 1.0);
+    float2 closest = a + t * ab;
+    return length(p - closest);
+}
+
+float RectSDF(float2 p, float2 center, float2 halfSize)
+{
+    float2 d = abs(p - center) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float CircleRingSDF(float2 p, float2 center, float radius, float thickness)
+{
+    return abs(length(p - center) - radius) - thickness * 0.5;
+}
+
+[numthreads(8,8,1)]
+void DrawMFD (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _Width || id.y >= _Height) return;
+
+    float2 pixelPos = float2(id.x, id.y) + 0.5;  // 像素中心
+    float4 finalColor = float4(0, 0, 0, 1);
+
+    for (int cmdIndex = 0; cmdIndex < _CommandCount; cmdIndex++)
+    {
+        DrawCommand cmd = _Commands[cmdIndex];
+        float4 cmdColor = cmd.color;
+        float alpha = 0.0;
+        float dist = 1e10;
+
+        switch (cmd.type)
+        {
+            case 0: // Line
+            {
+                float2 a = cmd.param1.xy;
+                float2 b = cmd.param1.zw;
+                dist = DistanceToLine(pixelPos, a, b);
+                alpha = 1.0 - smoothstep(0.5, 1.5, dist);
+                break;
+            }
+
+            case 1: // DashedLine
+            {
+                float2 a = cmd.param1.xy;
+                float2 b = cmd.param1.zw;
+                dist = DistanceToLine(pixelPos, a, b);
+                
+                // 简化：用屏幕坐标做 dash 判断
+                float lineLength = length(b - a);
+                float t = clamp(dot(pixelPos - a, b - a) / max(lineLength * lineLength, 0.0001), 0.0, 1.0);
+                float dashPos = t * lineLength;
+                float cycle = cmd.dashLength + cmd.gapLength;
+                float mod = fmod(dashPos, cycle);
+                bool inDash = mod < cmd.dashLength;
+                
+                alpha = inDash ? 1.0 - smoothstep(0.5, 1.5, dist) : 0.0;
+                break;
+            }
+
+            case 2: // Circle
+            {
+                float2 center = cmd.param1.xy;
+                float radius = cmd.param1.z;
+                float thickness = cmd.param1.w;
+                dist = CircleRingSDF(pixelPos, center, radius, thickness);
+                alpha = 1.0 - smoothstep(-0.5, 0.5, dist);
+                break;
+            }
+
+            case 3: // RectOutline
+            {
+                float2 center = cmd.param1.xy;
+                float2 halfSize = cmd.param1.zw;
+                float thickness = cmd.param2.x;
+                dist = RectSDF(pixelPos, center, halfSize);
+                // 空心：abs(dist) - thickness
+                dist = abs(dist) - thickness * 0.5;
+                alpha = 1.0 - smoothstep(-0.5, 0.5, dist);
+                break;
+            }
+
+            case 4: // RectFill
+            {
+                float2 center = cmd.param1.xy;
+                float2 halfSize = cmd.param1.zw;
+                dist = RectSDF(pixelPos, center, halfSize);
+                alpha = dist < 0 ? 1.0 : 0.0;
+                break;
+            }
+
+            case 5: // Texture
+            {
+                float2 targetMin = cmd.param1.xy;
+                float2 targetMax = cmd.param1.zw;
+                float2 uv = (pixelPos - targetMin) / max(targetMax - targetMin, 0.0001);
+                
+                if (uv.x >= 0 && uv.x <= 1 && uv.y >= 0 && uv.y <= 1)
+                {
+                    float4 texColor = _SourceTex.SampleLevel(sampler_SourceTex, uv, 0);
+                    texColor *= cmdColor;
+                    alpha = texColor.a;
+                    cmdColor = texColor;
+                }
+                else
+                {
+                    alpha = 0.0;
+                }
+                break;
+            }
+        }
+
+        // Alpha 混合
+        if (alpha > 0.0)
+        {
+            cmdColor.a *= alpha;
+            finalColor = lerp(finalColor, cmdColor, cmdColor.a);
+        }
+    }
+
+    _Result[id.xy] = finalColor;
+}

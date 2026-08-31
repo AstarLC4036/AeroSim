@@ -156,6 +156,11 @@ namespace AeroSim.AircraftModules
             UpdateTransmisson();
         }
 
+        public virtual bool TargetDetect(Vector3 position, bool isLocal = false)
+        {
+            return true;
+        }
+
         public virtual void UpdateScan()
         {
             if (radarMode == RadarMode.HMD && isControlling && radarCarrier == RadarCarrier.Aircraft)

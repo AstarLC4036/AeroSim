@@ -23,12 +23,13 @@ namespace AeroSim.UI
         public int vecLineLength = 30;
         public Vector2Int cursorDisplayPosition;
         private bool isDatalinkAvaliable => datalink != null;
+
         public void Init(Aircraft aircraft)
         {
             parentAircraft = aircraft;
             radar = aircraft.radar;
 
-            InitCanavs();
+            InitCanvas();
 
             if (parentAircraft.datalink != null)
             {
@@ -50,9 +51,7 @@ namespace AeroSim.UI
         public override void ProcessCanvas()
         {
             UpdateData();
-
             DrawRadar();
-
             //DrawBorder(3, Color.green);
             //DrawBorder(2, bgColor);
         }
@@ -64,25 +63,25 @@ namespace AeroSim.UI
             Vector2Int areaOffset = new Vector2Int(size.x * 1 / 4 / 2, size.y * 9 / 20);
 
             // Border
-            drawer.DrawRect(areaOffset.x, areaOffset.y, areaSize.x, areaSize.y, 3, Color.white);
+            drawer.DrawRectOutline(areaOffset.x, areaOffset.y, areaSize.x, areaSize.y, 5, Color.white);
 
             // Radar radius
-            drawer.DrawRect(areaOffset.x, areaOffset.y - 9, areaSize.x, 12, new Color32(255, 100, 240, 255));
-            drawer.DrawRect(areaOffset.x, areaOffset.y - 3, areaSize.x, 12, new Color32(50, 255, 50, 255));
+            drawer.DrawRectFill(areaOffset.x, areaOffset.y - 9, areaSize.x, 12, new Color32(255, 100, 240, 255));
+            drawer.DrawRectFill(areaOffset.x, areaOffset.y - 3, areaSize.x, 12, new Color32(50, 255, 50, 255));
 
             // Scaler
             for (int i = 1; i < 4; i++)
             {
-                drawer.DrawRect(areaOffset.x + areaSize.x / 4 * i - 1, areaOffset.y + 1, 3, 15, Color.white);
-                drawer.DrawRect(areaOffset.x + areaSize.x / 4 * i - 1, areaOffset.y + areaSize.y - 15, 3, 15, Color.white);
-                drawer.DrawRect(areaOffset.x + 1, areaOffset.y + areaSize.y / 4 * i - 1, 15, 3, Color.white);
-                drawer.DrawRect(areaOffset.x + areaSize.x - 15, areaOffset.y + areaSize.y / 4 * i - 1, 15, 3, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x / 4 * i - 1, areaOffset.y + 1, 3, 15, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x / 4 * i - 1, areaOffset.y + areaSize.y - 15, 3, 15, Color.white);
+                drawer.DrawRectFill(areaOffset.x + 1, areaOffset.y + areaSize.y / 4 * i - 1, 15, 3, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x - 15, areaOffset.y + areaSize.y / 4 * i - 1, 15, 3, Color.white);
 
                 if(i < 3)
                 {
                     for(int j = 1; j < 3; j++)
                     {
-                        drawer.DrawRect(areaOffset.x + 1, areaOffset.y + areaSize.y / 12 * (3 * i + j), 12, 3, Color.white); // i / 4 + j / 3 * (1 / 4) -> i/4 + j/12 -> 3i/12 + j/12 -> (3i + j) / 12
+                        drawer.DrawRectFill(areaOffset.x + 1, areaOffset.y + areaSize.y / 12 * (3 * i + j), 12, 3, Color.white); // i / 4 + j / 3 * (1 / 4) -> i/4 + j/12 -> 3i/12 + j/12 -> (3i + j) / 12
                     }
                 }
             }
@@ -128,29 +127,30 @@ namespace AeroSim.UI
             float posVectorY = areaOffset.y + areaSize.y / 2 * (1 + (pitchAngle / radar.currentScanAngleY));
             if(posVectorY > areaOffset.y && posVectorY < areaOffset.y + areaSize.y)
             {
-                drawer.DrawCircle(areaOffset.x + areaSize.x / 2, (int)posVectorY, 6, Color.white, 3);
-                drawer.DrawRect(areaOffset.x + areaSize.x / 2 - 1, (int)posVectorY + 6, 3, 6, Color.white);
-                drawer.DrawRect(areaOffset.x + areaSize.x / 2 + 6, (int)posVectorY, 6, 3, Color.white);
-                drawer.DrawRect(areaOffset.x + areaSize.x / 2 - 12, (int)posVectorY, 6, 3, Color.white);
+                drawer.DrawCircle(areaOffset.x + areaSize.x / 2, (int)posVectorY, 12, 3, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x / 2 - 1, (int)posVectorY + 12, 3, 6, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x / 2 + 12, (int)posVectorY, 12, 3, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x / 2 - 18, (int)posVectorY, 12, 3, Color.white);
             }
 
-            DrawCursor(areaOffset.x + cursorDisplayPosition.x * areaSize.x / RadarHUDDrawer.Instance.resolution, areaOffset.y + cursorDisplayPosition.y * areaSize.y / RadarHUDDrawer.Instance.resolution);
+            DrawCursor(areaOffset.x + cursorDisplayPosition.x * areaSize.x / RadarHUDDrawer.Instance.size.x, areaOffset.y + cursorDisplayPosition.y * areaSize.y / RadarHUDDrawer.Instance.size.y);
 
             foreach(Aircraft aircraft in radar.ScannedAircrafts)
             {
                 var (posX, posY) = TransformWorldToRadar(aircraft.transform.position, areaSize);
 
-                drawer.DrawCircle(areaOffset.x + posX, areaOffset.y + posY, 10, Color.white, 3);
+                drawer.DrawCircle(areaOffset.x + posX, areaOffset.y + posY, 20, 6, Color.white);
             }
 
             if(isDatalinkAvaliable)
             {
-                foreach(Missile missile in parentAircraft.datalink.missiles)
+                foreach(var mslAndTarget in parentAircraft.datalink.mslTrackInfo)
                 {
+                    Missile missile = mslAndTarget.Item1;
                     var (posX, posY) = TransformWorldToRadar(missile.transform.position, areaSize);
                     var (posTX, posTY) = TransformWorldToRadar(missile.target.position, areaSize);
 
-                    drawer.DrawRectCenter(areaOffset.x + posX, areaOffset.y + posY, 4, 4, Color.white);
+                    drawer.DrawRectFillCenter(areaOffset.x + posX, areaOffset.y + posY, 4, 4, Color.white);
                     if(missile.IsIgnited)
                         drawer.DrawLine(areaOffset.x + posX, areaOffset.y + posY, areaOffset.x + posTX, areaOffset.y + posTY, Color.white);
                     else
@@ -245,8 +245,8 @@ namespace AeroSim.UI
         {
             //drawer.DrawRect(x0 - 14, y0, 1, 7, new Color32(0, 255, 0, 255));
             //drawer.DrawRect(x0 + 14, y0, 1, 7, new Color32(0, 255, 0, 255));
-            drawer.DrawLine(x0 - 14, y0 - 14, x0 - 14, y0 + 14, Color.white);
-            drawer.DrawLine(x0 + 14, y0 - 14, x0 + 14, y0 + 14, Color.white);
+            drawer.DrawLine(x0 - 28, y0 - 28, x0 - 28, y0 + 28, Color.white);
+            drawer.DrawLine(x0 + 28, y0 - 28, x0 + 28, y0 + 28, Color.white);
         }
 
         private (int, int) TransformWorldToRadar(Vector3 worldPos, Vector2Int size = new Vector2Int())

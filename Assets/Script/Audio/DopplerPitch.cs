@@ -28,7 +28,14 @@ namespace AeroSim.Audio
             audioSource = GetComponent<AudioSource>();
             defaultPitch = audioSource.pitch;
 
-            listener = FindFirstObjectByType<AudioListener>().transform;
+            AudioListener audioListener = FindFirstObjectByType<AudioListener>();
+            if (audioListener == null)
+            {
+                enabled = false;
+                return;
+            }
+
+            listener = audioListener.transform;
 
             lastPos = transform.position;
             targetLastPos = listener.transform.position;
@@ -38,6 +45,8 @@ namespace AeroSim.Audio
 
         private void FixedUpdate()
         {
+            if (listener == null) return;
+
             Vector3 deltaPos = transform.position - lastPos;
             Vector3 targetDeltaPos = listener.transform.position - targetLastPos;
             velocity = deltaPos.normalized * (deltaPos.magnitude / Time.fixedDeltaTime);
