@@ -10022,7 +10022,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   connetor: {fileID: -2362393669002190726}
-  accTime: 0.2
+  accTime: 0.4
   accleration: 250
   dragCoeff: 0.06
   maxTurnRate: 25

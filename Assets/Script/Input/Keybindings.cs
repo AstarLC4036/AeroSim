@@ -10,6 +10,7 @@ namespace AeroSim.InputSystem
         public static KeyCode focusCam = KeyCode.Z;
         public static KeyCode changeView = KeyCode.V;
         public static KeyCode mslView = KeyCode.P;
+        public static KeyCode toggleGear = KeyCode.G;
 
         public static KeyCode fireMain = KeyCode.Space;
         public static KeyCode[] radarHmdLock = new KeyCode[] { KeyCode.LeftAlt, KeyCode.F };
@@ -19,6 +20,7 @@ namespace AeroSim.InputSystem
         public static bool radarHmdLockDown = false;
         public static bool radarTwsLockDown = false;
         public static bool radarNextModeDown = false;
+        public static bool toggleGearDown = false;
 
         public void Update()
         {
@@ -38,6 +40,8 @@ namespace AeroSim.InputSystem
             {
                 radarNextModeDown = true;
             }
+
+            UpdateSignleKeyDown(ref toggleGearDown, toggleGear);
         }
 
         private void ResetAllKeys()
@@ -45,6 +49,18 @@ namespace AeroSim.InputSystem
             radarHmdLockDown = false;
             radarTwsLockDown = false;
             radarNextModeDown = false;
+        }
+
+        private void UpdateSignleKeyDown(ref bool keyDown, KeyCode keyCode)
+        {
+            if (Input.GetKeyDown(keyCode) && !keyDown)
+            {
+                keyDown = true;
+            }
+            else if (keyDown && !Input.GetKeyDown(keyCode))
+            {
+                keyDown = false;
+            }
         }
 
         private bool OnCombinedKeyDown(KeyCode[] keys)

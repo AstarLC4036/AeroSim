@@ -52,6 +52,7 @@ namespace AeroSim.AeroPhysics
         public MissileModule mslManager;
         public FlightController flightController;
         public MFDDisplays mfdDisplay;
+        public ModuleMovement movement;
 
         // public fields
         public float AOA => angleOfAttack;
@@ -84,24 +85,15 @@ namespace AeroSim.AeroPhysics
 
             //use 'try' block instead
             //Init modules
-            radar = GetComponent<RadarModule>();
-            radar.Init(this);
-            datalink = GetComponent<DatalinkModule>();
-            datalink.Init(this);
-            if(targetingPod != null)
-            targetingPod.Init(this);
-            rwr = GetComponent<RWRModule>();
-            rwr.Init(this);
-            maw = GetComponent<MAWModule>();
-            maw.Init(this);
-            mslManager = GetComponent<MissileModule>();
-            mslManager.Init(this);
-            engine = GetComponent<EngineModule>();
-            engine.Init(this);
-            flightController = GetComponent<FlightController>();
-            flightController.Init(this);
-            mfdDisplay = GetComponent<MFDDisplays>();
-            mfdDisplay.Init(this);
+            radar?.Init(this);
+            datalink?.Init(this);
+            targetingPod?.Init(this);
+            rwr?.Init(this);
+            maw?.Init(this);
+            mslManager?.Init(this);
+            engine?.Init(this);
+            flightController?.Init(this);
+            mfdDisplay?.Init(this);
 
             if (this == main)
                 MainAircraftInit();
