@@ -18,16 +18,14 @@ namespace AeroSim.AircraftModules
             public Vector2 tiling;
             public Vector2 offset;
             public MFDType type;
-            [Header("Property Override")]
-            public Vector2Int size;
-            public Color32 bgColor;
         }
 
-        public Canvas displayCarrier;
         public List<ScreenProperty> mfdScreens = new List<ScreenProperty>();
         public List<MaterialPropertyBlock> mfdProperties = new List<MaterialPropertyBlock>();
         [SerializeField]
-        public RadarMFD radarDrawer;
+        public RadarBScopeMFD radarBScopeDrawer;
+        [SerializeField]
+        public RadarPPIMFD radarPPIDrawer;
 
         private Aircraft parentAircraft;
 
@@ -44,20 +42,30 @@ namespace AeroSim.AircraftModules
 
         private void InitDrawer()
         {
-            radarDrawer = new RadarMFD();
+            ScreenProperty radarDefineScreen = mfdScreens.Find(x => x.type == MFDType.RadarBScope || x.type == MFDType.RadarPPI);
 
-            // Set data override first
-            foreach (ScreenProperty mfd in mfdScreens)
+            if (radarBScopeDrawer == null)
             {
-                MFDDrawer drawer = GetMFDDrawer(mfd.type);
-                if (drawer != null)
-                {
-                    drawer.size = mfd.size;
-                    drawer.bgColor = mfd.bgColor;
-                }
+                radarBScopeDrawer = new RadarBScopeMFD(new Vector2Int(1024, 1024), Color.black);
+            }
+            if (radarPPIDrawer == null)
+            {
+                radarBScopeDrawer = new RadarBScopeMFD(new Vector2Int(1024, 1024), Color.black);
             }
 
-            radarDrawer.Init(parentAircraft);
+            // Set data override first
+            //foreach (ScreenProperty mfd in mfdScreens)
+            //{
+            //    MFDDrawer drawer = GetMFDDrawer(mfd.type);
+            //    if (drawer != null)
+            //    {
+            //        drawer.size = mfd.size;
+            //        drawer.bgColor = mfd.bgColor;
+            //    }
+            //}
+
+            radarBScopeDrawer.Init(parentAircraft);
+            radarPPIDrawer.Init(parentAircraft);
         }
 
         private void InitMFDRender()
@@ -77,8 +85,10 @@ namespace AeroSim.AircraftModules
         {
             switch (type)
             {
-                case (MFDType.Radar):
-                    return radarDrawer;
+                case (MFDType.RadarBScope):
+                    return radarBScopeDrawer;
+                case (MFDType.RadarPPI):
+                    return radarPPIDrawer;
                 default :
                     return null;
             }
@@ -107,14 +117,18 @@ namespace AeroSim.AircraftModules
         {
             if (parentAircraft.isControlling)
             {
-                radarDrawer.UpdateCanvas();
+                radarBScopeDrawer.UpdateCanvas();
+                radarPPIDrawer.UpdateCanvas();
             }
         }
 
         private void OnApplicationQuit()
         {
-            if(parentAircraft.isControlling)
-                radarDrawer.Dispose();
+            if (parentAircraft.isControlling)
+            {
+                radarBScopeDrawer.Dispose();
+                radarPPIDrawer.Dispose();
+            }
         }
     }
 }

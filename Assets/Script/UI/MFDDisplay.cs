@@ -11,7 +11,8 @@ namespace AeroSim.UI
     public enum MFDType
     {
         None,
-        Radar,
+        RadarPPI,
+        RadarBScope,
         RWR,
         Weapon,
         TargetingPod,
@@ -138,6 +139,13 @@ namespace AeroSim.UI
         public RenderTexture canvasTexture;
         public Vector2Int size = new Vector2Int(256, 256);
         public Color32 bgColor = new Color32(25, 25, 25, 255);
+
+        public MFDDrawer(Vector2Int size, Color32 bgColor)
+        {
+            this.size = size;
+            this.bgColor = bgColor;
+        }
+
 
         public void InitCanvas()
         {

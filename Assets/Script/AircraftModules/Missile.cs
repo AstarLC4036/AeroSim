@@ -222,13 +222,8 @@ namespace AeroSim.AircraftModules
 
         protected virtual void UpdatePosition(float dt)
         {
-            if (isIgnited && burntTime < duration)
+            if (isIgnited)
             {
-                burntTime += Time.fixedDeltaTime;
-                //rb.AddForce(transform.forward * thrust * Time.fixedDeltaTime);
-                velo += accleration * Time.fixedDeltaTime;
-
-
                 if (desiredDirection != Vector3.zero)
                 {
                     float angleToTarget = Vector3.Angle(transform.forward, desiredDirection);
@@ -245,12 +240,19 @@ namespace AeroSim.AircraftModules
                     transform.rotation = Quaternion.RotateTowards(
                         transform.rotation, targetRotation, currentTurnRate * dt);
                 }
-            }
-            else if (burntTime > duration)
-            {
-                burntTime = duration;
-                //flameParticle.Stop();
-                flameEffect.Stop();
+
+                if (burntTime < duration)
+                {
+                    burntTime += Time.fixedDeltaTime;
+                    //rb.AddForce(transform.forward * thrust * Time.fixedDeltaTime);
+                    velo += accleration * Time.fixedDeltaTime;
+                }
+                else if (burntTime >= duration)
+                {
+                    burntTime = duration;
+                    //flameParticle.Stop();
+                    flameEffect.Stop();
+                }
             }
 
             velo -= velo * velo * dragCoeff / (2 * rb.mass) * dt;

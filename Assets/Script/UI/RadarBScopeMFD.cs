@@ -10,19 +10,19 @@ using UnityEngine;
 namespace AeroSim.UI
 {
     [Serializable]
-    public class RadarMFD : MFDDrawer
+    public class RadarBScopeMFD : MFDDrawer
     {
         private Aircraft parentAircraft;
         private RadarModule radar;
         private DatalinkModule datalink;
-        public Color32 scanRangeColor = new Color(0, 185, 0, 180);
-        public Color32 scanRangeOutlineColor = new Color(0, 185, 0, 200);
         public float maxDrawDistance;
-        public int gridAngleX = 30;
-        public int gridAngleY = 30;
-        public int vecLineLength = 30;
         public Vector2Int cursorDisplayPosition;
         private bool isDatalinkAvaliable => datalink != null;
+
+        public RadarBScopeMFD(Vector2Int size, Color32 bgColor) : base(size, bgColor)
+        {
+            
+        }
 
         public void Init(Aircraft aircraft)
         {

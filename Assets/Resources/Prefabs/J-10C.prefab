@@ -1474,51 +1474,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2221025ea5b835e4f9cfa4381731b71c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayCarrier: {fileID: 0}
   mfdScreens:
   - renderer: {fileID: 8198550585146499758}
     targetMaterialIndex: 1
     tiling: {x: 3, y: 2}
     offset: {x: -0.25, y: -1}
-    type: 1
-    size: {x: 512, y: 768}
-    bgColor:
-      serializedVersion: 2
-      rgba: 4279834905
+    type: 2
   - renderer: {fileID: 6782223984701623289}
     targetMaterialIndex: 1
     tiling: {x: 3, y: 2}
     offset: {x: -1.75, y: -1}
-    type: 1
-    size: {x: 512, y: 768}
-    bgColor:
-      serializedVersion: 2
-      rgba: 4279834905
+    type: 2
   - renderer: {fileID: 1245533672616090714}
     targetMaterialIndex: 1
     tiling: {x: 3, y: 2}
     offset: {x: -0.25, y: 0}
     type: 1
-    size: {x: 512, y: 768}
-    bgColor:
-      serializedVersion: 2
-      rgba: 4279834905
-  radarDrawer:
-    size: {x: 512, y: 512}
+  radarBScopeDrawer:
+    canvasTexture: {fileID: 0}
+    size: {x: 1024, y: 1536}
     bgColor:
       serializedVersion: 2
       rgba: 4279834905
     scanRangeColor:
       serializedVersion: 2
-      rgba: 4278255360
+      rgba: 4278713600
     scanRangeOutlineColor:
       serializedVersion: 2
-      rgba: 4278255360
+      rgba: 4280155904
     maxDrawDistance: 50
     gridAngleX: 30
-    gridAngleY: 30
-    vecLineLength: 40
+    gridAngleY: 40
+    vecLineLength: 30
     cursorDisplayPosition: {x: 0, y: 0}
+  radarPPIDrawer:
+    canvasTexture: {fileID: 0}
+    size: {x: 1024, y: 1536}
+    bgColor:
+      serializedVersion: 2
+      rgba: 4279834905
+    scanScalerColor:
+      serializedVersion: 2
+      rgba: 4294967295
+    maxDrawDistance: 50
+    ppiRadius: 500
+    scalerCount: 3
 --- !u!114 &8961641150374775139
 MonoBehaviour:
   m_ObjectHideFlags: 0
