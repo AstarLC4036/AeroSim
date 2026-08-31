@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{841ef1a3-3456-4b18-bd08-c9b2678fd474}">
 		<property name="assetPath">
 			<value>radio_click_03.wav</value>

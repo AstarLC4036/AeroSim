@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{bbdd0b5f-3e07-46f5-9bb0-67ad9b126a8d}">
 		<property name="assetPath">
 			<value>ping.wav</value>

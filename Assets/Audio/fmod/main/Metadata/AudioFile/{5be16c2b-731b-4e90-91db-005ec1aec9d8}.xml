@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{5be16c2b-731b-4e90-91db-005ec1aec9d8}">
 		<property name="assetPath">
 			<value>missile_start_med-001.wav</value>
