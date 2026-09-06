@@ -10270,6 +10270,12 @@ MonoBehaviour:
   disableNav: 0
   noLostTrack: 1
   guideGain: 4
+  navPID:
+    kp: 0.1
+    ki: 0.02
+    kd: 0.1
+    factors: {x: 1, y: 1, z: 1}
+    iMax: 0.2
   flightController: {fileID: 9153573146721940117}
   surfaces:
   - {fileID: 6813262500026101484}
@@ -10334,25 +10340,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   missile: {fileID: 0}
-  maxG: 30
+  maxG: 50
   rollPID:
     kp: 5
     ki: 0
     kd: 0.2
-    factors: {x: 1, y: 1, z: 1}
-    iMin: 0
-    iMax: 0
-  yawPID:
-    kp: 0
-    ki: 0
-    kd: 0
-    factors: {x: 1, y: 1, z: 1}
-    iMin: 0
-    iMax: 0
-  pitchPID:
-    kp: 0
-    ki: 0
-    kd: -0.2
     factors: {x: 1, y: 1, z: 1}
     iMin: 0
     iMax: 0

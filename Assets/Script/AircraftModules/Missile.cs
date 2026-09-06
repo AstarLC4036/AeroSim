@@ -41,7 +41,7 @@ namespace AeroSim.AircraftModules
         public bool noLostTrack = false;
 
         [Header("Flight")]
-        public float guideGain;
+        public FlightController.Vector3PID navPID;
         public MissileFlightController flightController;
         public AeroSurface[] surfaces;
         public Vector3 centerOfMass;
@@ -151,7 +151,7 @@ namespace AeroSim.AircraftModules
                 if (burntTime >= accTime)
                 {
                     if(!disableNav)
-                        UpdateTrack();
+                        UpdateTrack(Time.fixedDeltaTime);
                     UpdateInput(Time.fixedDeltaTime);
                 }
 
@@ -238,12 +238,12 @@ namespace AeroSim.AircraftModules
             float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);
             controllingInput = new Vector3(clampedX, clampedY, clampedZ);
 
-            float speedFactor = Mathf.Clamp(165 / Mathf.Max(velo, 1f), 0.2f, 1.0f); // 165 -> reference speed
-            Vector3 actualInput = controllingInput * speedFactor;
+            //float speedFactor = Mathf.Clamp(165 / Mathf.Max(velo, 1f), 0.2f, 1.0f); // 165 -> reference speed
+            //Vector3 actualInput = controllingInput * speedFactor;
 
             foreach (AeroSurface surface in surfaces)
             {
-                surface.UpdateInput(actualInput);
+                surface.UpdateInput(controllingInput);
             }
         }
 
@@ -343,7 +343,7 @@ namespace AeroSim.AircraftModules
             }
         }
 
-        protected virtual void UpdateTrack()
+        protected virtual void UpdateTrack(float dt)
         {
             // bad method
             /*
@@ -373,8 +373,8 @@ namespace AeroSim.AircraftModules
             Vector3 relativeVelocity = targetVelo - velo * transform.forward; // 相对速度
             Vector3 losRate = Vector3.Cross(relativeVelocity, losDirection) / range; // 视线角速率
             //float closingVelocity = -Vector3.Dot(relativeVelocity, losDirection);
-
-            Vector3 commandAccel = guideGain * Vector3.Cross(velo * transform.forward, losRate); // 指令加速度
+            Vector3 commandAccel = navPID.Update(dt, Vector3.Cross(velo * transform.forward, losRate));
+            //Vector3 commandAccel = guideGain * Vector3.Cross(velo * transform.forward, losRate); // 指令加速度
             //Vector3 localAccel = transform.InverseTransformDirection(commandAccel);
             controllingInput = flightController.CalcInput(commandAccel);
             //Debug.Log($"input {controllingInput}, velocity {velo}, command accel {commandAccel}");

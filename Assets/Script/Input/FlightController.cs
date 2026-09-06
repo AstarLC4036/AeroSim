@@ -37,6 +37,43 @@ namespace AeroSim.InputSystem
                 float result = kp * factors.x * error + ki * factors.y * integral + kd * factors.z * dError;
                 return result;
             }
+
+            public static float Direct(float kp, float ki, float kd, float error, float integral, float dError)
+            {
+                return kp * error + ki * integral + kd * dError;
+            }
+        }
+
+        [Serializable]
+        public class Vector3PID
+        {
+            public float kp;
+            public float ki;
+            public float kd;
+            public Vector3 factors = Vector3.one;
+            private Vector3 integral;
+            private Vector3 previousError;
+            public float iMax;
+
+            public Vector3 Update(float dt, Vector3 error)
+            {
+                integral += error * dt;
+                if (integral.magnitude > iMax)
+                    integral = integral.normalized * iMax;
+                Vector3 dError = (error - previousError) / dt;
+                previousError = error;
+                Vector3 result = kp * factors.x * error + ki * factors.y * integral + kd * factors.z * dError;
+                return result;
+            }
+
+            public Vector3 Update(float dt, Vector3 error, Vector3 dError)
+            {
+                integral += error * dt;
+                if(integral.magnitude > iMax)
+                    integral = integral.normalized * iMax;
+                Vector3 result = kp * factors.x * error + ki * factors.y * integral + kd * factors.z * dError;
+                return result;
+            }
         }
 
         public float sensitivity = 0.5f;
