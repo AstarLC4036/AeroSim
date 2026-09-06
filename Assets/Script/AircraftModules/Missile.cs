@@ -1,5 +1,6 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.InputSystem;
+using AeroSim.Util;
 using AeroSim.Utility;
 using AeroSim.Utils;
 using System;
@@ -35,10 +36,22 @@ namespace AeroSim.AircraftModules
             SemiActive,
             Active
         }
+        [Header("Debug")]
+        public bool disableNav = false;
+        public bool noLostTrack = false;
+
+        [Header("Flight")]
+        public float guideGain;
+        public MissileFlightController flightController;
+        public AeroSurface[] surfaces;
+        public Vector3 centerOfMass;
 
         public Transform target;
         public FixedJoint connetor;
 
+        // guiding logic
+        [SerializeField]
+        protected Vector3 controllingInput;
         protected Vector3 targetPos;
         protected Vector3 targetVelo;
         protected Vector3 lastPos;
@@ -47,8 +60,9 @@ namespace AeroSim.AircraftModules
         protected float targetDst;
 
         protected float velo;
-        protected float currentTurnRate;
+        [SerializeField]
         protected Vector3 desiredDirection;
+        protected Vector3 previousPosition;
 
         [Header("Performence")]
         public float accTime = 1f;
@@ -79,10 +93,9 @@ namespace AeroSim.AircraftModules
         [SerializeField]
         protected bool isIgnited = false;
         protected bool isLaunched = false;
-        [SerializeField]
-        protected Rigidbody rb;
+        public Rigidbody rb;
 
-        protected Vector3 previousPosition;
+        // lock logic
         protected float lockTimer;
         protected float lockingTimer;
         protected float dataLinkTimer;
@@ -109,6 +122,12 @@ namespace AeroSim.AircraftModules
         {
             rb = GetComponent<Rigidbody>();
             OriginKeeper.onOriginChange += OnOriginChange;
+            flightController.missile = this;
+
+            foreach (AeroSurface surface in surfaces)
+            {
+                surface.parent = transform;
+            }
         }
 
         protected virtual void OnOriginChange(Vector3 delta)
@@ -122,6 +141,7 @@ namespace AeroSim.AircraftModules
         {
             UpdateState(Time.fixedDeltaTime);
             UpdateLock(Time.fixedDeltaTime);
+            UpdateAeroForces();
 
             if (isIgnited)
             {
@@ -129,13 +149,37 @@ namespace AeroSim.AircraftModules
 
                 // tracking
                 if (burntTime >= accTime)
-                    UpdateTrack();
+                {
+                    if(!disableNav)
+                        UpdateTrack();
+                    UpdateInput(Time.fixedDeltaTime);
+                }
 
                 // hit test
                 UpdateHit();
             }
 
             UpdateTransmit();
+        }
+
+        public void UpdateAeroForces()
+        {
+            BiVector3 forcesAndTorque = new BiVector3();
+            foreach (AeroSurface surface in surfaces)
+            {
+                Vector3 localCenterOfMass = centerOfMass.x * transform.forward + centerOfMass.y * transform.up + centerOfMass.z * transform.right;
+                BiVector3 forces = surface.CalcucateForces(localCenterOfMass);
+                forcesAndTorque += forces;
+                Debug.DrawLine(surface.transform.position, surface.transform.position + surface.LocalVelocity / 10, Color.white);
+                Debug.DrawLine(surface.transform.position, surface.transform.position + forces.lift / 100, Color.green);
+                Debug.DrawLine(surface.transform.position, surface.transform.position + forces.drag / 100, Color.red);
+                Debug.DrawLine(surface.transform.position, surface.transform.position + forces.torque / 100, Color.blue);
+            }
+
+            rb.AddForce(forcesAndTorque.lift);
+            rb.AddForce(forcesAndTorque.drag);
+            rb.AddTorque(forcesAndTorque.torque);
+
         }
 
         /// <summary>
@@ -161,6 +205,8 @@ namespace AeroSim.AircraftModules
         /// <param name="dt">Delta time</param>
         protected virtual void UpdateState(float dt)
         {
+            velo = rb.velocity.magnitude;
+
             if (target != null)
             {
                 targetPos = target.position;
@@ -182,6 +228,22 @@ namespace AeroSim.AircraftModules
             else if(targetAircraft != null)
             {
                 targetAircraft = null;
+            }
+        }
+
+        protected virtual void UpdateInput(float dt)
+        {
+            float clampedX = Mathf.Clamp(controllingInput.x, -1, 1);
+            float clampedY = Mathf.Clamp(controllingInput.y, -1, 1);
+            float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);
+            controllingInput = new Vector3(clampedX, clampedY, clampedZ);
+
+            float speedFactor = Mathf.Clamp(165 / Mathf.Max(velo, 1f), 0.2f, 1.0f); // 165 -> reference speed
+            Vector3 actualInput = controllingInput * speedFactor;
+
+            foreach (AeroSurface surface in surfaces)
+            {
+                surface.UpdateInput(actualInput);
             }
         }
 
@@ -224,28 +286,29 @@ namespace AeroSim.AircraftModules
         {
             if (isIgnited)
             {
-                if (desiredDirection != Vector3.zero)
-                {
-                    float angleToTarget = Vector3.Angle(transform.forward, desiredDirection);
+                //if (desiredDirection != Vector3.zero)
+                //{
+                //    float angleToTarget = Vector3.Angle(transform.forward, desiredDirection);
 
-                    // target angular velocity
-                    float desiredTurnRate = Mathf.Clamp(angleToTarget / dt, 0f, maxTurnRate);
+                //    // target angular velocity
+                //    float desiredTurnRate = Mathf.Clamp(angleToTarget / dt, 0f, maxTurnRate);
 
-                    // angular velocity
-                    currentTurnRate = Mathf.MoveTowards(
-                        currentTurnRate, desiredTurnRate, maxTurnAcceleration * dt);
+                //    // angular velocity
+                //    currentTurnRate = Mathf.MoveTowards(
+                //        currentTurnRate, desiredTurnRate, maxTurnAcceleration * dt);
 
-                    // rotation
-                    Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);
-                    transform.rotation = Quaternion.RotateTowards(
-                        transform.rotation, targetRotation, currentTurnRate * dt);
-                }
+                //    // rotation
+                //    Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);
+                //    transform.rotation = Quaternion.RotateTowards(
+                //        transform.rotation, targetRotation, currentTurnRate * dt);
+                //}
 
                 if (burntTime < duration)
                 {
+                    transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
                     burntTime += Time.fixedDeltaTime;
-                    //rb.AddForce(transform.forward * thrust * Time.fixedDeltaTime);
-                    velo += accleration * Time.fixedDeltaTime;
+                    rb.AddForce(transform.forward * thrust);
+                    //velo += accleration * Time.fixedDeltaTime;
                 }
                 else if (burntTime >= duration)
                 {
@@ -255,14 +318,11 @@ namespace AeroSim.AircraftModules
                 }
             }
 
-            velo -= velo * velo * dragCoeff / (2 * rb.mass) * dt;
-            if (Mathf.Abs(velo) < 0.1f)
-            {
-                velo = 0;
-            }
+            // drag
+            rb.AddForce(-rb.velocity.normalized * rb.velocity.sqrMagnitude * dragCoeff);
 
             previousPosition = transform.position;
-            transform.position += transform.forward * velo * Time.fixedDeltaTime;
+            //transform.position += transform.forward * velo * Time.fixedDeltaTime;
         }
 
         /// <summary>
@@ -314,10 +374,12 @@ namespace AeroSim.AircraftModules
             Vector3 losRate = Vector3.Cross(relativeVelocity, losDirection) / range; // 视线角速率
             //float closingVelocity = -Vector3.Dot(relativeVelocity, losDirection);
 
-            Vector3 commandAccel = 4 * Vector3.Cross(velo * transform.forward, losRate); // 指令加速度
+            Vector3 commandAccel = guideGain * Vector3.Cross(velo * transform.forward, losRate); // 指令加速度
             //Vector3 localAccel = transform.InverseTransformDirection(commandAccel);
-            Vector3 desiredVelo = transform.forward * velo + commandAccel * Time.fixedDeltaTime; // 期望速度
-            desiredDirection = desiredVelo.normalized * 10;
+            controllingInput = flightController.CalcInput(commandAccel);
+            //Debug.Log($"input {controllingInput}, velocity {velo}, command accel {commandAccel}");
+            //Vector3 desiredVelo = transform.forward * velo + commandAccel * Time.fixedDeltaTime; // 期望速度
+            //desiredDirection = desiredVelo.normalized * 10;
         }
 
         public virtual void Ignite()
@@ -329,7 +391,8 @@ namespace AeroSim.AircraftModules
             isIgnited = true;
             flameEffect.Play();
             GameObject.Destroy(connetor);
-            rb.isKinematic = true;
+            //rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.FreezeRotationZ;
 
             isLaunched = true;
         }
@@ -342,6 +405,7 @@ namespace AeroSim.AircraftModules
             isIgnited = false;
             explosionEffect.Play();
             flameEffect.Stop();
+            rb.isKinematic = true;
 
             float explosionRadius = 50;
             Collider[] targets = Physics.OverlapSphere(hit.point, explosionRadius);
@@ -387,8 +451,11 @@ namespace AeroSim.AircraftModules
             {
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawLine(target.position, target.position + targetVelo);
+            }
+            if (desiredDirection != Vector3.zero)
+            {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawLine(transform.position, transform.position + desiredDirection);
+                Gizmos.DrawLine(transform.position, transform.position + desiredDirection * 10);
             }
         }
     }

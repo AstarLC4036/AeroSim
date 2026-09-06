@@ -41,6 +41,9 @@ namespace AeroSim.InputSystem
 
         public float sensitivity = 0.5f;
 
+        [Header("Missile control")]
+        public Rigidbody rb;
+
         [Header("Aim Ring(PID)")]
         public PID rollPID;
         public PID pitchPID;
@@ -82,7 +85,7 @@ namespace AeroSim.InputSystem
 
         public void Start()
         {
-            aircraft = Aircraft.main;
+            //aircraft = Aircraft.main;
 
             previousValues = new Vector3[avgSize];
             previousValueIndex = 0;
@@ -99,7 +102,7 @@ namespace AeroSim.InputSystem
                 Cursor.visible = true;
             }
 
-            if(aircraft.isControlling)
+            if(aircraft != null && aircraft.isControlling)
             {
                 if (!Input.GetKey(Keybindings.holdControlInput) && CameraController.CurrentView.view != CameraController.CameraView.ViewType.Pod)
                 {
@@ -115,7 +118,7 @@ namespace AeroSim.InputSystem
         /// </summary>
         public Vector3 AimRingControl(Vector3 targetDir, float dt)
         {
-            Vector3 localTargetDir = aircraft.transform.InverseTransformDirection(targetDir).normalized;
+            Vector3 localTargetDir = transform.InverseTransformDirection(targetDir).normalized;
             Vector3 targetHorziontal = Vector3.ProjectOnPlane(targetDir, Vector3.up).normalized;
             Vector3 forwardHorziontal = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
 
@@ -127,12 +130,12 @@ namespace AeroSim.InputSystem
             float errorDeg = Vector3.Angle(Vector3.forward, localTargetDir);
 
             // Aircarft Status
-            Vector3 localAngularVelo = aircraft.transform.InverseTransformDirection(aircraft.Rb.angularVelocity);
+            Vector3 localAngularVelo = transform.InverseTransformDirection(rb.angularVelocity);
             float rollRate = localAngularVelo.z;
             float pitchRate = localAngularVelo.x;
             float yawRate = localAngularVelo.y;
             float currentRollAngle = CovertAngle(transform.eulerAngles.z) * Mathf.Deg2Rad;
-            float currentSpeed = aircraft.Velocity.magnitude;
+            float currentSpeed = rb.velocity.magnitude;
 
             // Factors
             Vector3 factors = new Vector3(generalFactor, 1, generalFactor);

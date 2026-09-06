@@ -9,7 +9,7 @@ namespace AeroSim.InputSystem
         public static KeyCode thurstDown = KeyCode.LeftControl;
         public static KeyCode focusCam = KeyCode.Z;
         public static KeyCode changeView = KeyCode.V;
-        public static KeyCode mslView = KeyCode.P;
+        public static KeyCode mslView = KeyCode.U;
         public static KeyCode toggleGear = KeyCode.G;
 
         public static KeyCode fireMain = KeyCode.Space;

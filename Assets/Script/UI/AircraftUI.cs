@@ -16,6 +16,7 @@ namespace AeroSim.UI
         public TMP_Text throttleText;
         public TMP_Text altText;
         public TMP_Text spdText;
+        public TMP_Text machSpdText;
         public TMP_Text overloadText;
         public Aircraft aircraft;
         private Rigidbody aircraftRB;
@@ -51,10 +52,11 @@ namespace AeroSim.UI
         private void Update()
         {
             int throttlePercent = (int)(aircraft.engine.thurst / aircraft.engine.maxThurst * 100);
-            throttleText.text = throttlePercent <= 100 ? $"{throttlePercent}%" : $"{throttlePercent}% <color=red>[加力]</color>";
-            altText.text = $"{((int)((aircraft.transform.position.y - OriginKeeper.origin.y) * 100)) / 100}m";
-            spdText.text = $"{((int)(aircraftRB.velocity.magnitude / 1000 * 3600 * 100)) / 100}km/h";
-            overloadText.text = $"{(int)(aircraft.G * 10) / 10f} G";
+            throttleText.text = throttlePercent <= 100 ? $"{throttlePercent} <size=16>%</size>" : $"{throttlePercent} <size=16>% <color=red>[加力]</color></size>";
+            altText.text = $"{((int)((aircraft.transform.position.y - OriginKeeper.origin.y) * 100)) / 100} <size=16>m</size>";
+            spdText.text = $"{((int)(aircraftRB.velocity.magnitude / 1000 * 3600 * 100)) / 100} <size=16>km/h</size>";
+            machSpdText.text = $"{(int)(aircraftRB.velocity.magnitude / 343.0f * 100) / 100f} <size=16>Mach</size>";
+            overloadText.text = $"{(int)(aircraft.G * 10) / 10f} <size=16>G</size>";
         }
 
         public void DisplayRWRMsgBG(bool display = true)

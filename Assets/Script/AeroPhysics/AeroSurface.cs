@@ -21,6 +21,13 @@ namespace AeroSim.AeroPhysics
             Pitch = 2,
             Roll = 3
         }
+
+        public enum InputHandleMode
+        {
+            Aircraft = 0,
+            Missile = 1
+        }
+
         [Header("Status")]
         private Vector3 velocity;
         private Vector3 localFlow;
@@ -28,10 +35,11 @@ namespace AeroSim.AeroPhysics
         private Vector3 lastPos;
 
         public Vector3 LocalVelocity => velocity;
+        public float aoa => angleOfAttack;
 
         [Header("Data")]
         //public AeroSurfaceData surfaceData;
-        public Aircraft parent;
+        public Transform parent;
         #region Surface Data
         public float span = 0;
         public float chord = 0;
@@ -62,10 +70,8 @@ namespace AeroSim.AeroPhysics
         [Header("Physics")]
         public Vector3 coefficientsInfo;
 
-        [Header("Effect")]
-        public ParticleSystem wingTipVotexEmitter;
-
         [Header("Surface Settings")]
+        public InputHandleMode inputMode = InputHandleMode.Aircraft;
         public float flapAngle = 0;
         public float maxFlapAngle = 0;
         public float flapMoveSpeed = 0;
@@ -150,26 +156,13 @@ namespace AeroSim.AeroPhysics
             {
                 angle += surface.GetAngle(input) * maxFlapAngle;
             }
-            angle /= controlSurfaces.Length; //avg
+
+            if(inputMode == InputHandleMode.Aircraft)
+                angle /= controlSurfaces.Length; //avg
+            else if(inputMode == InputHandleMode.Missile)
+                angle = Mathf.Clamp(angle, -maxFlapAngle, maxFlapAngle);
+
             targetFlapAngle = angle;
-        }
-
-        private void UpdateParticles(LDMCoefficients coefficients)
-        {
-            if (wingTipVotexEmitter != null && coefficients.liftCoefficient >= 0.2f && !wingTipVotexEmitter.isPlaying)
-            {
-                wingTipVotexEmitter.Play();
-            }
-            else if (wingTipVotexEmitter != null && coefficients.liftCoefficient < 0.2f && wingTipVotexEmitter.isPlaying)
-            {
-                wingTipVotexEmitter.Stop();
-            }
-
-            if (wingTipVotexEmitter != null && wingTipVotexEmitter.isPlaying)
-            {
-                ParticleSystem.MainModule main = wingTipVotexEmitter.main;
-                main.startSpeed = velocity.magnitude;
-            }
         }
 
         public void UpdateData()
@@ -254,12 +247,10 @@ namespace AeroSim.AeroPhysics
             Vector3 drag = dragForce * -velocity.normalized;
 
             Vector3 torque = transform.right * coefficients.torqueCoefficient * dymaticPresure * area * chord;
-            Vector3 totalTorque = Vector3.Cross(transform.position - parent.transform.position - aircraftCenterOfMass, lift + drag);
+            Vector3 totalTorque = Vector3.Cross(transform.position - parent.position - aircraftCenterOfMass, lift + drag);
             if (inverseTorque)
                 totalTorque *= -1;
 
-            //actually, it shouldn't be here
-            UpdateParticles(coefficients);
 
             return new BiVector3(lift, drag, totalTorque);
         }

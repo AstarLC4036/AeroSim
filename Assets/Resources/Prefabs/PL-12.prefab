@@ -1,5 +1,144 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &228388958111127604
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2829376137390347395}
+  - component: {fileID: 7915441015165368925}
+  m_Layer: 0
+  m_Name: ControlSurface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2829376137390347395
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228388958111127604}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: -0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: 0.15, y: -0.15, z: -1.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45}
+--- !u!114 &7915441015165368925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228388958111127604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 1.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 25
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces:
+  - surfaceType: 1
+    invertInput: 1
+    anglePercent: 0.707
+  - surfaceType: 2
+    invertInput: 0
+    anglePercent: 0.707
+  - surfaceType: 3
+    invertInput: 1
+    anglePercent: 0.707
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
+--- !u!1 &635909955792138405
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7694989023744596289}
+  - component: {fileID: 6896192952704531320}
+  m_Layer: 0
+  m_Name: Surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7694989023744596289
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635909955792138405}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: -0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: -0.15, y: 0.15, z: -0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45}
+--- !u!114 &6896192952704531320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635909955792138405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 2.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 45
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces: []
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
 --- !u!1 &1068996072421074529
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,6 +149,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8602348618290759155}
   - component: {fileID: 1949138448632137529}
+  - component: {fileID: 4749862818721106297}
   m_Layer: 0
   m_Name: Launch
   m_TagString: Untagged
@@ -63,6 +203,19 @@ MonoBehaviour:
   OverrideAttenuation: 0
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
+--- !u!114 &4749862818721106297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068996072421074529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16744046f72e8464aa10c566bc840631, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emitter: {fileID: 1949138448632137529}
 --- !u!1 &1516208459442671001
 GameObject:
   m_ObjectHideFlags: 0
@@ -5156,6 +5309,462 @@ Transform:
   - {fileID: 3469988010249054402}
   m_Father: {fileID: 4599142677834043034}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &2481001507530469919
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5463657877403330711}
+  - component: {fileID: 2022190119088768420}
+  m_Layer: 0
+  m_Name: Surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5463657877403330711
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2481001507530469919}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: -0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: 0.15, y: -0.15, z: -0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45}
+--- !u!114 &2022190119088768420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2481001507530469919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 2.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 45
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces: []
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
+--- !u!1 &2726773089699833144
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 191115637065632659}
+  - component: {fileID: 6058908773168242738}
+  m_Layer: 0
+  m_Name: ControlSurface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &191115637065632659
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2726773089699833144}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: 0.15, y: 0.15, z: -1.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
+--- !u!114 &6058908773168242738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2726773089699833144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 1.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 25
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces:
+  - surfaceType: 1
+    invertInput: 0
+    anglePercent: 0.707
+  - surfaceType: 2
+    invertInput: 0
+    anglePercent: 0.707
+  - surfaceType: 3
+    invertInput: 0
+    anglePercent: 0.707
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
+--- !u!1 &3427340788344702760
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1797248615837079281}
+  m_Layer: 0
+  m_Name: AeroSurfaces
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1797248615837079281
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3427340788344702760}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 191115637065632659}
+  - {fileID: 8527872774378637458}
+  - {fileID: 1986789249550863632}
+  - {fileID: 2829376137390347395}
+  - {fileID: 2389373689504911810}
+  - {fileID: 7694989023744596289}
+  - {fileID: 7375461226529885152}
+  - {fileID: 5463657877403330711}
+  m_Father: {fileID: 4599142677834043034}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4482395570097135753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1986789249550863632}
+  - component: {fileID: 6700435368220766601}
+  m_Layer: 0
+  m_Name: ControlSurface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1986789249550863632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4482395570097135753}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: -0.15, y: -0.15, z: -1.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
+--- !u!114 &6700435368220766601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4482395570097135753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 1.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 25
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces:
+  - surfaceType: 1
+    invertInput: 0
+    anglePercent: 0.707
+  - surfaceType: 2
+    invertInput: 0
+    anglePercent: 0.707
+  - surfaceType: 3
+    invertInput: 1
+    anglePercent: 0.707
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
+--- !u!1 &4874510318729022856
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2389373689504911810}
+  - component: {fileID: 6970264474071164553}
+  m_Layer: 0
+  m_Name: Surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2389373689504911810
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4874510318729022856}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: 0.15, y: 0.15, z: -0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
+--- !u!114 &6970264474071164553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4874510318729022856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 2.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 45
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces: []
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
+--- !u!1 &5353932476555689121
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7375461226529885152}
+  - component: {fileID: 3491275260508143745}
+  m_Layer: 0
+  m_Name: Surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7375461226529885152
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353932476555689121}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: -0.15, y: -0.15, z: -0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
+--- !u!114 &3491275260508143745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353932476555689121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 2.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 45
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces: []
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
+--- !u!1 &5401547437317775704
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8527872774378637458}
+  - component: {fileID: 8443017367275668940}
+  m_Layer: 0
+  m_Name: ControlSurface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8527872774378637458
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5401547437317775704}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: -0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: -0.15, y: 0.15, z: -1.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1797248615837079281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45}
+--- !u!114 &8443017367275668940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5401547437317775704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd2fd1f1f3be3649b0e6cbdd5842317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  span: 0.3
+  chord: 0.4
+  flapPercent: 1
+  liftSlope: 5
+  zeroLiftAngle: 0
+  aoaStallNB: -30
+  aoaStallPB: 30
+  skinFrictionCoiffient: 0.001
+  aspectRatio: 1.5
+  autoAR: 0
+  coefficientsInfo: {x: 0, y: 0, z: 0}
+  inputMode: 0
+  flapAngle: 0
+  maxFlapAngle: 25
+  flapMoveSpeed: 80
+  inverseTorque: 0
+  controlSurfaces:
+  - surfaceType: 1
+    invertInput: 1
+    anglePercent: 0.707
+  - surfaceType: 2
+    invertInput: 0
+    anglePercent: 0.707
+  - surfaceType: 3
+    invertInput: 0
+    anglePercent: 0.707
+  targetFlapAngle: 0
+  flapTransform: {fileID: 0}
+  rotateAxis: 0
 --- !u!1 &6003065859959280171
 GameObject:
   m_ObjectHideFlags: 0
@@ -15142,6 +15751,7 @@ GameObject:
   - component: {fileID: 4599142677834043034}
   - component: {fileID: 4715517386394031682}
   - component: {fileID: 8009321847862538011}
+  - component: {fileID: 4402767179932921774}
   - component: {fileID: 5338969918139218605}
   - component: {fileID: 33712565325503982}
   m_Layer: 0
@@ -15164,6 +15774,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1797248615837079281}
   - {fileID: 8834663295487770978}
   - {fileID: 3767705132440404623}
   - {fileID: 6045762855959526550}
@@ -15180,8 +15791,8 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 200
   m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0.2}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -15190,7 +15801,7 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -15209,16 +15820,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c544be6e5b97c444b70ce0116b5b63d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  disableNav: 0
+  guideGain: 4
+  flightController: {fileID: 4402767179932921774}
+  surfaces:
+  - {fileID: 6058908773168242738}
+  - {fileID: 8443017367275668940}
+  - {fileID: 6700435368220766601}
+  - {fileID: 7915441015165368925}
+  - {fileID: 6970264474071164553}
+  - {fileID: 6896192952704531320}
+  - {fileID: 3491275260508143745}
+  - {fileID: 2022190119088768420}
+  centerOfMass: {x: 0, y: 0, z: 0.2}
   target: {fileID: 0}
   connetor: {fileID: 5338969918139218605}
+  controllingInput: {x: 0, y: 0, z: 0}
+  desiredDirection: {x: 0, y: 0, z: 0}
   accTime: 0.6
   accleration: 275
   dragCoeff: 0.07
   maxTurnRate: 18
   maxTurnAcceleration: 50
-  duration: 12
+  duration: 12000
   burntTime: 0
-  thrust: 500000
+  thrust: 30000
   maxRange: 13
   lockTime: 0.5
   lockTimeout: 3
@@ -15241,6 +15867,41 @@ MonoBehaviour:
   targetAircraft: {fileID: 0}
   radarStartupRange: 4000
   radarFov: 45
+--- !u!114 &4402767179932921774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7531128965448476514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6efcbbd2cd1ca72428c5c6e82fc6aace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  missile: {fileID: 0}
+  maxG: 30
+  rollPID:
+    kp: 1.2
+    ki: 0
+    kd: 0.3
+    factors: {x: 1, y: 1, z: 1}
+    iMin: 0
+    iMax: 0
+  yawPID:
+    kp: 0
+    ki: 0
+    kd: 0.8
+    factors: {x: 1, y: 1, z: 1}
+    iMin: 0
+    iMax: 0
+  pitchPID:
+    kp: 0
+    ki: 0
+    kd: 0.8
+    factors: {x: 1, y: 1, z: 1}
+    iMin: 0
+    iMax: 0
 --- !u!138 &5338969918139218605
 FixedJoint:
   m_ObjectHideFlags: 0
@@ -15290,6 +15951,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8611783059863129430}
   - component: {fileID: 5756339358955521174}
+  - component: {fileID: 9210783343439873229}
   m_Layer: 0
   m_Name: Engine
   m_TagString: Untagged
@@ -15343,6 +16005,19 @@ MonoBehaviour:
   OverrideAttenuation: 0
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
+--- !u!114 &9210783343439873229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7651054030439445809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16744046f72e8464aa10c566bc840631, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emitter: {fileID: 5756339358955521174}
 --- !u!1 &7832876988795814904
 GameObject:
   m_ObjectHideFlags: 0

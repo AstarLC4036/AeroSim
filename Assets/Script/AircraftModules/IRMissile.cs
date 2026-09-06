@@ -50,7 +50,7 @@ namespace AeroSim.AircraftModules
             else if (target != null && lockState == MissileState.Locked)
             {
                 float dst = Vector3.Distance(transform.position, target.position);
-                if (MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) && dst <= maxRange * 1000)
+                if (MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) && dst <= maxRange * 1000 || noLostTrack)
                 {
                     seekerDirection = MathUtility.ApplyAngularJitter((target.position - seekerTransform.position).normalized, jitterAmplitude, jitterFreqency, transform.up);
                     seekerDirection = MathUtility.ClampTargetDir(transform, seekerDirection, yawLimits.x, yawLimits.y, pitchLimits.x, pitchLimits.y);

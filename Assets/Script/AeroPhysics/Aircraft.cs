@@ -75,10 +75,10 @@ namespace AeroSim.AeroPhysics
         public void Start()
         {
             //Register all aero surfaces
-            surfaces = GetComponentsInChildren<AeroSurface>(false);
+            //surfaces = GetComponentsInChildren<AeroSurface>(false);
             foreach (AeroSurface surface in surfaces)
             {
-                surface.parent = this;
+                surface.parent = transform;
             }
 
             rb = GetComponent<Rigidbody>();
