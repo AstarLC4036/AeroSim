@@ -2,7 +2,7 @@
 using UnityEngine;
 using AeroSim.AeroPhysics;
 
-namespace AeroSim.Utils
+namespace AeroSim.Cockpit
 {
     public class ElevatorStickMapper : MonoBehaviour
     {

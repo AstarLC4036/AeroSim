@@ -32,7 +32,7 @@ namespace AeroSim.AircraftModules
             // Update target position and velocity
             if (lockState == MissileState.Locked)
             {
-                if (status == 2 && MathUtility.ConeDetect(transform.position, transform.forward, targetPos, radarFov))
+                if (status == 2 && MathUtility.ConeDetect(transform.position, transform.forward, targetPos, radarFov) || noLostTrack)
                 {
                     targetPos = target.position;
                 }

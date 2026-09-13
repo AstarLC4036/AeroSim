@@ -13,35 +13,33 @@ namespace AeroSim.InputSystem
         public static KeyCode toggleGear = KeyCode.G;
 
         public static KeyCode fireMain = KeyCode.Space;
+        public static KeyCode shutdownSeeker = KeyCode.B;
         public static KeyCode[] radarHmdLock = new KeyCode[] { KeyCode.LeftAlt, KeyCode.F };
         public static KeyCode[] radarTwsLock = new KeyCode[] { KeyCode.LeftAlt, KeyCode.X };
         public static KeyCode[] radarNextMode = new KeyCode[] { KeyCode.LeftAlt, KeyCode.B };
+        public static KeyCode[] countermeasuresNextMode = new KeyCode[] { KeyCode.LeftAlt, KeyCode.S };
+        public static KeyCode[] countermeasuresDeploy = new KeyCode[] { KeyCode.LeftAlt, KeyCode.E };
 
         public static bool radarHmdLockDown = false;
         public static bool radarTwsLockDown = false;
         public static bool radarNextModeDown = false;
         public static bool toggleGearDown = false;
+        public static bool shutdownSeekerDown = false;
+        public static bool countermeasuresNextModeDown = false;
+        public static bool countermeasuresDeployDown = false;
 
         public void Update()
         {
             ResetAllKeys();
 
-            if(OnCombinedKeyDown(radarHmdLock))
-            {
-                radarHmdLockDown = true;
-            }
-
-            if(OnCombinedKeyDown(radarTwsLock))
-            {
-                radarTwsLockDown = true;
-            }
-
-            if(OnCombinedKeyDown(radarNextMode))
-            {
-                radarNextModeDown = true;
-            }
+            OnCombinedKeyDown(ref radarHmdLockDown, radarHmdLock);
+            OnCombinedKeyDown(ref radarTwsLockDown, radarTwsLock);
+            OnCombinedKeyDown(ref radarNextModeDown, radarNextMode);
+            OnCombinedKeyDown(ref countermeasuresNextModeDown, countermeasuresNextMode);
+            OnCombinedKeyDown(ref countermeasuresDeployDown, countermeasuresDeploy);
 
             UpdateSignleKeyDown(ref toggleGearDown, toggleGear);
+            UpdateSignleKeyDown(ref shutdownSeekerDown, shutdownSeeker);
         }
 
         private void ResetAllKeys()
@@ -49,6 +47,10 @@ namespace AeroSim.InputSystem
             radarHmdLockDown = false;
             radarTwsLockDown = false;
             radarNextModeDown = false;
+            toggleGearDown = false;
+            shutdownSeekerDown = false;
+            countermeasuresNextModeDown = false;
+            countermeasuresDeployDown = false;
         }
 
         private void UpdateSignleKeyDown(ref bool keyDown, KeyCode keyCode)
@@ -63,7 +65,7 @@ namespace AeroSim.InputSystem
             }
         }
 
-        private bool OnCombinedKeyDown(KeyCode[] keys)
+        private void OnCombinedKeyDown(ref bool keyDown, KeyCode[] keys)
         {
             bool allKeyPressing = true;
             bool anyKeyDown = false;
@@ -79,7 +81,7 @@ namespace AeroSim.InputSystem
                     allKeyPressing = false;
                 }
             }
-            return anyKeyDown && allKeyPressing;
+            keyDown = anyKeyDown && allKeyPressing;
         }
     }
 }

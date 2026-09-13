@@ -1,4 +1,5 @@
 ﻿using AeroSim.AeroPhysics;
+using AeroSim.General;
 using AeroSim.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,20 +29,33 @@ namespace AeroSim.AircraftModules
             if (Input.GetKeyDown(Keybindings.fireMain) && parentAircraft.isControlling)
             {
                 if (currentMissle.lockState == Missile.MissileState.None)
+                {
                     ActiveSeeker();
+                    VehicleLog.LogMsg($"[{currentMissle.nameId}] 导引头启动");
+                }
                 else if (currentMissle.lockState == Missile.MissileState.Locked)
                     Fire();
             }
+            else if(Keybindings.shutdownSeekerDown && parentAircraft.isControlling)
+            {
+                if (currentMissle.lockState != Missile.MissileState.None)
+                {
+                    currentMissle.ShutdownSeeker();
+                    VehicleLog.LogMsg($"[{currentMissle.nameId}] 导引头关闭");
+                }
+            }
 
-            if(Input.GetKeyDown(Keybindings.mslView) && parentAircraft.isControlling)
+            if (Input.GetKeyDown(Keybindings.mslView) && parentAircraft.isControlling)
             {
                 if(CameraController.Instance.target != transform)
                 {
                     CameraController.Instance.target = transform;
+                    CameraController.Instance.directlyRotate = false;
                 }
                 else if(launchedMissle != null)
                 {
                     CameraController.Instance.target = launchedMissle.transform;
+                    CameraController.Instance.directlyRotate = true;
                 }
             }
         }

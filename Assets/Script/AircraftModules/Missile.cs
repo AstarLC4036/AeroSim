@@ -40,8 +40,16 @@ namespace AeroSim.AircraftModules
         public bool disableNav = false;
         public bool noLostTrack = false;
 
+        [Header("Base peroperties")]
+        public string nameId = "Missile";
+        public MissileSize size = MissileSize.Small;
+        public MissileType type = MissileType.None;
+        public bool hasDatalink = false;
+        public LayerMask targetLayer;
+
         [Header("Flight")]
-        public FlightController.Vector3PID navPID;
+        public float guideGain;
+        public float cmdAccelMultiply;
         public MissileFlightController flightController;
         public AeroSurface[] surfaces;
         public Vector3 centerOfMass;
@@ -58,6 +66,7 @@ namespace AeroSim.AircraftModules
         protected Vector3 targetDir;
         protected Vector3 prevVelo;
         protected float targetDst;
+        protected Vector3 commandAccel;
 
         protected float velo;
         [SerializeField]
@@ -70,6 +79,7 @@ namespace AeroSim.AircraftModules
         public float dragCoeff = 0.01f;
         public float maxTurnRate;
         public float maxTurnAcceleration;
+        public float maxG;
         public float duration = 5f;
         public float burntTime = 0;
         public float thrust = 1000;
@@ -81,11 +91,6 @@ namespace AeroSim.AircraftModules
         public float boresightAngle = 30f;
         public float jitterAmplitude;
         public float jitterFreqency;
-        [Header("Base peroperties")]
-        public MissileSize size = MissileSize.Small;
-        public MissileType type = MissileType.None;
-        public bool hasDatalink = false;
-        public LayerMask targetLayer;
         [Header("Effect")]
         public EffectController flameEffect;
         public EffectController explosionEffect;
@@ -101,7 +106,6 @@ namespace AeroSim.AircraftModules
         protected float dataLinkTimer;
         public MissileState lockState = MissileState.None;
 
-        public Vector3 Velocity => velo * transform.forward;
 
         //public float a;
         //public float ac;
@@ -152,7 +156,6 @@ namespace AeroSim.AircraftModules
                 {
                     if(!disableNav)
                         UpdateTrack(Time.fixedDeltaTime);
-                    UpdateInput(Time.fixedDeltaTime);
                 }
 
                 // hit test
@@ -160,6 +163,7 @@ namespace AeroSim.AircraftModules
             }
 
             UpdateTransmit();
+            UpdateInput(Time.fixedDeltaTime);
         }
 
         public void UpdateAeroForces()
@@ -238,9 +242,6 @@ namespace AeroSim.AircraftModules
             float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);
             controllingInput = new Vector3(clampedX, clampedY, clampedZ);
 
-            //float speedFactor = Mathf.Clamp(165 / Mathf.Max(velo, 1f), 0.2f, 1.0f); // 165 -> reference speed
-            //Vector3 actualInput = controllingInput * speedFactor;
-
             foreach (AeroSurface surface in surfaces)
             {
                 surface.UpdateInput(controllingInput);
@@ -280,6 +281,7 @@ namespace AeroSim.AircraftModules
                     Explode(hitInfo);
                 }
             }
+            previousPosition = transform.position;
         }
 
         protected virtual void UpdatePosition(float dt)
@@ -305,7 +307,7 @@ namespace AeroSim.AircraftModules
 
                 if (burntTime < duration)
                 {
-                    transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
+                    //transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
                     burntTime += Time.fixedDeltaTime;
                     rb.AddForce(transform.forward * thrust);
                     //velo += accleration * Time.fixedDeltaTime;
@@ -320,8 +322,6 @@ namespace AeroSim.AircraftModules
 
             // drag
             rb.AddForce(-rb.velocity.normalized * rb.velocity.sqrMagnitude * dragCoeff);
-
-            previousPosition = transform.position;
             //transform.position += transform.forward * velo * Time.fixedDeltaTime;
         }
 
@@ -370,16 +370,14 @@ namespace AeroSim.AircraftModules
             //Vector3 relativePosition = targetPos - transform.position; // 相对坐标
             float range = targetDst; // 距离
             Vector3 losDirection = targetDir; // 方向
-            Vector3 relativeVelocity = targetVelo - velo * transform.forward; // 相对速度
+            Vector3 relativeVelocity = targetVelo - rb.velocity; // 相对速度
             Vector3 losRate = Vector3.Cross(relativeVelocity, losDirection) / range; // 视线角速率
             //float closingVelocity = -Vector3.Dot(relativeVelocity, losDirection);
-            Vector3 commandAccel = navPID.Update(dt, Vector3.Cross(velo * transform.forward, losRate));
-            //Vector3 commandAccel = guideGain * Vector3.Cross(velo * transform.forward, losRate); // 指令加速度
-            //Vector3 localAccel = transform.InverseTransformDirection(commandAccel);
-            controllingInput = flightController.CalcInput(commandAccel);
-            //Debug.Log($"input {controllingInput}, velocity {velo}, command accel {commandAccel}");
-            //Vector3 desiredVelo = transform.forward * velo + commandAccel * Time.fixedDeltaTime; // 期望速度
-            //desiredDirection = desiredVelo.normalized * 10;
+            commandAccel = guideGain * Vector3.Cross(rb.velocity, losRate); // 指令加速度
+            commandAccel = Vector3.ClampMagnitude(commandAccel, maxG * 9.81f);
+            Vector3 desiredVelo = rb.velocity + commandAccel * dt * cmdAccelMultiply; // 期望速度
+            controllingInput = flightController.CalcInput(desiredVelo.normalized, dt);
+            //Debug.Log($"input {controllingInput}, velocity {rb.velocity.magnitude}, command accel {commandAccel}");
         }
 
         public virtual void Ignite()
@@ -401,7 +399,6 @@ namespace AeroSim.AircraftModules
         {
             transform.position = hit.point;
 
-            velo = 0;
             isIgnited = false;
             explosionEffect.Play();
             flameEffect.Stop();
@@ -432,6 +429,16 @@ namespace AeroSim.AircraftModules
             lockingTimer = 0;
         }
 
+        public virtual void ShutdownSeeker()
+        {
+            if (lockState != MissileState.None)
+            {
+                lockState = MissileState.None;
+                lockTimer = lockTime;
+                lockingTimer = 0;
+            }
+        }
+
         public void DirectLock(Transform target)
         {
             this.target = target;
@@ -457,6 +464,10 @@ namespace AeroSim.AircraftModules
                 Gizmos.color = Color.blue;
                 Gizmos.DrawLine(transform.position, transform.position + desiredDirection * 10);
             }
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + commandAccel * 10);
+            Gizmos.DrawLine(transform.position, transform.position + rb.velocity * 10);
         }
     }
 }

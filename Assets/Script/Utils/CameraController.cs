@@ -56,14 +56,12 @@ namespace AeroSim.InputSystem
         public float defaultFov = 60;
         public float focusFov = 30;
         public bool isFocusing = false;
+        public bool directlyRotate = false;
 
         [Header("Post Processing")]
         public Volume mainVolume;
         private IREffect IREffect;
 
-        // 已作废，迁移。
-        //private float avgMouseDelta = 0;
-        //private float mouseDeltaTimer = 0;
         public float calcAvgTime = 0.5f;
         private bool isMoveingView = false;
         private Vector3 trackPoint;
@@ -73,6 +71,7 @@ namespace AeroSim.InputSystem
         private int currentViewIndex = 0;
         public int CurrentViewIndex => currentViewIndex;
         public static CameraView CurrentView => instance.currentView;
+        public bool enableMoveCameraDirectly => Input.GetKey(Keybindings.holdControlInput) || directlyRotate;
 
         private void Awake()
         {
@@ -126,7 +125,7 @@ namespace AeroSim.InputSystem
         void Update()
         {
             // Update control
-            if (Input.GetKey(Keybindings.holdControlInput) && currentView.view != CameraView.ViewType.Pod)
+            if (enableMoveCameraDirectly && currentView.view != CameraView.ViewType.Pod)
             {
                 Vector3 mouseDelta = Input.mousePositionDelta;
 
@@ -221,7 +220,7 @@ namespace AeroSim.InputSystem
         {
             transform.position = target.position + currentView.deltaPos.z * fwd + Vector3.up * currentView.deltaPos.y + target.forward * currentView.offset.z + target.right * currentView.offset.x + target.up * currentView.offset.y;
 
-            if (!Input.GetKey(Keybindings.holdControlInput))
+            if (!enableMoveCameraDirectly)
             {
                 fwd = Vector3.Lerp(fwd, Aircraft.main.targetDir, aimLerpParam * Time.fixedDeltaTime);
             }

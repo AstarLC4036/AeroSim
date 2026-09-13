@@ -21,8 +21,6 @@ namespace AeroSim.Audio
         public AudioClip irSearch;
         public AudioClip irLock;
 
-        public static bool IsPlayingLock => Instance.rwrAudio.clip == Instance.rwrLock && Instance.rwrAudio.isPlaying;
-        public static bool IsPlayingMsl => Instance.rwrAudio.clip == Instance.rwrMsl && Instance.rwrAudio.isPlaying;
         public static bool IsPlayingRwr => Instance.rwrAudio.isPlaying;
 
         public void Awake()

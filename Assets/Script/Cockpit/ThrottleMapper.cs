@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AeroSim.Utils
+namespace AeroSim.Cockpit
 {
     public class ThrottleMapper : MonoBehaviour
     {

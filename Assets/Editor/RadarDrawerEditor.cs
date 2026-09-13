@@ -13,7 +13,7 @@ public class RadarDrawerEditor : Editor
 
         RadarHUDDrawer drawer = (RadarHUDDrawer)target;
 
-        if(GUILayout.Button("Update Image"))
+        if (GUILayout.Button("Update Image"))
         {
             drawer.InitCanvas();
             drawer.UpdateCanvas();

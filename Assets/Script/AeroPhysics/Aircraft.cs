@@ -53,6 +53,7 @@ namespace AeroSim.AeroPhysics
         public FlightController flightController;
         public MFDDisplays mfdDisplay;
         public ModuleMovement movement;
+        public CountermeasureModule countermeasure;
 
         // public fields
         public float AOA => angleOfAttack;
@@ -94,6 +95,7 @@ namespace AeroSim.AeroPhysics
             engine?.Init(this);
             flightController?.Init(this);
             mfdDisplay?.Init(this);
+            countermeasure?.Init(this);
 
             if (this == main)
                 MainAircraftInit();

@@ -431,6 +431,21 @@ namespace AeroSim.UI
                     }
                 }
             }
+            // no selected missile, disable the HUD Mesh
+            else if (Aircraft.main.mslManager == null || Aircraft.main.mslManager.currentMissle == null)
+            {
+                // Reset HUD Mesh
+                if (mslBoresightMesh.isDisplaying || mslSeekerMesh.isDisplaying)
+                {
+                    mslBoresightMesh.isDisplaying = false;
+                    mslSeekerMesh.isDisplaying = false;
+                }
+                if (enableMslBlink)
+                {
+                    enableMslBlink = false;
+                    mslBlinkTimer = 0;
+                }
+            }
         }
 
         void DrawHUDMesh(ScriptableRenderContext context, Camera camera)

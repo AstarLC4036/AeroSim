@@ -41,6 +41,16 @@ namespace AeroSim.AircraftModules
             prewarmTimer = 0;
         }
 
+        public override void ShutdownSeeker()
+        {
+            base.ShutdownSeeker();
+            seekerTransform.localRotation = Quaternion.identity;
+            seekerDirection = seekerTransform.forward;
+            prewarmTimer = 0;
+            isPrewarmCompleted = false;
+            AudioManager.MissileStop();
+        }
+
         protected override void UpdateState(float dt)
         {
             if (lockState == MissileState.Locking)
@@ -50,15 +60,23 @@ namespace AeroSim.AircraftModules
             else if (target != null && lockState == MissileState.Locked)
             {
                 float dst = Vector3.Distance(transform.position, target.position);
-                if (MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) && dst <= maxRange * 1000 || noLostTrack)
+                if ((MathUtility.ConeDetect(seekerTransform.position, seekerDirection, target.position, seekerFov) && dst <= maxRange * 1000) || noLostTrack)
                 {
                     seekerDirection = MathUtility.ApplyAngularJitter((target.position - seekerTransform.position).normalized, jitterAmplitude, jitterFreqency, transform.up);
                     seekerDirection = MathUtility.ClampTargetDir(transform, seekerDirection, yawLimits.x, yawLimits.y, pitchLimits.x, pitchLimits.y);
 
                     targetPos = target.position;
-                    targetDir = seekerDirection;
+                    if (!noLostTrack)
+                    {
+                        targetDir = seekerDirection;
+                    }
+                    else
+                    {
+                        targetVelo = (seekerTransform.position + targetDir * targetDst - lastPos) / dt;
+                        targetDir = (target.position - seekerTransform.position).normalized;
+                    }
                     targetDst = Vector3.Distance(transform.position, targetPos);
-                    targetVelo = (seekerTransform.position + targetDir * targetDst - lastPos) / dt;
+                    targetVelo = (targetPos - lastPos) / dt;
                     lastPos = targetPos;
                 }
 
