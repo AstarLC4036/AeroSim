@@ -16117,7 +16117,7 @@ Rigidbody:
   m_Mass: 200
   m_Drag: 0
   m_AngularDrag: 0
-  m_CenterOfMass: {x: 0, y: 0, z: 0.2}
+  m_CenterOfMass: {x: 0, y: 0, z: 1}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -16166,7 +16166,7 @@ MonoBehaviour:
   - {fileID: 6896192952704531320}
   - {fileID: 3491275260508143745}
   - {fileID: 2022190119088768420}
-  centerOfMass: {x: 0, y: 0, z: 0.2}
+  centerOfMass: {x: 0, y: 0, z: 1}
   target: {fileID: 0}
   connetor: {fileID: 5338969918139218605}
   controllingInput: {x: 0, y: 0, z: 0}

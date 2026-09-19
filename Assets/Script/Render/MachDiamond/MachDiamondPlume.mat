@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MachDiamondPlume
+  m_Shader: {fileID: 4800000, guid: a7be56ce0f5c9fa419bc1d8c44399251, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _Absorption: 0.65
+    - _AxialDecay: 0.55
+    - _CellLength: 1
+    - _Density: 1
+    - _DiamondCarve: 1
+    - _ExitFade: 0.02
+    - _FlowSpeed: 1
+    - _Intensity: 1.6
+    - _MaxEmission: 12
+    - _NoiseSpan: 3
+    - _Seed: 0
+    - _ShockGlow: 0.55
+    - _ShockSharp: 45
+    - _SoftFade: 1.5
+    - _SoftParticlesOn: 0
+    - _StartPhase: 0.4
+    - _Steps: 28
+    - _TipPower: 1.6
+    - _TipStart: 0.62
+    - _Turbulence: 1
+    - _Wobble: 0.5
+    m_Colors:
+    - _AxialTint: {r: 0, g: 0.2, b: 0.6, a: 0}
+    - _ObjScale: {r: 0.45, g: 0.45, b: 6, a: 1}
+    - _TintInside: {r: 1.05, g: 1, b: 1.4, a: 1}
+    - _TintOutside: {r: 1.4, g: 1, b: 1.8, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
