@@ -1,8 +1,7 @@
 using AeroSim.AeroPhysics;
-using AeroSim.Utility;
 using System;
 using UnityEngine;
-using static AeroSim.Utility.MathUtility;
+using static AeroSim.Utils.MathUtility;
 
 namespace AeroSim.InputSystem
 {
@@ -175,7 +174,7 @@ namespace AeroSim.InputSystem
             float currentSpeed = rb.velocity.magnitude;
 
             // Factors
-            Vector3 factors = new Vector3(generalFactor, 1, generalFactor);
+            Vector3 factors = new Vector3(generalFactor, 1, 1);
             yawRatePID.factors = yawPID.factors = pitchRatePID.factors = pitchPID.factors = rollRatePID.factors = rollPID.factors = factors;
 
             // Pitch

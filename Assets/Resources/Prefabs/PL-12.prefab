@@ -166,22 +166,22 @@ MonoBehaviour:
   coefficientsInfo: {x: 0, y: 0, z: 0}
   inputMode: 0
   flapAngle: 0
-  maxFlapAngle: 45
-  flapMoveSpeed: 80
+  maxFlapAngle: 25
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1
-    invertInput: 0
+    invertInput: 1
     anglePercent: 3
   - surfaceType: 2
-    invertInput: 0
+    invertInput: 1
     anglePercent: 3
   - surfaceType: 3
     invertInput: 0
     anglePercent: 3
   targetFlapAngle: 0
   flapTransform: {fileID: 4856007785962690195}
-  rotateAxis: 0
+  rotateAxis: 1
 --- !u!1 &635909955792138405
 GameObject:
   m_ObjectHideFlags: 0
@@ -5755,15 +5755,15 @@ MonoBehaviour:
   coefficientsInfo: {x: 0, y: 0, z: 0}
   inputMode: 0
   flapAngle: 0
-  maxFlapAngle: 45
-  flapMoveSpeed: 80
+  maxFlapAngle: 25
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1
-    invertInput: 1
+    invertInput: 0
     anglePercent: 3
   - surfaceType: 2
-    invertInput: 0
+    invertInput: 1
     anglePercent: 3
   - surfaceType: 3
     invertInput: 0
@@ -5869,15 +5869,15 @@ MonoBehaviour:
   coefficientsInfo: {x: 0, y: 0, z: 0}
   inputMode: 0
   flapAngle: 0
-  maxFlapAngle: 45
-  flapMoveSpeed: 80
+  maxFlapAngle: 25
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1
-    invertInput: 1
+    invertInput: 0
     anglePercent: 3
   - surfaceType: 2
-    invertInput: 0
+    invertInput: 1
     anglePercent: 3
   - surfaceType: 3
     invertInput: 1
@@ -6074,15 +6074,15 @@ MonoBehaviour:
   coefficientsInfo: {x: 0, y: 0, z: 0}
   inputMode: 0
   flapAngle: 0
-  maxFlapAngle: 45
-  flapMoveSpeed: 80
+  maxFlapAngle: 25
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1
-    invertInput: 0
+    invertInput: 1
     anglePercent: 3
   - surfaceType: 2
-    invertInput: 0
+    invertInput: 1
     anglePercent: 3
   - surfaceType: 3
     invertInput: 1
@@ -16117,7 +16117,7 @@ Rigidbody:
   m_Mass: 200
   m_Drag: 0
   m_AngularDrag: 0
-  m_CenterOfMass: {x: 0, y: 0, z: 1}
+  m_CenterOfMass: {x: 0, y: 0, z: -0.1}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -16155,7 +16155,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   guideGain: 4
-  cmdAccelMultiply: 100
+  cmdAccelMultiply: 500
   flightController: {fileID: 4402767179932921774}
   surfaces:
   - {fileID: 6058908773168242738}
@@ -16166,14 +16166,14 @@ MonoBehaviour:
   - {fileID: 6896192952704531320}
   - {fileID: 3491275260508143745}
   - {fileID: 2022190119088768420}
-  centerOfMass: {x: 0, y: 0, z: 1}
+  centerOfMass: {x: 0, y: 0, z: -0.1}
   target: {fileID: 0}
   connetor: {fileID: 5338969918139218605}
   controllingInput: {x: 0, y: 0, z: 0}
   desiredDirection: {x: 0, y: 0, z: 0}
   accTime: 0.6
   accleration: 275
-  dragCoeff: 0.02
+  dragCoeff: 0.01
   maxTurnRate: 18
   maxTurnAcceleration: 50
   maxG: 50
@@ -16212,27 +16212,27 @@ MonoBehaviour:
   rollPID:
     kp: 0
     ki: 0
-    kd: 0.3
+    kd: 0
     factors: {x: 1, y: 1, z: 1}
     iMin: 0
     iMax: 0
   pitchPID:
-    kp: -1
-    ki: 0
-    kd: -0.1
-    factors: {x: 1, y: 1, z: 1}
-    iMin: 0
-    iMax: 0
-  yawPID:
-    kp: -1
+    kp: 1
     ki: 0
     kd: 0.1
     factors: {x: 1, y: 1, z: 1}
     iMin: 0
     iMax: 0
+  yawPID:
+    kp: 1
+    ki: 0
+    kd: -0.1
+    factors: {x: 1, y: 1, z: 1}
+    iMin: 0
+    iMax: 0
   debug: 0
   dirDebug: {x: 0, y: 0, z: 0}
-  referenceSpeed: 500
+  referenceSpeed: 400
 --- !u!138 &5338969918139218605
 FixedJoint:
   m_ObjectHideFlags: 0

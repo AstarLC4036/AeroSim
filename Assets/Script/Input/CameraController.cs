@@ -6,7 +6,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static AeroSim.Utility.MathUtility;
+using static AeroSim.Utils.MathUtility;
 
 namespace AeroSim.InputSystem
 {

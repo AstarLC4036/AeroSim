@@ -1,11 +1,8 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.InputSystem;
-using AeroSim.Util;
-using AeroSim.Utility;
 using AeroSim.Utils;
 using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
 
 namespace AeroSim.AircraftModules
@@ -171,7 +168,7 @@ namespace AeroSim.AircraftModules
             BiVector3 forcesAndTorque = new BiVector3();
             foreach (AeroSurface surface in surfaces)
             {
-                Vector3 localCenterOfMass = centerOfMass.x * transform.forward + centerOfMass.y * transform.up + centerOfMass.z * transform.right;
+                Vector3 localCenterOfMass = centerOfMass.z * transform.forward + centerOfMass.y * transform.up + centerOfMass.x * transform.right;
                 BiVector3 forces = surface.CalcucateForces(localCenterOfMass);
                 forcesAndTorque += forces;
                 Debug.DrawLine(surface.transform.position, surface.transform.position + surface.LocalVelocity / 10, Color.white);
@@ -451,6 +448,7 @@ namespace AeroSim.AircraftModules
                 targetAircraft = (Aircraft)component;
         }
 
+        #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
             //Gizmos.DrawLine(transform.position, transform.position + trackVelo.normalized);
@@ -469,5 +467,6 @@ namespace AeroSim.AircraftModules
             Gizmos.DrawLine(transform.position, transform.position + commandAccel * 10);
             Gizmos.DrawLine(transform.position, transform.position + rb.velocity * 10);
         }
+        #endif
     }
 }

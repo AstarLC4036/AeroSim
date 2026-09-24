@@ -1231,11 +1231,12 @@ MonoBehaviour:
   - {fileID: 3718468218165954556}
   aircraftName: J-10C
   simpifiedName: J10
-  centerOfMass: {x: 0.4, y: 0.2, z: 0}
+  centerOfMass: {x: 0, y: 0.2, z: 0.4}
   isControlling: 1
   liftMultiply: 1
   dragMultiply: 1
   torqueMultiply: 1
+  referenceSpeed: 165
   velocity: {x: 0, y: 0, z: 0}
   targetDir: {x: 0, y: 0, z: 1}
   engine: {fileID: 2619851623265575258}
@@ -1291,9 +1292,9 @@ MonoBehaviour:
   sensitivity: 0.002
   rb: {fileID: 328785237261412725}
   rollPID:
-    kp: 12
+    kp: 5
     ki: 0
-    kd: 1.5
+    kd: 0.5
     factors: {x: 1, y: 1, z: 1}
     iMin: 0
     iMax: 0
@@ -10496,7 +10497,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: -4.3921}
-  m_LocalScale: {x: 0.41666666, y: 0.41666666, z: 3.564}
+  m_LocalScale: {x: 0.41666666, y: 0.41666666, z: 3.408}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5528360555456476312}
@@ -40823,7 +40824,7 @@ GameObject:
   - component: {fileID: 6406034795643553291}
   - component: {fileID: 4788899862661633727}
   m_Layer: 0
-  m_Name: AnimationController
+  m_Name: HydraulicCOntroller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40856,8 +40857,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 036719324696a2349b23047136d7e89b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moduleName: Movement Controller
-  landingGear: {fileID: 4443880971216989834}
+  moduleName: Hydraulic Controller
+  landingGear: {fileID: 6728034450386719469}
 --- !u!1 &6050191099348219213
 GameObject:
   m_ObjectHideFlags: 0
@@ -72631,12 +72632,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5929667917642793331}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &4443880971216989834 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 8061935635878948857, guid: bc693af4e415ad64ebde753662688eb8,
-    type: 3}
-  m_PrefabInstance: {fileID: 5929667917642793331}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5583667609602351467 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2249343051943305240, guid: bc693af4e415ad64ebde753662688eb8,
@@ -72665,6 +72660,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5929667917642793331}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6728034450386719469 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1086684873047217054, guid: bc693af4e415ad64ebde753662688eb8,
+    type: 3}
+  m_PrefabInstance: {fileID: 5929667917642793331}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99e9c2c80d001ea48a5469bf0f08c632, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!23 &6782223984701623289 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 888657501911206538, guid: bc693af4e415ad64ebde753662688eb8,

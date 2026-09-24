@@ -10306,7 +10306,7 @@ MonoBehaviour:
   inputMode: 0
   flapAngle: 0
   maxFlapAngle: 25
-  flapMoveSpeed: 80
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1
@@ -10455,14 +10455,14 @@ MonoBehaviour:
   pitchPID:
     kp: 1
     ki: 0
-    kd: 0.1
+    kd: 0.3
     factors: {x: 1, y: 1, z: 1}
     iMin: 0
     iMax: 0
   yawPID:
     kp: 1
     ki: 0
-    kd: -0.1
+    kd: -0.3
     factors: {x: 1, y: 1, z: 1}
     iMin: 0
     iMax: 0
@@ -10595,7 +10595,7 @@ MonoBehaviour:
   inputMode: 0
   flapAngle: 0
   maxFlapAngle: 25
-  flapMoveSpeed: 80
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1
@@ -16161,7 +16161,7 @@ MonoBehaviour:
   inputMode: 0
   flapAngle: 0
   maxFlapAngle: 25
-  flapMoveSpeed: 80
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1
@@ -16420,7 +16420,7 @@ MonoBehaviour:
   inputMode: 0
   flapAngle: 0
   maxFlapAngle: 25
-  flapMoveSpeed: 80
+  flapMoveSpeed: 250
   inverseTorque: 0
   controlSurfaces:
   - surfaceType: 1

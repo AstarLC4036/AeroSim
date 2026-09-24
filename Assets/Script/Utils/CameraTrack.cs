@@ -3,7 +3,7 @@ using AeroSim.InputSystem;
 using System.Threading;
 using UnityEngine;
 
-namespace AeroSim.Util
+namespace AeroSim.Utils
 {
     public class CameraTrack : MonoBehaviour
     {

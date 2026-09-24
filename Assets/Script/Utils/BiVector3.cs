@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace AeroSim.Util
+namespace AeroSim.Utils
 {
     public struct BiVector3
     {

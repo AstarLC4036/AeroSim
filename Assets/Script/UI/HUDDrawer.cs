@@ -1,11 +1,9 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.AircraftModules;
-using AeroSim.Utility;
 using AeroSim.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 using static AeroSim.AircraftModules.RadarModule;
 
 namespace AeroSim.UI

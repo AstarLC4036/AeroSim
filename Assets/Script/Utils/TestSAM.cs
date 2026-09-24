@@ -3,7 +3,7 @@ using AeroSim.AircraftModules;
 using System.Collections;
 using UnityEngine;
 
-namespace AeroSIm.Utils
+namespace AeroSim.Utils
 {
     public class TestSAM : MonoBehaviour
     {

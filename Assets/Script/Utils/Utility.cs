@@ -2,7 +2,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace AeroSim.Utility
+namespace AeroSim.Utils
 {
     public class Utilities
     {

@@ -1,7 +1,5 @@
 ﻿using System.Collections;
-using UnityEditor;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 namespace AeroSim.AeroPhysics
 {

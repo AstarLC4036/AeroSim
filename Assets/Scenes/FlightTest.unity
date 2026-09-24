@@ -1364,6 +1364,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 51393352}
   m_CullTransparentMesh: 1
+--- !u!114 &67402993 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 250768538046541936, guid: 4221c1db7874d52459bacdbba637d19a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8169330676871698548}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c544be6e5b97c444b70ce0116b5b63d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &70506415
 GameObject:
   m_ObjectHideFlags: 0
@@ -8771,6 +8783,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 389368305}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &400092964 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9163194403763927528, guid: 4221c1db7874d52459bacdbba637d19a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8169330676871698548}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f816d5a69f4ff7643809cd7b4305dc5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &406471373
 GameObject:
   m_ObjectHideFlags: 0
@@ -12192,6 +12216,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 576459725}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &580664665 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1844308116101751529, guid: 4221c1db7874d52459bacdbba637d19a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8169330676871698548}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c544be6e5b97c444b70ce0116b5b63d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &582730012
 GameObject:
   m_ObjectHideFlags: 0
@@ -39407,6 +39443,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1789732473}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1796202009 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1606843769890125132, guid: 4221c1db7874d52459bacdbba637d19a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8169330676871698548}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f816d5a69f4ff7643809cd7b4305dc5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1799776670
 GameObject:
   m_ObjectHideFlags: 0
@@ -65663,6 +65711,26 @@ PrefabInstance:
       propertyPath: azimuthGimbal
       value: 
       objectReference: {fileID: 1905292737}
+    - target: {fileID: 4234961213404824044, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: 'leftMSLs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 67402993}
+    - target: {fileID: 4234961213404824044, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: 'leftMSLs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 400092964}
+    - target: {fileID: 4234961213404824044, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: 'rightMSLs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 580664665}
+    - target: {fileID: 4234961213404824044, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: 'rightMSLs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1796202009}
     - target: {fileID: 4408188574315690508, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_Mesh
@@ -65787,6 +65855,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.2671907
+      objectReference: {fileID: 0}
+    - target: {fileID: 6044860869794902417, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_Name
+      value: HydraulicController
       objectReference: {fileID: 0}
     - target: {fileID: 6244564693527209493, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}

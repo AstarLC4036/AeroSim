@@ -6,12 +6,11 @@ namespace AeroSim.AircraftModules
 {
     public class ModuleMovement : AircraftModule
     {
-        public Animator landingGear;
-        private bool isGearDeployed;
+        public HydraulicMechSystem landingGear;
 
         private void Start()
         {
-            isGearDeployed = landingGear.GetBool("deployed");
+            landingGear.ResetState(landingGear.duration);
         }
 
         private void Update()
@@ -24,22 +23,18 @@ namespace AeroSim.AircraftModules
 
         public void ToggleGear()
         {
-            if (!isGearDeployed)
-                DeployGear();
+            if (landingGear.time == 0)
+            {
+                landingGear.Play();
+            }
+            else if(landingGear.time == landingGear.duration)
+            {
+                landingGear.Play(-1);
+            }
             else
-                StowGear();
-        }
-
-        public void DeployGear()
-        {
-            landingGear.SetBool("deployed", true);
-            isGearDeployed = true;
-        }
-
-        public void StowGear()
-        {
-            landingGear.SetBool("deployed", false);
-            isGearDeployed = false;
+            {
+                landingGear.speed *= -1;
+            }
         }
     }
 }

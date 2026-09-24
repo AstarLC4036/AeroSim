@@ -878,7 +878,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207972815864010761}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.107044406, y: 0.13191275, z: -0.014330312, w: 0.98536044}
+  m_LocalRotation: {x: 0.10704439, y: 0.13191278, z: -0.014330314, w: 0.98536044}
   m_LocalPosition: {x: 15.143, y: -20.928, z: -25.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -9466,7 +9466,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2238195825471009154}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10.950005, y: -21.75, z: 32.90001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -26656,8 +26656,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 440090594718808475}
-  - component: {fileID: 6695037767007131090}
-  - component: {fileID: 8061935635878948857}
+  - component: {fileID: 1086684873047217054}
   m_Layer: 0
   m_Name: Landing Gear
   m_TagString: Untagged
@@ -26683,48 +26682,303 @@ Transform:
   - {fileID: 3542115582144170505}
   m_Father: {fileID: 7655342127828048310}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &6695037767007131090
-Animation:
+--- !u!114 &1086684873047217054
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6027313104298470626}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 0}
-  m_Animations:
-  - {fileID: 7400000, guid: 0b8b0c1a9f5abe44cac4e19e8d825681, type: 2}
-  - {fileID: 7400000, guid: 8e4b6ed0c5b47394ea3e1f71715abf3f, type: 2}
-  - {fileID: 7400000, guid: 7c587b2ecab586a40bd95c0be1035034, type: 2}
-  - {fileID: 7400000, guid: e0611b8484fc2984080afeae672babe9, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_UpdateMode: 0
-  m_CullingType: 0
---- !u!95 &8061935635878948857
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6027313104298470626}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: cabf4cbf5c1b1f045b85fddf953c2db8, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99e9c2c80d001ea48a5469bf0f08c632, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mechMotions:
+  - motionType: 1
+    attachedTransform: {fileID: 8911838661407940675}
+    startValue: {x: 0, y: 0, z: 0}
+    endValue: {x: 80, y: 0, z: 0}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.275
+      - serializedVersion: 3
+        time: 3.3
+        value: 1
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.3
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 4240457470924018610}
+    startValue: {x: 0, y: 0, z: 0}
+    endValue: {x: -80, y: 0, z: 0}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.28055558
+      - serializedVersion: 3
+        time: 3.3
+        value: 1
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.61111104
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 3855833178324616743}
+    startValue: {x: 0, y: 0, z: 0}
+    endValue: {x: 0, y: 0, z: -97}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 1.5
+        value: 0
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.19722223
+      - serializedVersion: 3
+        time: 5.5
+        value: 1
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.23888886
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 2453081957787432336}
+    startValue: {x: 0, y: -90, z: 0}
+    endValue: {x: -90, y: -90, z: 0}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 1.5
+        value: 0
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.3
+      - serializedVersion: 3
+        time: 5.5
+        value: 1
+        inSlope: 0.0010254201
+        outSlope: 0.0010254201
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.38333333
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 3159403890562141515}
+    startValue: {x: 0, y: 0, z: 0}
+    endValue: {x: 74, y: 0, z: 0}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0.002256894
+        outSlope: 0.002256894
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.21111113
+      - serializedVersion: 3
+        time: 2.3
+        value: 1
+        inSlope: -0.0013833173
+        outSlope: -0.0013833173
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.34444442
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 7819978894369803820}
+    startValue: {x: 0, y: 0, z: 0}
+    endValue: {x: 74, y: 0, z: 0}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 2.3
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 2169911835952203943}
+    startValue: {x: 0, y: 0, z: 0}
+    endValue: {x: -74, y: 0, z: 0}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0.0015314638
+        outSlope: 0.0015314638
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.31111115
+      - serializedVersion: 3
+        time: 2.3
+        value: 1
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.26111105
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 7377862898534296519}
+    startValue: {x: 0, y: 0, z: 0}
+    endValue: {x: -74, y: 0, z: 0}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.26666668
+      - serializedVersion: 3
+        time: 2.3
+        value: 1
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33611104
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 8527646546950305358}
+    startValue: {x: 12.4, y: 15.25, z: 0}
+    endValue: {x: 12.4, y: 15.25, z: 90}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 1.5
+        value: 0
+        inSlope: -0
+        outSlope: -0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.23333335
+      - serializedVersion: 3
+        time: 5.5
+        value: 1
+        inSlope: -0.0014896145
+        outSlope: -0.0014896145
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.26388884
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - motionType: 1
+    attachedTransform: {fileID: 6827324614765170491}
+    startValue: {x: -12.4, y: -15.25, z: 0}
+    endValue: {x: -12.4, y: -15.25, z: 90}
+    mechAnimCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 1.5
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 5.5
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  duration: 5.5
+  time: 0
+  speed: 0
+  showPreview: 1
 --- !u!1 &6029138564831526530
 GameObject:
   m_ObjectHideFlags: 0
@@ -33752,7 +34006,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7690762547202473024}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.107044406, y: -0.13191284, z: -0.014330322, w: 0.98536044}
+  m_LocalRotation: {x: -0.10704439, y: -0.13191278, z: -0.014330314, w: 0.98536044}
   m_LocalPosition: {x: 15.14301, y: -20.928, z: 25.65001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -34814,7 +35068,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7846321378740688571}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -160.67603, y: -30.788, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1

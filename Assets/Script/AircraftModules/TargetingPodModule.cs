@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
-using static AeroSim.Utility.MathUtility;
+using static AeroSim.Utils.MathUtility;
 
 namespace AeroSim.AircraftModules
 {

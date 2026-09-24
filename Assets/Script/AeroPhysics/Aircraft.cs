@@ -1,8 +1,7 @@
-using AeroSim.Util;
+using AeroSim.Utils;
 using AeroSim.InputSystem;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using AeroSim.AircraftModules;
 using AeroSim.UI;
 
@@ -23,6 +22,7 @@ namespace AeroSim.AeroPhysics
         public float liftMultiply = 1;
         public float dragMultiply = 1;
         public float torqueMultiply = 1;
+        public float referenceSpeed = 165;
 
         //[Header("Thruster")]
         //public float maxThurst = 10000;
@@ -130,7 +130,7 @@ namespace AeroSim.AeroPhysics
             velocity = rb.velocity;
             localFlow = transform.InverseTransformVector(velocity);
             angleOfAttack = Mathf.Atan2(-localFlow.y, localFlow.z) * Mathf.Rad2Deg;
-            localCenterOfMass = centerOfMass.x * transform.forward + centerOfMass.y * transform.up + centerOfMass.z * transform.right;
+            localCenterOfMass = centerOfMass.z * transform.forward + centerOfMass.y * transform.up + centerOfMass.x * transform.right;
 
             //liftCoiffient = liftCurve.Evaluate(angleOfAttack);
             //dragCoiffient = dragCurve.Evaluate(angleOfAttack);
@@ -171,7 +171,7 @@ namespace AeroSim.AeroPhysics
             float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);
             controllingInput = new Vector3(clampedX, clampedY, clampedZ);
 
-            float speedFactor = Mathf.Clamp(165 / Mathf.Max(velocity.magnitude, 1f), 0.2f, 1.0f); // 165 -> reference speed
+            float speedFactor = Mathf.Clamp(referenceSpeed / Mathf.Max(velocity.magnitude, 1f), 0.2f, 1.0f);
             actualInput = controllingInput * speedFactor;
 
             foreach (AeroSurface surface in surfaces)

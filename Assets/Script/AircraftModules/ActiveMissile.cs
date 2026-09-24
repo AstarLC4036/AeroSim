@@ -1,5 +1,5 @@
 ﻿using AeroSim.AeroPhysics;
-using AeroSim.Utility;
+using AeroSim.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -161,6 +161,7 @@ namespace AeroSim.AircraftModules
             }
         }
 
+        #if UNITY_EDITOR
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
@@ -178,5 +179,6 @@ namespace AeroSim.AircraftModules
                 Gizmos.DrawRay(transform.position, (transform.forward - transform.right * Mathf.Tan(radarFov * Mathf.Deg2Rad)) * 100);
             }
         }
+        #endif
     }
 }

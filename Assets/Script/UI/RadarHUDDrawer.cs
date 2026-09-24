@@ -105,7 +105,7 @@ namespace AeroSim.UI
 
         public void OnRadarStatusChange()
         {
-            modeLabel.text = Utility.Utilities.RadarStatusString(radar);
+            modeLabel.text = Utils.Utilities.RadarStatusString(radar);
             searchRangeLabel.text = $"{radar.currentScanAngleX * 2}°x{radar.currentScanAngleY * 2}°";
             dstRangeLabel.text = $"{maxDrawDistance} km";
             minAngleXLabel.text = $"-{radar.displayAngleX}°";

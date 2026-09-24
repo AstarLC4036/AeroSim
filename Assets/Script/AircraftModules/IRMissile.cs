@@ -1,7 +1,7 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.Audio;
 using AeroSim.General;
-using AeroSim.Utility;
+using AeroSim.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -201,6 +201,7 @@ namespace AeroSim.AircraftModules
             AudioManager.MissileStop();
         }
 
+        #if UNITY_EDITOR
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
@@ -219,5 +220,6 @@ namespace AeroSim.AircraftModules
                 Gizmos.DrawRay(seekerTransform.position, (seekerTransform.forward - seekerTransform.right * Mathf.Tan(seekerFov * Mathf.Deg2Rad)) * 100);
             }
         }
+        #endif
     }
 }

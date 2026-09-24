@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Assets.Script.AeroPhysics
+namespace AeroSim.AeroPhysics
 {
     public class AeroCenterCaculator : MonoBehaviour
     {
