@@ -2,6 +2,7 @@
 using AeroSim.Utils;
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +16,8 @@ namespace AeroSim.UI
         public GameObject targetingPodView;
         public TMP_Text throttleText;
         public TMP_Text altText;
-        public TMP_Text spdText;
+        public TMP_Text tasText;
+        public TMP_Text iasText;
         public TMP_Text machSpdText;
         public TMP_Text overloadText;
         public Aircraft aircraft;
@@ -52,9 +54,11 @@ namespace AeroSim.UI
         private void Update()
         {
             int throttlePercent = (int)(aircraft.engine.thurst / aircraft.engine.maxThurst * 100);
+            float ias = aircraftRB.velocity.magnitude * Mathf.Sqrt(AtmosphereEnv.Density(aircraft.transform.position.y - OriginKeeper.origin.y) / 1.225f);
             throttleText.text = throttlePercent <= 100 ? $"{throttlePercent} <size=16>%</size>" : $"{throttlePercent} <size=16>% <color=red>[加力]</color></size>";
             altText.text = $"{((int)((aircraft.transform.position.y - OriginKeeper.origin.y) * 100)) / 100} <size=16>m</size>";
-            spdText.text = $"{((int)(aircraftRB.velocity.magnitude / 1000 * 3600 * 100)) / 100} <size=16>km/h</size>";
+            tasText.text = $"{((int)(aircraftRB.velocity.magnitude / 1000 * 3600 * 100)) / 100} <size=16>km/h</size>";
+            iasText.text = $"{((int)(ias / 1000 * 3600 * 100)) / 100} <size=16>km/h</size>";
             machSpdText.text = $"{(int)(aircraftRB.velocity.magnitude / 343.0f * 100) / 100f} <size=16>Mach</size>";
             overloadText.text = $"{(int)(aircraft.G * 10) / 10f} <size=16>G</size>";
         }

@@ -16155,7 +16155,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   guideGain: 4
-  cmdAccelMultiply: 500
+  cmdAccelMultiply: 300
   flightController: {fileID: 4402767179932921774}
   surfaces:
   - {fileID: 6058908773168242738}

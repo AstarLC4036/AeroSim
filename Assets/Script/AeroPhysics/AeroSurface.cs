@@ -281,7 +281,8 @@ namespace AeroSim.AeroPhysics
 
         public Vector3 CalcucateTorque(Vector3 velocity, Vector3 totalForce, Vector3 worldCenterOfMass, float TC)
         {
-            float dymaticPresure = 0.5f * 1.225f * velocity.sqrMagnitude;
+            float density = AtmosphereEnv.Density(transform.position.y - OriginKeeper.origin.y);
+            float dymaticPresure = 0.5f * density * velocity.sqrMagnitude;
             Vector3 torque = transform.right * TC * dymaticPresure * area * chord;
             return Vector3.Cross(transform.position - worldCenterOfMass, totalForce) + torque;
         }

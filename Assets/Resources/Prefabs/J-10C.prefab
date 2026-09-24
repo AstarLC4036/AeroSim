@@ -71585,23 +71585,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5901544075240851477, guid: bc693af4e415ad64ebde753662688eb8,
         type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.99539626
-      objectReference: {fileID: 0}
-    - target: {fileID: 5901544075240851477, guid: bc693af4e415ad64ebde753662688eb8,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5901544075240851477, guid: bc693af4e415ad64ebde753662688eb8,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0.095845714
-      objectReference: {fileID: 0}
-    - target: {fileID: 5901544075240851477, guid: bc693af4e415ad64ebde753662688eb8,
-        type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -0.09
       objectReference: {fileID: 0}
     - target: {fileID: 5904191645035893232, guid: bc693af4e415ad64ebde753662688eb8,
         type: 3}
@@ -72651,8 +72636,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataType: 5
-  inputRange: {x: 0, y: 2}
-  angleRange: {x: 0, y: 35.5}
+  ranges:
+  - inputRange: {x: 0, y: 1.5}
+    angleRange: {x: 0, y: 6.2}
+  - inputRange: {x: 1.5, y: 2}
+    angleRange: {x: 6.2, y: 34}
   rotateAxis: 1
 --- !u!4 &5802424821470686936 stripped
 Transform:
