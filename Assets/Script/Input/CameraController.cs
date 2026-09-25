@@ -27,6 +27,7 @@ namespace AeroSim.InputSystem
 
             public Vector3 offset;
             public Vector3 deltaPos;
+            public float eyeDist;
             public bool followRotation;
             //public bool targetingPodView;
             public ViewType view;
@@ -218,7 +219,8 @@ namespace AeroSim.InputSystem
 
         void LateUpdate()
         {
-            transform.position = target.position + currentView.deltaPos.z * fwd + Vector3.up * currentView.deltaPos.y + target.forward * currentView.offset.z + target.right * currentView.offset.x + target.up * currentView.offset.y;
+            Vector3 rootPos = target.position + currentView.deltaPos.z * fwd + Vector3.up * currentView.deltaPos.y + target.forward * currentView.offset.z + target.right * currentView.offset.x + target.up * currentView.offset.y;
+            transform.position = rootPos + fwd * currentView.eyeDist;
 
             if (!enableMoveCameraDirectly)
             {

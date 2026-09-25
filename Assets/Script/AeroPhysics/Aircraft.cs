@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AeroSim.AircraftModules;
 using AeroSim.UI;
+using AeroSim.Cockpit;
 
 namespace AeroSim.AeroPhysics
 {
@@ -22,7 +23,11 @@ namespace AeroSim.AeroPhysics
         public float liftMultiply = 1;
         public float dragMultiply = 1;
         public float torqueMultiply = 1;
+
+        [Header("Flight Control Limits")]
         public float referenceSpeed = 165;
+        public float designedQ = 15000;
+        public Vector2 factorLimits;
 
         //[Header("Thruster")]
         //public float maxThurst = 10000;
@@ -34,10 +39,11 @@ namespace AeroSim.AeroPhysics
         private Vector3 velocity;
         private Vector3 localFlow;
         private float angleOfAttack;
+        private float currentQ;
 
         private float gOverload = 1;
 
-        // nav
+        [Header("Navigation")]
         public Vector3 targetDir = Vector3.forward;
         private Vector3 controllingInput;
         private Vector3 actualInput;
@@ -51,6 +57,7 @@ namespace AeroSim.AeroPhysics
         public MAWModule maw;
         public MissileModule mslManager;
         public FlightController flightController;
+        public HUDHolder hud;
         public MFDDisplays mfdDisplay;
         public ModuleMovement movement;
         public CountermeasureModule countermeasure;
@@ -96,6 +103,7 @@ namespace AeroSim.AeroPhysics
             flightController?.Init(this);
             mfdDisplay?.Init(this);
             countermeasure?.Init(this);
+            hud?.Init(this);
 
             if (this == main)
                 MainAircraftInit();
@@ -131,6 +139,7 @@ namespace AeroSim.AeroPhysics
             localFlow = transform.InverseTransformVector(velocity);
             angleOfAttack = Mathf.Atan2(-localFlow.y, localFlow.z) * Mathf.Rad2Deg;
             localCenterOfMass = centerOfMass.z * transform.forward + centerOfMass.y * transform.up + centerOfMass.x * transform.right;
+            currentQ = 0.5f * AtmosphereEnv.Density(transform.position.y - OriginKeeper.origin.y) * velocity.sqrMagnitude;
 
             //liftCoiffient = liftCurve.Evaluate(angleOfAttack);
             //dragCoiffient = dragCurve.Evaluate(angleOfAttack);
@@ -171,8 +180,9 @@ namespace AeroSim.AeroPhysics
             float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);
             controllingInput = new Vector3(clampedX, clampedY, clampedZ);
 
-            float speedFactor = Mathf.Clamp(referenceSpeed / Mathf.Max(velocity.magnitude, 1f), 0.2f, 1.0f);
-            actualInput = controllingInput * speedFactor;
+            //float speedFactor = Mathf.Clamp(referenceSpeed / Mathf.Max(velocity.magnitude, 1f), factorLimits.x, factorLimits.y);
+            float speedFactorQ = Mathf.Clamp(designedQ / Mathf.Max(currentQ, 1f), factorLimits.x, factorLimits.y);
+            actualInput = controllingInput * speedFactorQ;
 
             foreach (AeroSurface surface in surfaces)
             {

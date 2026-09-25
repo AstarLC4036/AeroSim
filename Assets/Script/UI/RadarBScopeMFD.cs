@@ -66,22 +66,22 @@ namespace AeroSim.UI
             drawer.DrawRectOutline(areaOffset.x, areaOffset.y, areaSize.x, areaSize.y, 5, Color.white);
 
             // Radar radius
-            drawer.DrawRectFill(areaOffset.x, areaOffset.y - 9, areaSize.x, 12, new Color32(255, 100, 240, 255));
-            drawer.DrawRectFill(areaOffset.x, areaOffset.y - 3, areaSize.x, 12, new Color32(50, 255, 50, 255));
+            drawer.DrawRectFill(areaOffset.x, areaOffset.y - 9, areaSize.x, 12, new Color32(255, 100, 240, 130));
+            drawer.DrawRectFill(areaOffset.x, areaOffset.y - 3, areaSize.x, 12, new Color32(50, 255, 50, 130));
 
             // Scaler
             for (int i = 1; i < 4; i++)
             {
-                drawer.DrawRectFill(areaOffset.x + areaSize.x / 4 * i - 1, areaOffset.y + 1, 3, 15, Color.white);
-                drawer.DrawRectFill(areaOffset.x + areaSize.x / 4 * i - 1, areaOffset.y + areaSize.y - 15, 3, 15, Color.white);
-                drawer.DrawRectFill(areaOffset.x + 1, areaOffset.y + areaSize.y / 4 * i - 1, 15, 3, Color.white);
-                drawer.DrawRectFill(areaOffset.x + areaSize.x - 15, areaOffset.y + areaSize.y / 4 * i - 1, 15, 3, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x / 4 * i - 2, areaOffset.y + 3, 5, 30, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x / 4 * i - 2, areaOffset.y + areaSize.y - 30, 5, 30, Color.white);
+                drawer.DrawRectFill(areaOffset.x + 2, areaOffset.y + areaSize.y / 4 * i - 3, 30, 5, Color.white);
+                drawer.DrawRectFill(areaOffset.x + areaSize.x - 30, areaOffset.y + areaSize.y / 4 * i - 2, 30, 5, Color.white);
 
                 if(i < 3)
                 {
                     for(int j = 1; j < 3; j++)
                     {
-                        drawer.DrawRectFill(areaOffset.x + 1, areaOffset.y + areaSize.y / 12 * (3 * i + j), 12, 3, Color.white); // i / 4 + j / 3 * (1 / 4) -> i/4 + j/12 -> 3i/12 + j/12 -> (3i + j) / 12
+                        drawer.DrawRectFill(areaOffset.x + 1, areaOffset.y + areaSize.y / 12 * (3 * i + j), 25, 5, Color.white); // i / 4 + j / 3 * (1 / 4) -> i/4 + j/12 -> 3i/12 + j/12 -> (3i + j) / 12
                     }
                 }
             }
@@ -127,10 +127,10 @@ namespace AeroSim.UI
             float posVectorY = areaOffset.y + areaSize.y / 2 * (1 + (pitchAngle / radar.currentScanAngleY));
             if(posVectorY > areaOffset.y && posVectorY < areaOffset.y + areaSize.y)
             {
-                drawer.DrawCircle(areaOffset.x + areaSize.x / 2, (int)posVectorY, 12, 3, Color.white);
-                drawer.DrawRectFill(areaOffset.x + areaSize.x / 2 - 1, (int)posVectorY + 12, 3, 6, Color.white);
-                drawer.DrawRectFill(areaOffset.x + areaSize.x / 2 + 12, (int)posVectorY, 12, 3, Color.white);
-                drawer.DrawRectFill(areaOffset.x + areaSize.x / 2 - 18, (int)posVectorY, 12, 3, Color.white);
+                drawer.DrawCircle(areaOffset.x + areaSize.x / 2, (int)posVectorY, 12, 4, Color.white);
+                drawer.DrawRectFillCenter(areaOffset.x + areaSize.x / 2, (int)posVectorY + 20, 2, 10, Color.white);
+                drawer.DrawRectFillCenter(areaOffset.x + areaSize.x / 2 + 20, (int)posVectorY, 10, 2, Color.white);
+                drawer.DrawRectFillCenter(areaOffset.x + areaSize.x / 2 - 20, (int)posVectorY, 10, 2, Color.white);
             }
 
             DrawCursor(areaOffset.x + cursorDisplayPosition.x * areaSize.x / RadarHUDDrawer.Instance.size.x, areaOffset.y + cursorDisplayPosition.y * areaSize.y / RadarHUDDrawer.Instance.size.y);

@@ -35,7 +35,7 @@ namespace AeroSim.InputSystem
             float yawRate = localAngularVelo.y;
 
             float speedFactor = Mathf.Clamp(referenceSpeed * referenceSpeed / Mathf.Max(missile.rb.velocity.magnitude * missile.rb.velocity.magnitude, 1f), 0.05f, 1.0f);
-            rollPID.factors = pitchPID.factors = yawPID.factors = new Vector3(speedFactor, 1f, speedFactor);
+            //rollPID.factors = pitchPID.factors = yawPID.factors = new Vector3(speedFactor, 1f, speedFactor);
 
             // 转为机体坐标
             Vector3 localDir = transform.InverseTransformDirection(desiredDir);

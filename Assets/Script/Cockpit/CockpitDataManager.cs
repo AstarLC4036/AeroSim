@@ -1,4 +1,5 @@
 ﻿using AeroSim.AeroPhysics;
+using AeroSim.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,18 @@ namespace AeroSim.Cockpit
             CabinTemperature
         }
 
+        public enum WeaponState
+        {
+            NoWeapon,
+            WeaponSafe,
+            WeaponReay,
+            Lock,
+            InRange,
+            Shoot
+        }
+
         public Aircraft playerAircraft;
+        public WeaponState weaponState;
 
         private void Awake()
         {
@@ -39,6 +51,32 @@ namespace AeroSim.Cockpit
         private void Start()
         {
             playerAircraft = Aircraft.main;
+        }
+
+        public static string GetParsedWeaponState()
+        {
+            return ParseWeaponState(Instance.weaponState);
+        }
+
+        public static string ParseWeaponState(WeaponState state)
+        {
+            switch(state)
+            {
+                case WeaponState.NoWeapon:
+                    return "NO WPN";
+                case WeaponState.WeaponSafe:
+                    return "WPN SAFE";
+                case WeaponState.WeaponReay:
+                    return "WPN RDY";
+                case WeaponState.Lock:
+                    return "LOCK";
+                case WeaponState.InRange:
+                    return "IN RNG";
+                case WeaponState.Shoot:
+                    return "SHOOT";
+                default:
+                    return "NONE";
+            }
         }
 
         public float GetFloatData(CockpitDataType dataType)
@@ -55,6 +93,12 @@ namespace AeroSim.Cockpit
                         return playerAircraft.Rb.velocity.magnitude / 340.3f;
                     else
                         return 0;
+                case CockpitDataType.Heading:
+                    return playerAircraft.transform.eulerAngles.y;
+                case CockpitDataType.Airspeed:
+                    return playerAircraft.Velocity.magnitude;
+                case CockpitDataType.Altitude:
+                    return playerAircraft.transform.position.y - OriginKeeper.origin.y;
                 default:
                     return 0;
             }

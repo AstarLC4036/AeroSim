@@ -23,6 +23,11 @@ int _CommandCount;
 Texture2D<float4> _SourceTex;
 SamplerState sampler_SourceTex;
 
+// 字体图集（TMP SDF）。_FontAtlasChannel: 0 = alpha(Alpha8 图集), 1 = red(R8 图集)
+// 用 Load 取样，所以不需要 sampler_FontAtlas
+Texture2D<float4> _FontAtlas;
+int _FontAtlasChannel;
+
 // 辅助函数
 float DistanceToLine(float2 p, float2 a, float2 b)
 {
@@ -50,23 +55,66 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
     if (id.x >= _Width || id.y >= _Height) return;
 
     float2 pixelPos = float2(id.x, id.y) + 0.5;  // 像素中心
-    float4 finalColor = float4(0, 0, 0, 1);
+    float4 finalColor = float4(0, 0, 0, 0);
 
     for (int cmdIndex = 0; cmdIndex < _CommandCount; cmdIndex++)
     {
         DrawCommand cmd = _Commands[cmdIndex];
         float4 cmdColor = cmd.color;
+
+        // ---- 包围盒剔除：像素不在命令范围内直接跳过（省掉 SDF 与图集采样，字多了非常关键）----
+        float2 bMin, bMax;
+        if (cmd.type == 0 || cmd.type == 1)          // Line / DashedLine
+        {
+            float pad = 2.0 + max(cmd.param2.x, 0.0) * 0.5;   // + 线宽的一半（type 1 的 param2.x 恒为 0）
+            bMin = min(cmd.param1.xy, cmd.param1.zw) - pad;
+            bMax = max(cmd.param1.xy, cmd.param1.zw) + pad;
+        }
+        else if (cmd.type == 2)                      // Circle
+        {
+            float rr = cmd.param1.z + cmd.param1.w * 0.5 + 2.0;
+            bMin = cmd.param1.xy - rr;
+            bMax = cmd.param1.xy + rr;
+        }
+        else if (cmd.type == 3)                      // RectOutline
+        {
+            float2 e = cmd.param1.zw + cmd.param2.x * 0.5 + 2.0;
+            bMin = cmd.param1.xy - e;
+            bMax = cmd.param1.xy + e;
+        }
+        else if (cmd.type == 4)                      // RectFill（param1 = 中心 + 半尺寸）
+        {
+            bMin = cmd.param1.xy - cmd.param1.zw;
+            bMax = cmd.param1.xy + cmd.param1.zw;
+        }
+        else                                         // Texture / Text：param1 本身是 min/max
+        {
+            bMin = cmd.param1.xy;
+            bMax = cmd.param1.zw;
+        }
+        if (pixelPos.x < bMin.x || pixelPos.x > bMax.x ||
+            pixelPos.y < bMin.y || pixelPos.y > bMax.y) continue;
+
         float alpha = 0.0;
         float dist = 1e10;
 
         switch (cmd.type)
         {
-            case 0: // Line
+            case 0: // Line（param2.x = 线宽，像素；<=1 时保持原来的 1px 观感）
             {
                 float2 a = cmd.param1.xy;
                 float2 b = cmd.param1.zw;
                 dist = DistanceToLine(pixelPos, a, b);
-                alpha = 1.0 - smoothstep(0.5, 1.5, dist);
+                float w = cmd.param2.x;
+                if (w > 1.0)
+                {
+                    float halfW = w * 0.5;
+                    alpha = 1.0 - smoothstep(halfW - 0.5, halfW + 0.5, dist);
+                }
+                else
+                {
+                    alpha = 1.0 - smoothstep(0.5, 1.5, dist);   // 原行为，一字不改
+                }
                 break;
             }
 
@@ -138,15 +186,52 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 }
                 break;
             }
+            case 6: // Text 单字形：param1 = (x0,y0,x1,y1) 目标矩形, param2 = (u0,v0,u1,v1) 图集UV
+            {
+                float2 tMin = cmd.param1.xy;
+                float2 tMax = cmd.param1.zw;
+                float2 uv = (pixelPos - tMin) / max(tMax - tMin, 0.0001);
+                uv = lerp(cmd.param2.xy, cmd.param2.zw, uv);
+
+                // 用 Load（texel fetch）而不是 Sample：不需要 sampler 绑定，
+                // 也不受图集 filterMode/wrapMode 影响，字边缘由 smoothstep 自己控制 → 更脆更可控
+                uint aw, ah;
+                _FontAtlas.GetDimensions(aw, ah);
+                int2 texel = clamp(int2(uv * float2(aw, ah)), int2(0, 0), int2(aw - 1, ah - 1));
+                float4 s = _FontAtlas.Load(int3(texel, 0));
+                // _FontAtlasChannel: 0 = alpha(Alpha8 图集), 1 = red(R8 图集), 2 = 调试(整块实心，用来确认四边形位置对不对)
+                float sd = (_FontAtlasChannel == 1) ? s.r : (_FontAtlasChannel == 2 ? 0.75 : s.a);
+
+                // dashLength 复用为 sharpness * 1000（保持 DrawCommand 布局不变）
+                float soft = max((float)cmd.dashLength, 1.0) * 0.001;
+                alpha = smoothstep(0.5 - soft, 0.5 + soft, sd);
+                break;
+            }
         }
 
-        // Alpha 混合
+        // 混合。注意 finalColor 内部是 **预乘 alpha** 累加的（最后才除回 alpha），
+        // 所以 Erase 必须把 rgb 和 a 一起缩，否则会越擦越亮。
         if (alpha > 0.0)
         {
-            cmdColor.a *= alpha;
-            finalColor = lerp(finalColor, cmdColor, cmdColor.a);
+            float a = saturate(cmdColor.a * alpha);
+
+            if (cmd.layer == 1)          // Erase：destination-out，只削减已有内容
+            {
+                finalColor *= (1.0 - a);
+            }
+            else if (cmd.layer == 2)     // Replace：直接覆盖，不混合
+            {
+                finalColor = float4(cmdColor.rgb * a, a);
+            }
+            else                         // Over：straight-alpha over
+            {
+                finalColor.rgb = cmdColor.rgb * a + finalColor.rgb * (1.0 - a);
+                finalColor.a   = a              + finalColor.a   * (1.0 - a);
+            }
         }
     }
 
+    // 输出 straight alpha：rgb 内部是预乘累加，除回 alpha 才能被 UI/Default 正确合成
+    if (finalColor.a > 0.0001) finalColor.rgb /= finalColor.a;
     _Result[id.xy] = finalColor;
 }

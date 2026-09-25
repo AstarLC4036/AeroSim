@@ -78,6 +78,7 @@ namespace AeroSim.Render
         Material _runtimeMaterial;
         MaterialPropertyBlock _mpb;
         float _afterburnerSmooth;
+        float _afterburnerIntensity;
         float _seed;
         int _steps = -1;
         bool _ownsRuntimeMaterial;
@@ -97,7 +98,8 @@ namespace AeroSim.Render
             EnsureMaterial();
             ConfigureRenderer();
 
-            _afterburnerSmooth = DriveTarget();   // snap, so enabling does not fade in
+            //_afterburnerSmooth = DriveTarget();   // snap, so enabling does not fade in
+            _afterburnerSmooth = afterburner;
             Apply();
         }
 
@@ -119,6 +121,7 @@ namespace AeroSim.Render
             if (smoothing <= 0f || dt <= 0f)
             {
                 _afterburnerSmooth = target;
+                //_afterburnerIntensity = target;
             }
             else
             {
@@ -136,7 +139,7 @@ namespace AeroSim.Render
         public void SetAfterburner(float value)
         {
             afterburner = Mathf.Clamp01(value);
-            if (engine == null) _afterburnerSmooth = afterburner;
+            if (engine == null) _afterburnerIntensity = afterburner; // changed to intensity control
         }
 
         /// <summary>Bind an engine module at runtime.</summary>
@@ -267,7 +270,8 @@ namespace AeroSim.Render
 
             float metresPerCell = unit * RefCellWidth;
             float radius = Mathf.Max(volumeRadiusUnits, 0.05f) * unit * sizeMultiplier;
-            float length = Mathf.Max(plumeLength, 0.05f) * Mathf.Lerp(dryLengthFactor, 1f, level) * sizeMultiplier;
+            //float length = Mathf.Max(plumeLength, 0.05f) * Mathf.Lerp(dryLengthFactor, 1f, level) * sizeMultiplier;
+            float length = Mathf.Max(plumeLength, 0.05f) * sizeMultiplier;
 
             // container scale == shading volume (the shader reads the same numbers)
             var scale = new Vector3(radius, radius, length);

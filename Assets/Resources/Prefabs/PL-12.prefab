@@ -16155,7 +16155,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   guideGain: 4
-  cmdAccelMultiply: 300
+  cmdAccelMultiply: 500
   flightController: {fileID: 4402767179932921774}
   surfaces:
   - {fileID: 6058908773168242738}
@@ -16180,6 +16180,8 @@ MonoBehaviour:
   duration: 12
   burntTime: 0
   thrust: 30000
+  designedQ: 70000
+  factorLimits: {x: 0.05, y: 1}
   maxRange: 13
   lockTime: 0.5
   lockTimeout: 3

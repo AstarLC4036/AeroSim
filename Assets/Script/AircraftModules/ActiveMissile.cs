@@ -29,6 +29,8 @@ namespace AeroSim.AircraftModules
 
         protected override void UpdateState(float dt)
         {
+            UpdateBaseState();
+
             // Update target position and velocity
             if (lockState == MissileState.Locked)
             {

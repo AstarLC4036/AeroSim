@@ -1,4 +1,5 @@
 ﻿using AeroSim.AeroPhysics;
+using AeroSim.Cockpit;
 using AeroSim.General;
 using AeroSim.InputSystem;
 using System.Collections;
@@ -30,8 +31,8 @@ namespace AeroSim.AircraftModules
             {
                 if (currentMissle.lockState == Missile.MissileState.None)
                 {
-                    ActiveSeeker();
-                    VehicleLog.LogMsg($"[{currentMissle.nameId}] 导引头启动");
+                    if(ActiveSeeker())
+                        VehicleLog.LogMsg($"{currentMissle.nameId} > 导引头启动");
                 }
                 else if (currentMissle.lockState == Missile.MissileState.Locked)
                     Fire();
@@ -41,7 +42,7 @@ namespace AeroSim.AircraftModules
                 if (currentMissle.lockState != Missile.MissileState.None)
                 {
                     currentMissle.ShutdownSeeker();
-                    VehicleLog.LogMsg($"[{currentMissle.nameId}] 导引头关闭");
+                    VehicleLog.LogMsg($"{currentMissle.nameId} > 导引头关机");
                 }
             }
 
@@ -56,6 +57,35 @@ namespace AeroSim.AircraftModules
                 {
                     CameraController.Instance.target = launchedMissle.transform;
                     CameraController.Instance.directlyRotate = true;
+                }
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            //Update weapon state
+            if (parentAircraft.isControlling)
+            {
+                if (currentMissle != null)
+                {
+                    if (currentMissle.lockState == Missile.MissileState.Locking)
+                    {
+                        if (CockpitDataManager.Instance.weaponState != CockpitDataManager.WeaponState.Lock)
+                            CockpitDataManager.Instance.weaponState = CockpitDataManager.WeaponState.Lock;
+                    }
+                    else if (currentMissle.lockState == Missile.MissileState.Locked)
+                    {
+                        if(CockpitDataManager.Instance.weaponState != CockpitDataManager.WeaponState.InRange && CockpitDataManager.Instance.weaponState != CockpitDataManager.WeaponState.Shoot)
+                            CockpitDataManager.Instance.weaponState = CockpitDataManager.WeaponState.InRange;
+                    }
+                    else if (CockpitDataManager.Instance.weaponState != CockpitDataManager.WeaponState.WeaponReay)
+                    {
+                        CockpitDataManager.Instance.weaponState = CockpitDataManager.WeaponState.WeaponReay;
+                    }
+                }
+                else if (CockpitDataManager.Instance.weaponState != CockpitDataManager.WeaponState.NoWeapon)
+                {
+                    CockpitDataManager.Instance.weaponState = CockpitDataManager.WeaponState.NoWeapon;
                 }
             }
         }
@@ -105,22 +135,26 @@ namespace AeroSim.AircraftModules
             }
         }
 
-        public void ActiveSeeker()
+        public bool ActiveSeeker()
         {
             if (currentMissle.type == Missile.MissileType.IR)
             {
                 currentMissle.ActiveSeeker();
+                return true;
             }
             else if (currentMissle.type == Missile.MissileType.Active && target != null)
             {
                 currentMissle.ActiveSeeker();
                 currentMissle.SetTarget(target);
 
-                if(currentMissle.hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
+                if (currentMissle.hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
                 {
                     parentAircraft.datalink.RegisterDatalink(currentMissle, target);
                 }
+                return true;
             }
+            else
+                return false;
         }
 
         public void Fire()

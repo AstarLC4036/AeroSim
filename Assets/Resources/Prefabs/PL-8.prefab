@@ -10410,6 +10410,8 @@ MonoBehaviour:
   duration: 8
   burntTime: 0
   thrust: 15000
+  designedQ: 40000
+  factorLimits: {x: 0.05, y: 1}
   maxRange: 13
   lockTime: 0.8
   lockTimeout: 15

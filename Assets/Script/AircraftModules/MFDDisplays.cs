@@ -1,4 +1,4 @@
-﻿using AeroSim.AeroPhysics;
+using AeroSim.AeroPhysics;
 using AeroSim.UI;
 using System;
 using System.Collections.Generic;
@@ -50,7 +50,7 @@ namespace AeroSim.AircraftModules
             }
             if (radarPPIDrawer == null)
             {
-                radarBScopeDrawer = new RadarBScopeMFD(new Vector2Int(1024, 1024), Color.black);
+                radarPPIDrawer = new RadarPPIMFD(new Vector2Int(1024, 1024), Color.black);   // 原来写成了 radarBScopeDrawer（复制粘贴 bug：PPI 为 null 时会 NRE，且新 drawer 直接泄漏）
             }
 
             // Set data override first
@@ -94,20 +94,31 @@ namespace AeroSim.AircraftModules
             }
         }
 
+        private static RenderTexture emptyMFDTexture;
+
+        /// <summary>空 MFD 槽位共用一个 1x1 RT。以前每次 Init 都 new 一个且从不释放 → Persistent 泄漏。</summary>
+        private static RenderTexture GetEmptyMFDTexture()
+        {
+            if (emptyMFDTexture == null)
+            {
+                emptyMFDTexture = new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32)
+                {
+                    enableRandomWrite = true,
+                    wrapMode = TextureWrapMode.Clamp,
+                    filterMode = FilterMode.Point
+                };
+                emptyMFDTexture.Create();
+            }
+            return emptyMFDTexture;
+        }
+
         private RenderTexture GetMFDTexture(ScreenProperty display)
         {
             MFDType type = display.type;
             switch (type)
             {
                 case (MFDType.None):
-                    RenderTexture newTex = new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32)
-                    {
-                        enableRandomWrite = true,
-                        wrapMode = TextureWrapMode.Clamp,
-                        filterMode = FilterMode.Point
-                    };
-                    newTex.Create();
-                    return newTex;
+                    return GetEmptyMFDTexture();
                 default :
                     return GetMFDDrawer(type).canvasTexture;
             }
@@ -124,10 +135,16 @@ namespace AeroSim.AircraftModules
 
         private void OnApplicationQuit()
         {
-            if (parentAircraft.isControlling)
+            if (parentAircraft != null && parentAircraft.isControlling)
             {
-                radarBScopeDrawer.Dispose();
-                radarPPIDrawer.Dispose();
+                radarBScopeDrawer?.Dispose();
+                radarPPIDrawer?.Dispose();
+            }
+            if (emptyMFDTexture != null)
+            {
+                emptyMFDTexture.Release();
+                UnityEngine.Object.Destroy(emptyMFDTexture);
+                emptyMFDTexture = null;
             }
         }
     }

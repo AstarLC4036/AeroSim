@@ -1,4 +1,4 @@
-﻿using AeroSim.AircraftModules;
+using AeroSim.AircraftModules;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,12 +30,24 @@ namespace AeroSim.UI
 
         public void InitCanvas()
         {
-            canvasTexture = new RenderTexture(size.x, size.y, 0, RenderTextureFormat.ARGB32) {
+            Dispose();
+            if (canvasTexture != null) // 重复初始化 = 旧 RT 永久泄漏（Persistent allocation）
+            {
+                drawer?.Dispose();     // 旧的 helper 也要释放，否则它的 ComputeBuffer 一样会漏
+                drawer = null;
+                canvasTexture.Release();
+                GameObject.Destroy(canvasTexture);
+                canvasTexture = null;
+            }
+
+            canvasTexture = new RenderTexture(size.x, size.y, 0, RenderTextureFormat.ARGB32)
+            {
                 enableRandomWrite = true,
                 wrapMode = TextureWrapMode.Clamp,
                 filterMode = FilterMode.Point
             };
             canvasTexture.Create();
+
             drawer = new MFDGraphicHelper(canvasTexture, size.x, size.y);
 
             foreach (RawImage rawImage in drawTargets)
@@ -68,10 +80,22 @@ namespace AeroSim.UI
 
         public void Dispose()
         {
-            drawer.Dispose();
+            if (drawer != null) { drawer.Dispose(); drawer = null; }
+            if (canvasTexture != null)
+            {
+                canvasTexture.Release();                     // 释放 native/GPU 内存（Leak Detected 的元凶）
+                if (Application.isPlaying) Destroy(canvasTexture);
+                else DestroyImmediate(canvasTexture);
+                canvasTexture = null;
+            }
         }
 
         private void OnApplicationQuit()
+        {
+            Dispose();
+        }
+
+        private void OnDestroy()
         {
             Dispose();
         }
@@ -148,13 +172,22 @@ namespace AeroSim.UI
 
         public void InitCanvas()
         {
+            Dispose();
+            if (canvasTexture != null) // 重复初始化 = 旧 RT 永久泄漏（Persistent allocation）
+            {
+                drawer?.Dispose();     // 旧的 helper 也要释放，否则它的 ComputeBuffer 一样会漏
+                drawer = null;
+                canvasTexture.Release();
+                GameObject.Destroy(canvasTexture);
+                canvasTexture = null;
+            }
+
             canvasTexture = new RenderTexture(size.x, size.y, 0, RenderTextureFormat.ARGB32)
             {
                 enableRandomWrite = true,
                 wrapMode = TextureWrapMode.Clamp,
                 filterMode = FilterMode.Point
             };
-            canvasTexture.Create();
             drawer = new MFDGraphicHelper(canvasTexture, size.x, size.y);
         }
 
@@ -177,7 +210,14 @@ namespace AeroSim.UI
 
         public void Dispose()
         {
-            drawer.Dispose();
+            if (drawer != null) { drawer.Dispose(); drawer = null; }
+            if (canvasTexture != null)
+            {
+                canvasTexture.Release();                     // 释放 native/GPU 内存（Leak Detected 的元凶）
+                if (Application.isPlaying) UnityEngine.Object.Destroy(canvasTexture);
+                else UnityEngine.Object.DestroyImmediate(canvasTexture);
+                canvasTexture = null;
+            }
         }
 
         /*

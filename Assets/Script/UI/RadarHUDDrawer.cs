@@ -223,13 +223,13 @@ namespace AeroSim.UI
                         Vector2Int acPos = new Vector2Int(posX, posY);
 
                         if (radar.radarMode == RadarModule.RadarMode.SRC)
-                            drawer.DrawRectFillCenter(posX, posY, 7, 2, new Color32(0, 255, 0, 255));
+                            drawer.DrawRectFillCenter(posX, posY, 14, 4, new Color32(0, 255, 0, 255));
                         else if (radar.radarMode == RadarModule.RadarMode.TWS)
                         {
                             Vector3 localVector = radar.transform.InverseTransformDirection(aircraft.Velocity);
                             Vector3 normVector = Vector3.Normalize(new Vector3(localVector.x, 0, localVector.z));
-                            drawer.DrawCircle(posX, posY, 8, 3, Color.green);
-                            drawer.DrawLine(posX + (int)(normVector.x * 10), posY + (int)(normVector.y * 10), posX + (int)(normVector.x * 30), posY + (int)(normVector.z * 30), Color.green);
+                            drawer.DrawCircle(posX, posY, 16, 6, Color.green);
+                            drawer.DrawLine(posX + (int)(normVector.x * 20), posY + (int)(normVector.y * 20), posX + (int)(normVector.x * 60), posY + (int)(normVector.z * 60), Color.green);
                         }
 
                         if (aircraft == selectedAircraft)
@@ -283,7 +283,7 @@ namespace AeroSim.UI
                 Vector3 radarVeloPos = parentAircraft.transform.InverseTransformPoint(radar.lockedAircraft.transform.position + radar.lockedAircraft.Velocity * 100);
                 Vector3 localVelo = (radarVeloPos - radarPos).normalized;
 
-                drawer.DrawCircle(posX, posY, 6, 2, new Color(0, 1, 0, 1));
+                drawer.DrawCircle(posX, posY, 12, 4, new Color(0, 1, 0, 1));
                 drawer.DrawLine(
                     posX,
                     posY,
@@ -337,8 +337,8 @@ namespace AeroSim.UI
 
         private void DrawCursor(int x0, int y0)
         {
-            drawer.DrawRectFillCenter(x0 - 14, y0, 1, 12, new Color32(0, 255, 0, 255));
-            drawer.DrawRectFillCenter(x0 + 14, y0, 1, 12, new Color32(0, 255, 0, 255));
+            drawer.DrawRectFillCenter(x0 - 28, y0, 1, 24, new Color32(0, 255, 0, 255));
+            drawer.DrawRectFillCenter(x0 + 28, y0, 1, 24, new Color32(0, 255, 0, 255));
         }
 
         private void DrawCursor(Vector2Int pos)

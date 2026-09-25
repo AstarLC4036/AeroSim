@@ -66,6 +66,7 @@ namespace AeroSim.AircraftModules
         protected Vector3 commandAccel;
 
         protected float velo;
+        protected float currentQ;
         [SerializeField]
         protected Vector3 desiredDirection;
         protected Vector3 previousPosition;
@@ -80,6 +81,8 @@ namespace AeroSim.AircraftModules
         public float duration = 5f;
         public float burntTime = 0;
         public float thrust = 1000;
+        public float designedQ = 26000;
+        public Vector2 factorLimits;
         [Header("Tracking")]
         public float maxRange = 13;
         public float lockTime = 0.5f;
@@ -206,7 +209,7 @@ namespace AeroSim.AircraftModules
         /// <param name="dt">Delta time</param>
         protected virtual void UpdateState(float dt)
         {
-            velo = rb.velocity.magnitude;
+            UpdateBaseState();
 
             if (target != null)
             {
@@ -232,6 +235,13 @@ namespace AeroSim.AircraftModules
             }
         }
 
+        // basic flight data
+        protected void UpdateBaseState()
+        {
+            velo = rb.velocity.magnitude;
+            currentQ = 0.5f * AtmosphereEnv.Density(transform.position.y - OriginKeeper.origin.y) * velo * velo;
+        }
+
         protected virtual void UpdateInput(float dt)
         {
             float clampedX = Mathf.Clamp(controllingInput.x, -1, 1);
@@ -239,9 +249,11 @@ namespace AeroSim.AircraftModules
             float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);
             controllingInput = new Vector3(clampedX, clampedY, clampedZ);
 
+            float speedFactorQ = Mathf.Clamp(designedQ / Mathf.Max(currentQ, 1f), factorLimits.x, factorLimits.y);
+
             foreach (AeroSurface surface in surfaces)
             {
-                surface.UpdateInput(controllingInput);
+                surface.UpdateInput(controllingInput * speedFactorQ);
             }
         }
 
@@ -285,41 +297,20 @@ namespace AeroSim.AircraftModules
         {
             if (isIgnited)
             {
-                //if (desiredDirection != Vector3.zero)
-                //{
-                //    float angleToTarget = Vector3.Angle(transform.forward, desiredDirection);
-
-                //    // target angular velocity
-                //    float desiredTurnRate = Mathf.Clamp(angleToTarget / dt, 0f, maxTurnRate);
-
-                //    // angular velocity
-                //    currentTurnRate = Mathf.MoveTowards(
-                //        currentTurnRate, desiredTurnRate, maxTurnAcceleration * dt);
-
-                //    // rotation
-                //    Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);
-                //    transform.rotation = Quaternion.RotateTowards(
-                //        transform.rotation, targetRotation, currentTurnRate * dt);
-                //}
-
                 if (burntTime < duration)
                 {
-                    //transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
                     burntTime += Time.fixedDeltaTime;
                     rb.AddForce(transform.forward * thrust);
-                    //velo += accleration * Time.fixedDeltaTime;
                 }
                 else if (burntTime >= duration)
                 {
                     burntTime = duration;
-                    //flameParticle.Stop();
                     flameEffect.Stop();
                 }
             }
 
             // drag
-            rb.AddForce(-rb.velocity.normalized * rb.velocity.sqrMagnitude * dragCoeff);
-            //transform.position += transform.forward * velo * Time.fixedDeltaTime;
+            rb.AddForce(-rb.velocity.normalized * currentQ * dragCoeff);
         }
 
         /// <summary>

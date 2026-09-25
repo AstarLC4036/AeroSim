@@ -53,6 +53,8 @@ namespace AeroSim.AircraftModules
 
         protected override void UpdateState(float dt)
         {
+            UpdateBaseState();
+
             if (lockState == MissileState.Locking)
             {
                 seekerDirection = seekerTransform.forward;

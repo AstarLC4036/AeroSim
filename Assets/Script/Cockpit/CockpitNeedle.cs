@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Animations.Rigging;
 
 namespace AeroSim.Cockpit
 {
@@ -17,26 +18,40 @@ namespace AeroSim.Cockpit
         public CockpitDataManager.CockpitDataType dataType;
         public RangeMapping[] ranges;
         public Axis rotateAxis;
+        public bool invert = false;
 
         protected override void UpdateIndicator()
         {
             float value = CockpitDataManager.GetDataFloat(dataType);
-            foreach (RangeMapping rng in ranges)
+            if (ranges != null && ranges.Length > 0)
             {
-                if(!(value >= rng.inputRange.x && value <= rng.inputRange.y))
+                foreach (RangeMapping rng in ranges)
                 {
-                    continue;
-                }
+                    if (!(value >= rng.inputRange.x && value <= rng.inputRange.y))
+                    {
+                        continue;
+                    }
 
-                value = Mathf.Clamp(value, rng.inputRange.x, rng.inputRange.y);
-                float angleLerpPercent = (value - rng.inputRange.x) / (rng.inputRange.y - rng.inputRange.x);
-                float targetAngle = Mathf.Lerp(rng.angleRange.x, rng.angleRange.y, angleLerpPercent);
+                    value = Mathf.Clamp(value, rng.inputRange.x, rng.inputRange.y);
+                    float angleLerpPercent = (value - rng.inputRange.x) / (rng.inputRange.y - rng.inputRange.x);
+                    float targetAngle = Mathf.Lerp(rng.angleRange.x, rng.angleRange.y, angleLerpPercent);
+                    targetAngle = invert ? -targetAngle : targetAngle;
+                    transform.localEulerAngles = new Vector3(
+                        rotateAxis == Axis.X ? targetAngle : transform.localEulerAngles.x,
+                        rotateAxis == Axis.Y ? targetAngle : transform.localEulerAngles.y,
+                        rotateAxis == Axis.Z ? targetAngle : transform.localEulerAngles.z
+                    );
+                }
+            }
+            else
+            {
+                float targetAngle = invert ? -value : value;
                 transform.localEulerAngles = new Vector3(
                     rotateAxis == Axis.X ? targetAngle : transform.localEulerAngles.x,
                     rotateAxis == Axis.Y ? targetAngle : transform.localEulerAngles.y,
                     rotateAxis == Axis.Z ? targetAngle : transform.localEulerAngles.z
                 );
-            }        
+            }
          }
     }
 }
