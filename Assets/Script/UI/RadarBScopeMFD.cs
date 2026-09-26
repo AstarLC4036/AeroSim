@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 namespace AeroSim.UI
@@ -35,6 +36,11 @@ namespace AeroSim.UI
             {
                 datalink = parentAircraft.datalink;
             }
+        }
+
+        public void SetFont(TMP_FontAsset font)
+        {
+            drawer.TextFont = font;
         }
 
         private void UpdateData()
@@ -135,11 +141,13 @@ namespace AeroSim.UI
 
             DrawCursor(areaOffset.x + cursorDisplayPosition.x * areaSize.x / RadarHUDDrawer.Instance.size.x, areaOffset.y + cursorDisplayPosition.y * areaSize.y / RadarHUDDrawer.Instance.size.y);
 
-            foreach(Aircraft aircraft in radar.ScannedAircrafts)
+            for(int i = 0; i <  radar.ScannedAircrafts.Count; i++)
             {
+                Aircraft aircraft = radar.ScannedAircrafts[i];
                 var (posX, posY) = TransformWorldToRadar(aircraft.transform.position, areaSize);
 
-                drawer.DrawCircle(areaOffset.x + posX, areaOffset.y + posY, 20, 6, Color.white);
+                drawer.DrawCircle(areaOffset.x + posX, areaOffset.y + posY, 28, 6, Color.white);
+                drawer.DrawText((i+1).ToString(), areaOffset.x + posX, areaOffset.y + posY - 18, Color.white, size: 36, anchor: MFDTextAnchor.Center);
             }
 
             if(isDatalinkAvaliable)
@@ -245,8 +253,8 @@ namespace AeroSim.UI
         {
             //drawer.DrawRect(x0 - 14, y0, 1, 7, new Color32(0, 255, 0, 255));
             //drawer.DrawRect(x0 + 14, y0, 1, 7, new Color32(0, 255, 0, 255));
-            drawer.DrawLine(x0 - 28, y0 - 28, x0 - 28, y0 + 28, Color.white);
-            drawer.DrawLine(x0 + 28, y0 - 28, x0 + 28, y0 + 28, Color.white);
+            drawer.DrawLine(x0 - 36, y0 - 36, x0 - 36, y0 + 36, Color.white);
+            drawer.DrawLine(x0 + 36, y0 - 36, x0 + 36, y0 + 36, Color.white);
         }
 
         private (int, int) TransformWorldToRadar(Vector3 worldPos, Vector2Int size = new Vector2Int())

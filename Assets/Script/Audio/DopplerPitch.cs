@@ -40,7 +40,7 @@ namespace AeroSim.Audio
             lastPos = transform.position;
             targetLastPos = listener.transform.position;
 
-            OriginKeeper.onOriginChange += OnOriginChange;
+            FloatingOrigin.onOriginChange += OnOriginChange;
         }
 
         private void FixedUpdate()

@@ -139,7 +139,7 @@ namespace AeroSim.AeroPhysics
             localFlow = transform.InverseTransformVector(velocity);
             angleOfAttack = Mathf.Atan2(-localFlow.y, localFlow.z) * Mathf.Rad2Deg;
             localCenterOfMass = centerOfMass.z * transform.forward + centerOfMass.y * transform.up + centerOfMass.x * transform.right;
-            currentQ = 0.5f * AtmosphereEnv.Density(transform.position.y - OriginKeeper.origin.y) * velocity.sqrMagnitude;
+            currentQ = 0.5f * AtmosphereEnv.Density(transform.position.y - FloatingOrigin.origin.y) * velocity.sqrMagnitude;
 
             //liftCoiffient = liftCurve.Evaluate(angleOfAttack);
             //dragCoiffient = dragCurve.Evaluate(angleOfAttack);

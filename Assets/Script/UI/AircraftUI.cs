@@ -1,4 +1,4 @@
-﻿using AeroSim.AeroPhysics;
+using AeroSim.AeroPhysics;
 using AeroSim.Utils;
 using System.Collections;
 using TMPro;
@@ -53,13 +53,20 @@ namespace AeroSim.UI
 
         private void Update()
         {
-            int throttlePercent = (int)(aircraft.engine.thurst / aircraft.engine.maxThurst * 100);
-            float ias = aircraftRB.velocity.magnitude * Mathf.Sqrt(AtmosphereEnv.Density(aircraft.transform.position.y - OriginKeeper.origin.y) / 1.225f);
-            throttleText.text = throttlePercent <= 100 ? $"{throttlePercent} <size=16>%</size>" : $"{throttlePercent} <size=16>% <color=red>[加力]</color></size>";
-            altText.text = $"{((int)((aircraft.transform.position.y - OriginKeeper.origin.y) * 100)) / 100} <size=16>m</size>";
+            // 真实高度：和 Aircraft / AtmosphereEnv 用同一个口径
+            float altitude = aircraft.transform.position.y - FloatingOrigin.origin.y;
+            float sonic = Mathf.Max(AtmosphereEnv.SonicSpeed(altitude), 1f);
+
+            // 节流阀显示「杆位 + 卡位名 + N1」：杆位是飞行员给的，N1 是发动机的响应
+            int leverPercent = Mathf.RoundToInt(aircraft.engine.ThrottlePercent);
+            int n1Percent = Mathf.RoundToInt(aircraft.engine.N1Percent);
+            float ias = aircraftRB.velocity.magnitude * Mathf.Sqrt(AtmosphereEnv.Density(altitude) / 1.225f);
+            string abTag = aircraft.engine.IsAfterburner ? " <size=16><color=red>[加力]</color></size>" : string.Empty;
+            throttleText.text = $"{aircraft.engine.DetentName} {leverPercent} <size=16>% · N1 {n1Percent}%</size>{abTag}";
+            altText.text = $"{((int)(altitude * 100)) / 100} <size=16>m</size>";
             tasText.text = $"{((int)(aircraftRB.velocity.magnitude / 1000 * 3600 * 100)) / 100} <size=16>km/h</size>";
             iasText.text = $"{((int)(ias / 1000 * 3600 * 100)) / 100} <size=16>km/h</size>";
-            machSpdText.text = $"{(int)(aircraftRB.velocity.magnitude / 343.0f * 100) / 100f} <size=16>Mach</size>";
+            machSpdText.text = $"{(int)(aircraftRB.velocity.magnitude / sonic * 100) / 100f} <size=16>Mach</size>";
             overloadText.text = $"{(int)(aircraft.G * 10) / 10f} <size=16>G</size>";
         }
 

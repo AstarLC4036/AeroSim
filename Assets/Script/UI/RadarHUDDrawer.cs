@@ -229,7 +229,7 @@ namespace AeroSim.UI
                             Vector3 localVector = radar.transform.InverseTransformDirection(aircraft.Velocity);
                             Vector3 normVector = Vector3.Normalize(new Vector3(localVector.x, 0, localVector.z));
                             drawer.DrawCircle(posX, posY, 16, 6, Color.green);
-                            drawer.DrawLine(posX + (int)(normVector.x * 20), posY + (int)(normVector.y * 20), posX + (int)(normVector.x * 60), posY + (int)(normVector.z * 60), Color.green);
+                            drawer.DrawLine(posX + (int)(normVector.x * 20), posY + (int)(normVector.z * 20), posX + (int)(normVector.x * 60), posY + (int)(normVector.z * 60), Color.green);
                         }
 
                         if (aircraft == selectedAircraft)

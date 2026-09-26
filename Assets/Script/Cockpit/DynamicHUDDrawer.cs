@@ -1,4 +1,4 @@
-﻿using AeroSim.AeroPhysics;
+using AeroSim.AeroPhysics;
 using AeroSim.AircraftModules;
 using AeroSim.UI;
 using System;
@@ -239,15 +239,15 @@ namespace AeroSim.Cockpit
                     Vector2 pointRInner = gimbalCenter + new Vector2(-pointInner.x, pointInner.y);
                     Vector2 pointROuter = gimbalCenter + new Vector2(-pointOuter.x, pointOuter.y);
 
-                    drawer.DrawLine(pointLInner, pointLOuter, Color.green, 10);
-                    drawer.DrawLine(pointRInner, pointROuter, Color.green, 10);
+                    drawer.DrawLine(pointLInner, pointLOuter, Color.green, 2f);
+                    drawer.DrawLine(pointRInner, pointROuter, Color.green, 2f);
                 }
                 else
                 {
                     Vector2 pointMInner = gimbalCenter + pointInner;
                     Vector2 pointMOuter = gimbalCenter + pointOuter * ((gimbalScalerLength * 1.2f + gimbalRadius) / gimbalRadius);
 
-                    drawer.DrawLine(pointMInner, pointMOuter, Color.green, 10);
+                    drawer.DrawLine(pointMInner, pointMOuter, Color.green, 2f);
                 }
             }
             Vector2 indicatorPos = new Vector2(Mathf.Cos((rollAngle - 90) * Mathf.Deg2Rad), Mathf.Sin((rollAngle - 90) * Mathf.Deg2Rad)) * (gimbalScalerLength + gimbalRadius) + gimbalCenter;
@@ -265,9 +265,9 @@ namespace AeroSim.Cockpit
                 Mathf.Sin((angle - 45) * Mathf.Deg2Rad)
             );
 
-            drawer.DrawLine(p0, p0 + d1 * gimbalIndicatorSize, Color.green, 10);
-            drawer.DrawLine(p0, p0 + d2 * gimbalIndicatorSize, Color.green, 10);
-            drawer.DrawLine(p0 + d1 * gimbalIndicatorSize, p0 + d2 * gimbalIndicatorSize, Color.green, 10);
+            drawer.DrawLine(p0, p0 + d1 * gimbalIndicatorSize, Color.green, 2f);
+            drawer.DrawLine(p0, p0 + d2 * gimbalIndicatorSize, Color.green, 2f);
+            drawer.DrawLine(p0 + d1 * gimbalIndicatorSize, p0 + d2 * gimbalIndicatorSize, Color.green, 2f);
         }
     }
 }

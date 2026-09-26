@@ -2,16 +2,21 @@ using AeroSim.AircraftModules;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace AeroSim.UI
 {
+    /// <summary>
+    /// MFD Display content types
+    /// </summary>
     public enum MFDType
     {
         None,
         RadarPPI,
         RadarBScope,
+        Gimbal,
         RWR,
         Weapon,
         TargetingPod,
@@ -61,6 +66,9 @@ namespace AeroSim.UI
             UpdateCanvas();
         }
 
+        /// <summary>
+        /// Draw canvas.
+        /// </summary>
         public virtual void ProcessCanvas()
         {
             // Draw here
@@ -99,57 +107,6 @@ namespace AeroSim.UI
         {
             Dispose();
         }
-
-        /*
-        public List<RawImage> drawTargets = new List<RawImage>();
-        public int resolution = 260;
-        protected Texture2D canvasTex;
-        protected Color32[] pixels;
-        protected MFDGraphicHelper drawer;
-
-        public Color32 bgColor = new Color32(0, 185, 0, 128);
-
-        public void InitCanavs()
-        {
-            canvasTex = new Texture2D(resolution, resolution, TextureFormat.ARGB32, false);
-            foreach (RawImage rawImage in drawTargets)
-            {
-                rawImage.texture = canvasTex;
-            }
-            pixels = new Color32[resolution * resolution];
-
-            Array.Fill(pixels, bgColor);
-            canvasTex.SetPixels32(pixels);
-
-            drawer = new MFDGraphicHelper(resolution, resolution);
-
-            canvasTex.wrapMode = TextureWrapMode.Clamp;
-            canvasTex.filterMode = FilterMode.Point;
-        }
-
-        protected virtual void Update()
-        {
-            UpdateCanvas();
-        }
-
-        public virtual void ProcessCanvas()
-        {
-            // Draw here
-        }
-
-        public virtual void UpdateCanvas()
-        {
-            Array.Fill(pixels, bgColor);
-            ProcessCanvas();
-            ApplyTexture();
-        }
-
-        public void ApplyTexture()
-        {
-            canvasTex.SetPixels32(pixels);
-            canvasTex.Apply();
-        }
-        */
     }
 
     /// <summary>
@@ -169,11 +126,10 @@ namespace AeroSim.UI
             this.bgColor = bgColor;
         }
 
-
         public void InitCanvas()
         {
             Dispose();
-            if (canvasTexture != null) // 重复初始化 = 旧 RT 永久泄漏（Persistent allocation）
+            if (canvasTexture != null)
             {
                 drawer?.Dispose();     // 旧的 helper 也要释放，否则它的 ComputeBuffer 一样会漏
                 drawer = null;
@@ -191,6 +147,9 @@ namespace AeroSim.UI
             drawer = new MFDGraphicHelper(canvasTexture, size.x, size.y);
         }
 
+        /// <summary>
+        /// Draw canvas.
+        /// </summary>
         public virtual void ProcessCanvas()
         {
             // Draw here
@@ -208,60 +167,19 @@ namespace AeroSim.UI
             drawer.Submit();
         }
 
+        /// <summary>
+        /// Dispose drawer and texture memory
+        /// </summary>
         public void Dispose()
         {
             if (drawer != null) { drawer.Dispose(); drawer = null; }
             if (canvasTexture != null)
             {
-                canvasTexture.Release();                     // 释放 native/GPU 内存（Leak Detected 的元凶）
+                canvasTexture.Release(); // Release native/GPU Memory (to avoid leak)
                 if (Application.isPlaying) UnityEngine.Object.Destroy(canvasTexture);
                 else UnityEngine.Object.DestroyImmediate(canvasTexture);
                 canvasTexture = null;
             }
         }
-
-        /*
-        public Vector2Int size = new Vector2Int(256, 256);
-        protected Texture2D canvasTex;
-        protected Color32[] pixels;
-        protected MFDGraphicHelper32 drawer;
-
-        public Texture2D CanvasTexture => canvasTex;
-
-        [SerializeField]
-        public Color32 bgColor = new Color32(25, 25, 25, 255);
-
-        public void InitCanavs()
-        {
-            canvasTex = new Texture2D(size.x, size.y, TextureFormat.ARGB32, false);
-            pixels = new Color32[size.x * size.y];
-
-            Array.Fill(pixels, bgColor);
-            canvasTex.SetPixels32(pixels);
-
-            drawer = new MFDGraphicHelper32(pixels, size.x, size.y);
-
-            canvasTex.wrapMode = TextureWrapMode.Clamp;
-            canvasTex.filterMode = FilterMode.Point;
-        }
-
-        public virtual void ProcessCanvas()
-        {
-            // Draw here
-        }
-
-        public virtual void UpdateCanvas()
-        {
-            Array.Fill(pixels, bgColor);
-            ProcessCanvas();
-            ApplyTexture();
-        }
-
-        public void ApplyTexture()
-        {
-            canvasTex.SetPixels32(pixels);
-            canvasTex.Apply();
-        }
-        */
     }
 }

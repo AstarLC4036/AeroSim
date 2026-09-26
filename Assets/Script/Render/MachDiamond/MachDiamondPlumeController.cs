@@ -1,4 +1,4 @@
-﻿using AeroSim.AircraftModules;
+using AeroSim.AircraftModules;
 using UnityEngine;
 using UnityEngine.Rendering;
 #if UNITY_EDITOR
@@ -148,17 +148,24 @@ namespace AeroSim.Render
         // --------------------------------------------------------------- internal
 
         /// <summary>
-        /// Engine thrust above military thrust is the afterburner range: the
-        /// engine allows up to 1.1 * maxThurst, which maps to 0..1 here (the
-        /// same split EngineModule uses for its flame scaling).
+        /// 加力段现在是 EngineModule 里的独立状态量：真机开加力时核心转速基本不变，
+        /// 所以不能再用「推力超过军用推力」来判断加力。
         /// </summary>
         float DriveTarget()
         {
-            if (engine == null) return Mathf.Clamp01(afterburner);
+            if (engine == null)
+            {
+                // 引用断了（改过 prefab 层级 / 复制过物体就会出现）。不自己找一次的话，
+                // 这里会一直退回手动的 afterburner(=0)，表现就是"HUD 显示全加力，但尾焰只有干推那点亮度"。
+                engine = GetComponentInParent<EngineModule>();
+                if (engine != null)
+                    Debug.LogWarning("[MachDiamond] engine 引用为空，已自动从父级找到 EngineModule（建议在 Inspector 里重新指一下）。", this);
+                else
+                    return Mathf.Clamp01(afterburner);
+            }
             if (!engine.isEngineToggled) return 0f;
 
-            float max = Mathf.Max(engine.maxThurst, 1e-3f);
-            return Mathf.Clamp01((engine.thurst - max) / (max * 0.1f));
+            return Mathf.Clamp01(engine.AbLevel);
         }
 
         void EnsureMaterial()

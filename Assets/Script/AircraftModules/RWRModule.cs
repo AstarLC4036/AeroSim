@@ -56,7 +56,7 @@ namespace AeroSim.AircraftModules
 
         private void Start()
         {
-            OriginKeeper.onOriginChange += OnOriginChange;
+            FloatingOrigin.onOriginChange += OnOriginChange;
         }
 
         // Update is called once per frame

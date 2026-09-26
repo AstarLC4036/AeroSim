@@ -57,9 +57,27 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
     float2 pixelPos = float2(id.x, id.y) + 0.5;  // 像素中心
     float4 finalColor = float4(0, 0, 0, 0);
 
+    // 裁剪矩形状态：type 9 设置、type 10 清除；之后所有命令只在矩形内生效（scissor）
+    float2 clipMin = float2(0.0, 0.0);
+    float2 clipMax = float2(_Width, _Height);
+
     for (int cmdIndex = 0; cmdIndex < _CommandCount; cmdIndex++)
     {
         DrawCommand cmd = _Commands[cmdIndex];
+
+        if (cmd.type == 9)                       // SetClipRect（param1 = min/max）
+        {
+            clipMin = min(cmd.param1.xy, cmd.param1.zw);
+            clipMax = max(cmd.param1.xy, cmd.param1.zw);
+            continue;
+        }
+        if (cmd.type == 10)                      // ClearClip
+        {
+            clipMin = float2(0.0, 0.0);
+            clipMax = float2(_Width, _Height);
+            continue;
+        }
+
         float4 cmdColor = cmd.color;
 
         // ---- 包围盒剔除：像素不在命令范围内直接跳过（省掉 SDF 与图集采样，字多了非常关键）----
@@ -87,13 +105,51 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
             bMin = cmd.param1.xy - cmd.param1.zw;
             bMax = cmd.param1.xy + cmd.param1.zw;
         }
+        else if (cmd.type == 7)                      // Disc（param1 = 圆心 + 半径）
+        {
+            float rr = max(cmd.param1.z, 0.0) + 2.0;
+            bMin = cmd.param1.xy - rr;
+            bMax = cmd.param1.xy + rr;
+        }
+        else if (cmd.type == 8)                      // RotatedRectFill（param1 = 中心 + 半尺寸；param2.xy = cos/sin）
+        {
+            float2 cc = cmd.param2.xy;
+            float2 ax = float2(cc.x, cc.y) * cmd.param1.z;
+            float2 ay = float2(-cc.y, cc.x) * cmd.param1.w;
+            float2 e = abs(ax) + abs(ay) + 1.0;
+            bMin = cmd.param1.xy - e;
+            bMax = cmd.param1.xy + e;
+        }
+        else if (cmd.type == 11)                     // Arc（param1 = 圆心 + 半径 + 厚度；param2.xy = 起止角(度)）
+        {
+            float rr = max(cmd.param1.z, 0.0) + max(cmd.param1.w, 0.0) * 0.5 + 2.0;
+            bMin = cmd.param1.xy - rr;
+            bMax = cmd.param1.xy + rr;
+        }
+        else if (cmd.type == 12)                     // Triangle（param1.xy / param1.zw / param2.xy = 三个顶点）
+        {
+            float2 t0 = cmd.param1.xy;
+            float2 t1 = cmd.param1.zw;
+            float2 t2 = cmd.param2.xy;
+            bMin = min(min(t0, t1), t2) - 2.0;
+            bMax = max(max(t0, t1), t2) + 2.0;
+        }
         else                                         // Texture / Text：param1 本身是 min/max
         {
             bMin = cmd.param1.xy;
             bMax = cmd.param1.zw;
         }
-        if (pixelPos.x < bMin.x || pixelPos.x > bMax.x ||
-            pixelPos.y < bMin.y || pixelPos.y > bMax.y) continue;
+
+        // 只有 3/4/5 是"在形状以外生效"，其它 layer 值（包括代码里误传的任意 int）都当成 0 = 普通覆盖，
+        // 这样历史代码里 `layer` 从没被用过的那些写法不会因为这次改动而突然有语义。
+        bool outsideShape = (cmd.layer == 3 || cmd.layer == 4 || cmd.layer == 5);
+        if (!outsideShape &&
+            (pixelPos.x < bMin.x || pixelPos.x > bMax.x ||
+             pixelPos.y < bMin.y || pixelPos.y > bMax.y)) continue;
+
+        // 裁剪矩形对所有命令都生效（包括 EraseOutside）
+        if (pixelPos.x < clipMin.x || pixelPos.x > clipMax.x ||
+            pixelPos.y < clipMin.y || pixelPos.y > clipMax.y) continue;
 
         float alpha = 0.0;
         float dist = 1e10;
@@ -146,6 +202,15 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 break;
             }
 
+            case 7: // Disc（实心圆：param1 = 圆心 + 半径）
+            {
+                float2 center = cmd.param1.xy;
+                float radius = max(cmd.param1.z, 0.0);
+                dist = length(pixelPos - center) - radius;
+                alpha = 1.0 - smoothstep(-0.5, 0.5, dist);
+                break;
+            }
+
             case 3: // RectOutline
             {
                 float2 center = cmd.param1.xy;
@@ -164,6 +229,65 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 float2 halfSize = cmd.param1.zw;
                 dist = RectSDF(pixelPos, center, halfSize);
                 alpha = dist < 0 ? 1.0 : 0.0;
+                break;
+            }
+
+            case 8: // RotatedRectFill（param1 = 中心 + 半尺寸；param2.xy = (cos, sin)）
+            {
+                float2 center = cmd.param1.xy;
+                float2 halfSize = cmd.param1.zw;
+                float2 cs = cmd.param2.xy;
+                float2 d = pixelPos - center;
+                // 把像素转回矩形局部坐标（旋转 -angle），再套普通矩形 SDF
+                float2 local = float2(d.x * cs.x + d.y * cs.y, -d.x * cs.y + d.y * cs.x);
+                dist = RectSDF(local, float2(0.0, 0.0), halfSize);
+                alpha = dist < 0 ? 1.0 : 0.0;
+                break;
+            }
+
+            case 11: // Arc（圆环弧 / 扇形）
+                     // param1 = 圆心 + 半径 + 厚度（thickness <= 0 时是从圆心填到半径的扇形）
+                     // param2.xy = 起始角、结束角（度，0° = +X，逆时针为正；end < start 即顺时针扫）
+            {
+                float2 center = cmd.param1.xy;
+                float radius = max(cmd.param1.z, 0.0);
+                float thickness = cmd.param1.w;
+                float startDeg = cmd.param2.x;
+                float endDeg = cmd.param2.y;
+
+                float2 d = pixelPos - center;
+                float len = length(d);
+                float aDeg = degrees(atan2(d.y, d.x));
+
+                float sweep = endDeg - startDeg;
+                float rel = aDeg - startDeg;
+                // 把相对角折叠到和扫掠方向同号的一侧
+                rel = (sweep >= 0.0)
+                    ? fmod(rel + 1440.0, 360.0)
+                    : -fmod(-rel + 1440.0, 360.0);
+                bool inAngle = (sweep >= 0.0) ? (rel <= sweep) : (rel >= sweep);
+
+                // 径向：厚度 > 0 是环带（和 DrawCircle 同一套），否则从圆心填满
+                float rdist = (thickness > 0.0)
+                    ? (abs(len - radius) - thickness * 0.5)
+                    : (len - radius);
+
+                alpha = inAngle ? (1.0 - smoothstep(-0.5, 0.5, rdist)) : 0.0;
+                break;
+            }
+
+            case 12: // Triangle（实心三角；三个顶点按逆时针给，C# 侧已保证绕向）
+            {
+                float2 t0 = cmd.param1.xy;
+                float2 t1 = cmd.param1.zw;
+                float2 t2 = cmd.param2.xy;
+                // 三条边的"向内"有符号距离（逆时针时内部为正）→ 取 min 再取负，才是"内部为负"的 SDF
+                float2 e0 = t1 - t0, e1 = t2 - t1, e2 = t0 - t2;
+                float d0 = (e0.x * (pixelPos.y - t0.y) - e0.y * (pixelPos.x - t0.x)) / max(length(e0), 1e-5);
+                float d1 = (e1.x * (pixelPos.y - t1.y) - e1.y * (pixelPos.x - t1.x)) / max(length(e1), 1e-5);
+                float d2 = (e2.x * (pixelPos.y - t2.y) - e2.y * (pixelPos.x - t2.x)) / max(length(e2), 1e-5);
+                dist = -min(min(d0, d1), d2);
+                alpha = 1.0 - smoothstep(-0.5, 0.5, dist);
                 break;
             }
 
@@ -209,17 +333,24 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
             }
         }
 
+        // layer 3/4/5：覆盖率取反 —— 命令在形状"以外"生效
+        //   3 = EraseOutside   擦掉形状外（裁剪到形状里）
+        //   4 = OverOutside    在形状外做正常 alpha 覆盖（把圆外刷回背景色，不会露黑底）
+        //   5 = ReplaceOutside 在形状外直接覆盖，不混合
+        // 其它值（包括误传的 int）保持普通覆盖，语义和 layer 字段从未被使用前一致
+        if (outsideShape) alpha = 1.0 - alpha;
+
         // 混合。注意 finalColor 内部是 **预乘 alpha** 累加的（最后才除回 alpha），
         // 所以 Erase 必须把 rgb 和 a 一起缩，否则会越擦越亮。
         if (alpha > 0.0)
         {
             float a = saturate(cmdColor.a * alpha);
 
-            if (cmd.layer == 1)          // Erase：destination-out，只削减已有内容
+            if (cmd.layer == 1 || cmd.layer == 3)   // Erase / EraseOutside：destination-out
             {
                 finalColor *= (1.0 - a);
             }
-            else if (cmd.layer == 2)     // Replace：直接覆盖，不混合
+            else if (cmd.layer == 2 || cmd.layer == 5)   // Replace / ReplaceOutside：直接覆盖，不混合
             {
                 finalColor = float4(cmdColor.rgb * a, a);
             }

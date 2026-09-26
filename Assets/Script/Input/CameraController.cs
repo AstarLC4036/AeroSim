@@ -92,7 +92,7 @@ namespace AeroSim.InputSystem
                 Debug.LogWarning($"'IR Effect' is not avaliable, we can't find it in the volume profile.");
             }
 
-            OriginKeeper.onOriginChange += OnOriginChange;
+            FloatingOrigin.onOriginChange += OnOriginChange;
         }
 
         private void OnOriginChange(Vector3 delta)

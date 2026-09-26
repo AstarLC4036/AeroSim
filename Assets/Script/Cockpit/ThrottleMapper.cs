@@ -1,4 +1,4 @@
-﻿using AeroSim.AeroPhysics;
+using AeroSim.AeroPhysics;
 using AeroSim.AircraftModules;
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,8 @@ namespace AeroSim.Cockpit
             {
                 engine = aircraft.engine;
             }
-            float percent = engine.thurst / engine.maxThurst * 1.1f;
+            // 三 D 油门杆直接跟杆位走（原来乘 1.1 会让手柄转过印字刻度）
+            float percent = engine.ThrottleLever;
             transform.localEulerAngles = new Vector3(maxAngle * percent, transform.localEulerAngles.y, transform.localEulerAngles.z);
         }
     }

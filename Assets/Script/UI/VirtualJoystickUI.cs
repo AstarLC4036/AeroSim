@@ -26,7 +26,7 @@ namespace AeroSim.UI
         public void Update()
         {
             Vector3 rawInput = Aircraft.main.ControllingInput;
-            float throttle = Aircraft.main.engine.thurst / Aircraft.main.engine.maxThurst;
+            float throttle = Aircraft.main.engine.ThrottleLever;
             Vector3 input = new Vector2(rawInput.z, rawInput.y);
             cursor.position = centerOffset + input * scaleInner;
             yawCursor.position = yawOffset + new Vector3(rawInput.x * scaleExternalX, 0, 0);

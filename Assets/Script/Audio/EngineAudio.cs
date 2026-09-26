@@ -1,4 +1,4 @@
-﻿using AeroSim.AircraftModules;
+using AeroSim.AircraftModules;
 using AeroSim.InputSystem;
 using System.Collections;
 using UnityEngine;
@@ -35,8 +35,9 @@ namespace AeroSim.Audio
 
         void UpdateEmit()
         {
-            float thrustPercent = Mathf.Clamp01(engine.thurst / engine.maxThurst);
-            bool isWep = engine.isEngineToggled && engine.thurst > engine.maxThurst;
+            // 音色由 N1 转速驱动（不是推力百分比：高空推力会衰减，但转速不该跟着变）
+            float n1 = Mathf.Clamp01(engine.Rpm);
+            float wepLevel = Mathf.Clamp01(engine.AbLevel);
 
             //float volumeParam = 1;
             float dstToListener = 10000;
@@ -50,11 +51,10 @@ namespace AeroSim.Audio
 
             if (engineEmitter != null)
             {
-                float wep = isWep ? 1f : 0f;
                 bool isCockpitView = CameraController.Instance != null && CameraController.CurrentView.view == CameraController.CameraView.ViewType.Cockpit;
 
-                engineEmitter.SetParameter("Throttle", thrustPercent);
-                engineEmitter.SetParameter("WEP", wep);
+                engineEmitter.SetParameter("Throttle", n1);
+                engineEmitter.SetParameter("WEP", wepLevel);
                 engineEmitter.SetParameter("Inner", isCockpitView ? 1 : 0);
                 //engineEmitter.SetParameter("Volume", volumeParam);
                 engineEmitter.SetParameter("dist", dstToListener / 1000);

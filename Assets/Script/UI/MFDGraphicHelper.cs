@@ -22,6 +22,20 @@ namespace AeroSim.UI
         Erase = 1,
         /// <summary>直接覆盖，不做混合（alpha=1 时等于用该颜色顶掉已有像素）。</summary>
         Replace = 2,
+        /// <summary>
+        /// "形状以外"生效的擦除：和 Erase 同一套数学，但覆盖率取反。
+        /// 用途是把已画内容**裁剪到某个形状里**（先大范围画，再用它擦掉形状外的部分）。
+        /// 注意：擦完形状外会变成**透明**（露出后面的黑底）—— 想保留背景色请用 <see cref="FillOutsideDisc"/> 或 OverOutside。
+        /// 只有 3/4/5 这三个值有"形状以外"的语义，其它 layer 值（包括误传的 int）都按 0 处理，不会突然生效。
+        /// </summary>
+        EraseOutside = 3,
+        /// <summary>
+        /// 在形状**以外**做正常 alpha 覆盖（和 Over 同一套数学，覆盖率取反）。
+        /// 典型用途：姿态球画完天地之后，把圆外刷回 MFD 的灰背景色 ✓ 任何图元都能这么用。
+        /// </summary>
+        OverOutside = 4,
+        /// <summary>在形状**以外**直接覆盖，不做混合（Replace 的反相版）。</summary>
+        ReplaceOutside = 5,
     }
 
     /// <summary>文字的水平锚点：x 指的是文字的哪一边。Default = 用 MFDGraphicHelper.DefaultAnchor。</summary>
@@ -57,7 +71,13 @@ namespace AeroSim.UI
             RectOutline = 3,
             RectFill = 4,
             Texture = 5,
-            Text = 6
+            Text = 6,
+            Disc = 7,
+            RotatedRectFill = 8,
+            SetClipRect = 9,
+            ClearClip = 10,
+            Arc = 11,
+            Triangle = 12
         }
 
         public struct DrawCommand
@@ -83,6 +103,36 @@ namespace AeroSim.UI
 
         private bool registered;
         private static readonly List<MFDGraphicHelper> liveHelpers = new List<MFDGraphicHelper>();
+
+        // ================= 设计分辨率缩放 =================
+        // 页面按 designSize 写坐标/尺寸/字号，实际画布（构造时的 width/height）自动缩放。
+        // 默认 (0,0) = 关闭 → 所有参数 ×1，输出与加这个功能之前逐像素一致。
+        private Vector2Int designSize = Vector2Int.zero;
+
+        /// <summary>当前设计分辨率；(0,0) 表示未启用缩放。</summary>
+        public Vector2Int DesignSize => designSize;
+
+        /// <summary>设备像素 / 设计单位。未启用缩放时恒为 1。</summary>
+        public float DesignScale
+        {
+            get
+            {
+                if (designSize.x <= 0 || designSize.y <= 0 || width <= 0 || height <= 0) return 1f;
+                // 取两轴中较小的缩放比：万一宽高比不一致，宁可留白，也不会把内容裁掉
+                return Mathf.Min((float)width / designSize.x, (float)height / designSize.y);
+            }
+        }
+
+        /// <summary>
+        /// 设定设计分辨率：页面按这个尺寸写坐标与字号，画布分辨率可以随时改（宽高比要和画布一致）。
+        /// 传 (0,0) 关闭缩放。返回的水平推进量仍以设计单位计。
+        /// </summary>
+        public void SetDesignSize(int w, int h) { designSize = new Vector2Int(w, h); }
+        public void SetDesignSize(Vector2Int size) { designSize = size; }
+
+        // 设计单位 → 设备像素（关闭缩放时 ×1）
+        private float Scale(float v) => v * DesignScale;
+        private Vector2 Scale(Vector2 v) => v * DesignScale;
 
         public int Width => width;
         public int Height => height;
@@ -156,7 +206,7 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 0,
-                param1 = new Vector4(x0, y0, x1, y1),
+                param1 = new Vector4(Scale(x0), Scale(y0), Scale(x1), Scale(y1)),
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
@@ -177,8 +227,8 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 0,
-                param1 = new Vector4(x0, y0, x1, y1),
-                param2 = new Vector4(width, 0, 0, 0),   // param2 之前对 Line 是空的，正好拿来放线宽
+                param1 = new Vector4(Scale(x0), Scale(y0), Scale(x1), Scale(y1)),
+                param2 = new Vector4(Scale(width), 0, 0, 0),   // param2 之前对 Line 是空的，正好拿来放线宽
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
@@ -194,10 +244,10 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 1,
-                param1 = new Vector4(x0, y0, x1, y1),
+                param1 = new Vector4(Scale(x0), Scale(y0), Scale(x1), Scale(y1)),
                 color = new Vector4(color.r, color.g, color.b, color.a),
-                dashLength = dashLength,
-                gapLength = gapLength,
+                dashLength = Mathf.Max(Mathf.RoundToInt(Scale(dashLength)), 1),
+                gapLength = Mathf.Max(Mathf.RoundToInt(Scale(gapLength)), 0),
                 layer = layer
             });
         }
@@ -212,10 +262,283 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 2,
-                param1 = new Vector4(x0, y0, radius, thickness),
+                param1 = new Vector4(Scale(x0), Scale(y0), Scale(radius), Scale(thickness)),
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
+        }
+
+        /// <summary>
+        /// 实心圆（disc）。param1 = 圆心 + 半径，抗锯齿和圆环同一套（1px）。
+        /// 配合 <see cref="MFDBlend.Erase"/> 就是"圆形挖洞" —— 画姿态球、把矩形裁成圆、瞄准光环遮罩都用得上。
+        /// </summary>
+        public void DrawDisc(Vector2 center, float radius, Color color, int layer = 0)
+        {
+            DrawDisc(center.x, center.y, radius, color, layer);
+        }
+
+        public void DrawDisc(float x0, float y0, float radius, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 7,
+                param1 = new Vector4(Scale(x0), Scale(y0), Mathf.Max(Scale(radius), 0f), 0f),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        /// <summary>实心圆擦除（destination-out，不混合）：alpha=1 完全挖穿，0.5 只挖一半。</summary>
+        public void DrawDiscErase(float x0, float y0, float radius, float alpha = 1f)
+        {
+            DrawDisc(x0, y0, radius, new Color(0f, 0f, 0f, Mathf.Clamp01(alpha)), (int)MFDBlend.Erase);
+        }
+
+        /// <summary>
+        /// 只保留圆内的内容：把圆**以外**全部擦掉。等价于"裁剪到圆形"（stencil）。
+        /// 用法：先随便大范围画，然后调一次这个，超出的部分就没了。
+        /// </summary>
+        public void DrawDiscStencil(float x0, float y0, float radius, float alpha = 1f)
+        {
+            DrawDisc(x0, y0, radius, new Color(0f, 0f, 0f, Mathf.Clamp01(alpha)), (int)MFDBlend.EraseOutside);
+        }
+
+        /// <summary>
+        /// 把圆**以外**刷成指定颜色（正常 alpha 覆盖）——<see cref="DrawDiscStencil"/> 的"不露黑底"版本。
+        /// 姿态球的标准用法：画完天/地（会溢出）之后调一次，圆外就恢复成 MFD 背景色 ✓
+        /// 其它形状同理：<c>DrawRectFill(..., (int)MFDBlend.OverOutside)</c> 就是把矩形外刷掉。
+        /// </summary>
+        public void FillOutsideDisc(Vector2 center, float radius, Color color)
+        {
+            DrawDisc(center, radius, color, (int)MFDBlend.OverOutside);
+        }
+
+        public void FillOutsideDisc(float x0, float y0, float radius, Color color)
+        {
+            DrawDisc(x0, y0, radius, color, (int)MFDBlend.OverOutside);
+        }
+
+        /// <summary>
+        /// 圆弧：只在一个角度范围内填充的**环带**（转速表那种绿弧）。
+        /// 角度用度，0° = +X 方向，逆时针为正（和 Mathf.Cos/Sin 一致）✓
+        /// endDeg &lt; startDeg 就是顺时针扫 ✓ 角度边缘是硬边（径向仍然是 1px 抗锯齿 ✓）
+        /// thickness &lt;= 0 时变成**扇形**（从圆心一直填到半径）✓
+        /// </summary>
+        public void DrawArc(Vector2 center, float radius, float thickness,
+                            float startDeg, float endDeg, Color color, int layer = 0)
+        {
+            DrawArc(center.x, center.y, radius, thickness, startDeg, endDeg, color, layer);
+        }
+
+        public void DrawArc(float cx, float cy, float radius, float thickness,
+                            float startDeg, float endDeg, Color color, int layer = 0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 11,
+                param1 = new Vector4(Scale(cx), Scale(cy), Mathf.Max(Scale(radius), 0f), Scale(Mathf.Max(thickness, 0f))),
+                param2 = new Vector4(startDeg, endDeg, 0f, 0f),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        /// <summary>按 0~1 的值填一段弧（仪表盘最常用）：value=0 时画空、1 时画满整段 ✓</summary>
+        public void DrawArcValue(Vector2 center, float radius, float thickness,
+                                 float startDeg, float endDeg, float value01,
+                                 Color color, int layer = 0)
+        {
+            DrawArcValue(center.x, center.y, radius, thickness, startDeg, endDeg, value01, color, layer);
+        }
+
+        public void DrawArcValue(float cx, float cy, float radius, float thickness,
+                                 float startDeg, float endDeg, float value01,
+                                 Color color, int layer = 0)
+        {
+            float end = Mathf.Lerp(startDeg, endDeg, Mathf.Clamp01(value01));
+            DrawArc(cx, cy, radius, thickness, startDeg, end, color, layer);
+        }
+
+        /// <summary>扇形（从圆心填到半径，thickness 传 0 的封装 ✓）。</summary>
+        public void DrawSector(Vector2 center, float radius, float startDeg, float endDeg,
+                               Color color, int layer = 0)
+        {
+            DrawArc(center.x, center.y, radius, 0f, startDeg, endDeg, color, layer);
+        }
+
+        // ================= 三角形 / 任意多边形（path 填充） =================
+
+        /// <summary>
+        /// 实心三角形（1px 抗锯齿）。绕向无所谓，内部会自动统一成逆时针。
+        /// 这是 <see cref="FillPolygon"/> 的基础图元，也可以直接用来画三角符号。
+        /// </summary>
+        public void DrawTriangle(Vector2 a, Vector2 b, Vector2 c, Color color, int layer = 0)
+        {
+            // 统一成逆时针（shader 里的半平面 SDF 依赖绕向）
+            float cross = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+            if (cross < 0f) { Vector2 tmp = b; b = c; c = tmp; }
+
+            commands.Add(new DrawCommand
+            {
+                type = 12,
+                param1 = new Vector4(Scale(a.x), Scale(a.y), Scale(b.x), Scale(b.y)),
+                param2 = new Vector4(Scale(c.x), Scale(c.y), 0f, 0f),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        /// <summary>
+        /// 用一串点连成闭合路径并**填充内部**（凸的、凹的都能处理：内部做耳切三角化）。
+        /// 返回生成了多少个三角形命令（= 点数 - 2；自交/退化多边形会提前收手）。
+        /// 注意：每次调用会分配少量临时 List；每帧画很多大多边形的话建议缓存顶点数组再来。
+        /// 小技巧：填完再补一圈 <see cref="DrawPolygonOutline"/> 可以盖掉三角形之间的 AA 接缝。
+        /// </summary>
+        public int FillPolygon(IList<Vector2> points, Color color, int layer = 0)
+        {
+            if (points == null || points.Count < 3) return 0;
+
+            // 有符号面积 → 决定索引顺序（统一成逆时针）
+            float area = 0f;
+            for (int i = 0; i < points.Count; i++)
+            {
+                Vector2 p = points[i], q = points[(i + 1) % points.Count];
+                area += p.x * q.y - q.x * p.y;
+            }
+
+            List<int> idx = new List<int>(points.Count);
+            for (int i = 0; i < points.Count; i++)
+                idx.Add(area >= 0f ? i : points.Count - 1 - i);
+
+            int made = 0;
+            int guard = idx.Count * idx.Count + 8;      // 防止退化输入死循环
+
+            while (idx.Count > 3 && guard-- > 0)
+            {
+                bool clipped = false;
+                for (int i = 0; i < idx.Count; i++)
+                {
+                    int i0 = idx[(i + idx.Count - 1) % idx.Count];
+                    int i1 = idx[i];
+                    int i2 = idx[(i + 1) % idx.Count];
+                    Vector2 a = points[i0], b = points[i1], c = points[i2];
+
+                    // 逆时针下 cross > 0 才是凸耳
+                    if ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) <= 0f) continue;
+
+                    bool isEar = true;
+                    for (int j = 0; j < idx.Count && isEar; j++)
+                    {
+                        int ij = idx[j];
+                        if (ij == i0 || ij == i1 || ij == i2) continue;
+                        if (PointInTriangle(points[ij], a, b, c)) isEar = false;
+                    }
+                    if (!isEar) continue;
+
+                    DrawTriangle(a, b, c, color, layer);
+                    made++;
+                    idx.RemoveAt(i);
+                    clipped = true;
+                    break;
+                }
+                if (!clipped) break;    // 自交或退化：剩下的放弃，避免死循环
+            }
+
+            if (idx.Count == 3)
+            {
+                DrawTriangle(points[idx[0]], points[idx[1]], points[idx[2]], color, layer);
+                made++;
+            }
+            return made;
+        }
+
+        /// <summary>把一串点连成线（默认闭合），用作轮廓。width &lt;= 1 时就是原来的 1px 细线。</summary>
+        public void DrawPolygonOutline(IList<Vector2> points, float width, Color color,
+                                       int layer = 0, bool closed = true)
+        {
+            if (points == null || points.Count < 2) return;
+            int last = closed ? points.Count : points.Count - 1;
+            for (int i = 0; i < last; i++)
+            {
+                Vector2 a = points[i];
+                Vector2 b = points[(i + 1) % points.Count];
+                DrawLine(a.x, a.y, b.x, b.y, color, width, layer);
+            }
+        }
+
+        private static bool PointInTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+        {
+            float d1 = (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+            float d2 = (p.x - c.x) * (b.y - c.y) - (b.x - c.x) * (p.y - c.y);
+            float d3 = (p.x - a.x) * (c.y - a.y) - (c.x - a.x) * (p.y - a.y);
+            bool hasNeg = (d1 < 0f) || (d2 < 0f) || (d3 < 0f);
+            bool hasPos = (d1 > 0f) || (d2 > 0f) || (d3 > 0f);
+            return !(hasNeg && hasPos);
+        }
+
+        /// <summary>
+        /// 设置裁剪矩形：之后的绘制**只在矩形内生效**（等于 scissor）。
+        /// 参数和 <see cref="DrawRectFill(float,float,float,float,Color,int)"/> 一致：(x0,y0) 是角，w/h 是完整宽高。
+        /// 一页里想做好几个各自裁剪的区域就靠它；用完记得 <see cref="ClearClip"/>（每帧命令流清空时也会自动恢复）。
+        /// </summary>
+        public void SetClipRect(float x0, float y0, float w0, float h0)
+        {
+            commands.Add(new DrawCommand
+            {
+                type = 9,
+                param1 = new Vector4(Scale(x0), Scale(y0), Scale(x0 + Mathf.Max(w0, 0f)), Scale(y0 + Mathf.Max(h0, 0f))),
+                layer = 0
+            });
+        }
+
+        public void SetClipRect(Rect rect)
+        {
+            SetClipRect(rect.xMin, rect.yMin, rect.width, rect.height);
+        }
+
+        /// <summary>取消裁剪，恢复整屏。</summary>
+        public void ClearClip()
+        {
+            commands.Add(new DrawCommand { type = 10, layer = 0 });
+        }
+
+        /// <summary>
+        /// 旋转实心矩形：中心 + 半尺寸 + 旋转角（度）。旋转以 (cos, sin) 传进 param2，shader 每像素不用三角函数。
+        /// 配合 <see cref="MFDBlend.Erase"/> 可以擦一个斜的矩形；配合 EraseOutside 可以做斜的裁剪框。
+        /// </summary>
+        public void DrawRotatedRectFill(Vector2 center, Vector2 halfSize, float angleDeg, Color color, int layer = 0)
+        {
+            float rad = angleDeg * Mathf.Deg2Rad;
+            commands.Add(new DrawCommand
+            {
+                type = 8,
+                param1 = new Vector4(Scale(center.x), Scale(center.y), Mathf.Max(Scale(halfSize.x), 0f), Mathf.Max(Scale(halfSize.y), 0f)),
+                param2 = new Vector4(Mathf.Cos(rad), Mathf.Sin(rad), 0f, 0f),
+                color = new Vector4(color.r, color.g, color.b, color.a),
+                layer = layer
+            });
+        }
+
+        /// <summary>旋转实心矩形擦除。</summary>
+        public void DrawRotatedRectErase(Vector2 center, Vector2 halfSize, float angleDeg, float alpha = 1f)
+        {
+            DrawRotatedRectFill(center, halfSize, angleDeg, new Color(0f, 0f, 0f, Mathf.Clamp01(alpha)), (int)MFDBlend.Erase);
+        }
+
+        /// <summary>
+        /// 半平面填充：(x0, y0) 是分界线上的一个点，angleDeg 是分界线的倾角，
+        /// 填充**法线负侧**（局部 -Y 那一边，也就是"线下方"）。姿态球的天地分割就用这个：
+        /// 分界点随俯仰上下移、倾角随滚转反向转，地下半片就跟着对上了。
+        /// </summary>
+        public void DrawHalfPlane(float x0, float y0, float angleDeg, float size, Color color, int layer = 0)
+        {
+            float rad = angleDeg * Mathf.Deg2Rad;
+            float c = Mathf.Cos(rad);
+            float s = Mathf.Sin(rad);
+            // 局部 -Y 方向 = (s, -c)；把矩形中心推到界线的一侧，让它的上边正好压在分界线上
+            Vector2 below = new Vector2(s, -c);
+            Vector2 center = new Vector2(x0, y0) + below * size;
+            DrawRotatedRectFill(center, new Vector2(size, size), angleDeg, color, layer);
         }
 
         public void DrawRectOutlineCenter(Vector2 center, Vector2 size, float thickness, Color color, int layer = 0)
@@ -228,8 +551,8 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 3,
-                param1 = new Vector4(x0, y0, w0, h0),
-                param2 = new Vector4(thickness, 0, 0, 0),
+                param1 = new Vector4(Scale(x0), Scale(y0), Scale(w0), Scale(h0)),
+                param2 = new Vector4(Scale(thickness), 0, 0, 0),
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
@@ -245,8 +568,8 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 3,
-                param1 = new Vector4(x0 + w0 / 2, y0 + h0 / 2, w0 / 2, h0 / 2),
-                param2 = new Vector4(thickness, 0, 0, 0),
+                param1 = new Vector4(Scale(x0 + w0 / 2), Scale(y0 + h0 / 2), Scale(w0 / 2), Scale(h0 / 2)),
+                param2 = new Vector4(Scale(thickness), 0, 0, 0),
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
@@ -262,7 +585,7 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 4,
-                param1 = new Vector4(x0, y0, w0, h0),
+                param1 = new Vector4(Scale(x0), Scale(y0), Scale(w0), Scale(h0)),
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
@@ -278,7 +601,7 @@ namespace AeroSim.UI
             commands.Add(new DrawCommand
             {
                 type = 4,
-                param1 = new Vector4(x0 + w0 / 2, y0 + h0 / 2, w0 / 2, h0 / 2),
+                param1 = new Vector4(Scale(x0 + w0 / 2), Scale(y0 + h0 / 2), Scale(w0 / 2), Scale(h0 / 2)),
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
@@ -454,16 +777,16 @@ namespace AeroSim.UI
                               MFDTextAnchor anchor = MFDTextAnchor.Default,
                               float letterSpacing = float.NaN)
         {
-            return LayoutText(text, x, y, color, size, sharpness,
-                              ResolveAnchor(anchor), false, 0f, letterSpacing);
+            return LayoutText(text, Scale(x), Scale(y), color, Scale(size), sharpness,
+                              ResolveAnchor(anchor), false, 0f, letterSpacing) / DesignScale;
         }
 
         /// <summary>同上（位置参数版，第 7 个参数是字距）。anchor 用 <see cref="DefaultAnchor"/>。</summary>
         public float DrawText(string text, float x, float y, Color color,
                               float size, float sharpness, float tracking)
         {
-            return LayoutText(text, x, y, color, size, sharpness,
-                              ResolveAnchor(MFDTextAnchor.Default), false, 0f, tracking);
+            return LayoutText(text, Scale(x), Scale(y), color, Scale(size), sharpness,
+                              ResolveAnchor(MFDTextAnchor.Default), false, 0f, tracking) / DesignScale;
         }
 
         /// <summary>以 (cx, cy) 为中心画一行文字（水平居中，垂直按大写字高居中）。</summary>
@@ -471,8 +794,8 @@ namespace AeroSim.UI
                                       float size = 16f, float sharpness = DefaultTextSharpness,
                                       float letterSpacing = float.NaN)
         {
-            return LayoutText(text, cx, cy, color, size, sharpness,
-                              MFDTextAnchor.Center, true, cy, letterSpacing);
+            return LayoutText(text, Scale(cx), Scale(cy), color, Scale(size), sharpness,
+                              MFDTextAnchor.Center, true, Scale(cy), letterSpacing) / DesignScale;
         }
 
         private MFDTextAnchor ResolveAnchor(MFDTextAnchor anchor)
@@ -486,8 +809,14 @@ namespace AeroSim.UI
             return MeasureText(text, size, LetterSpacing);
         }
 
-        /// <summary>只量宽度（像素）。tracking 与 DrawText 的 letterSpacing 同义。</summary>
+        /// <summary>只量宽度（设计单位）。tracking 与 DrawText 的 letterSpacing 同义。</summary>
         public float MeasureText(string text, float size, float letterSpacing)
+        {
+            return MeasureTextDevice(text, Scale(size), letterSpacing) / DesignScale;
+        }
+
+        // 设备像素空间的测量（内部用：LayoutText 已经在设备空间里工作）
+        private float MeasureTextDevice(string text, float size, float letterSpacing)
         {
             TMP_FontAsset font = TextFont;
             if (font == null || string.IsNullOrEmpty(text) || font.characterLookupTable == null) return 0f;
@@ -526,7 +855,7 @@ namespace AeroSim.UI
             float px = size / font.faceInfo.pointSize * font.faceInfo.scale;
             int sharp = Mathf.Clamp(Mathf.RoundToInt(sharpness * 1000f), 1, 8000);
 
-            float lineWidth = MeasureText(text, size, letterSpacing);
+            float lineWidth = MeasureTextDevice(text, size, letterSpacing);
             float tracking = letterSpacing * size;          // 像素
 
             // 水平锚点：x 指左端 / 中心 / 右端

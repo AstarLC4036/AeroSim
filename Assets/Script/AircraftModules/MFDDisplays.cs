@@ -2,6 +2,7 @@ using AeroSim.AeroPhysics;
 using AeroSim.UI;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,6 +27,9 @@ namespace AeroSim.AircraftModules
         public RadarBScopeMFD radarBScopeDrawer;
         [SerializeField]
         public RadarPPIMFD radarPPIDrawer;
+        [SerializeField]
+        public GimbalMFD gimbalDrawer;
+        public TMP_FontAsset stdFont;
 
         private Aircraft parentAircraft;
 
@@ -40,6 +44,9 @@ namespace AeroSim.AircraftModules
             }
         }
 
+        /// <summary>
+        /// Init all drawers
+        /// </summary>
         private void InitDrawer()
         {
             ScreenProperty radarDefineScreen = mfdScreens.Find(x => x.type == MFDType.RadarBScope || x.type == MFDType.RadarPPI);
@@ -50,24 +57,22 @@ namespace AeroSim.AircraftModules
             }
             if (radarPPIDrawer == null)
             {
-                radarPPIDrawer = new RadarPPIMFD(new Vector2Int(1024, 1024), Color.black);   // 原来写成了 radarBScopeDrawer（复制粘贴 bug：PPI 为 null 时会 NRE，且新 drawer 直接泄漏）
+                radarPPIDrawer = new RadarPPIMFD(new Vector2Int(1024, 1024), Color.black);   // 原来写成了 radarBScopeDrawer（复制粘贴 bug：PPI 为 null 时会 NRE，且新 drawer 直接泄漏） // 臭肥鱼你怎么什么都说
             }
-
-            // Set data override first
-            //foreach (ScreenProperty mfd in mfdScreens)
-            //{
-            //    MFDDrawer drawer = GetMFDDrawer(mfd.type);
-            //    if (drawer != null)
-            //    {
-            //        drawer.size = mfd.size;
-            //        drawer.bgColor = mfd.bgColor;
-            //    }
-            //}
+            if (gimbalDrawer == null)
+            {
+                gimbalDrawer = new GimbalMFD(new Vector2Int(1024, 1024), Color.black);
+            }
 
             radarBScopeDrawer.Init(parentAircraft);
             radarPPIDrawer.Init(parentAircraft);
+            gimbalDrawer.Init(parentAircraft);
+            gimbalDrawer.SetFont(stdFont);
         }
 
+        /// <summary>
+        /// Init MFD for Renderer
+        /// </summary>
         private void InitMFDRender()
         {
             foreach (ScreenProperty mfd in mfdScreens)
@@ -89,6 +94,8 @@ namespace AeroSim.AircraftModules
                     return radarBScopeDrawer;
                 case (MFDType.RadarPPI):
                     return radarPPIDrawer;
+                case (MFDType.Gimbal):
+                    return gimbalDrawer;
                 default :
                     return null;
             }
@@ -96,11 +103,14 @@ namespace AeroSim.AircraftModules
 
         private static RenderTexture emptyMFDTexture;
 
-        /// <summary>空 MFD 槽位共用一个 1x1 RT。以前每次 Init 都 new 一个且从不释放 → Persistent 泄漏。</summary>
+        /// <summary>
+        /// Get a empty MFD texture when there's nothing to display.
+        /// </summary>
         private static RenderTexture GetEmptyMFDTexture()
         {
             if (emptyMFDTexture == null)
             {
+                // TODO: 空 MFD 槽位共用一个 1x1 RT。以前每次 Init 都 new 一个且从不释放 → Persistent 泄漏。
                 emptyMFDTexture = new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32)
                 {
                     enableRandomWrite = true,
@@ -130,20 +140,23 @@ namespace AeroSim.AircraftModules
             {
                 radarBScopeDrawer.UpdateCanvas();
                 radarPPIDrawer.UpdateCanvas();
+                gimbalDrawer.UpdateCanvas();
             }
         }
 
         private void OnApplicationQuit()
         {
+            // Dispose all resources when quit.
             if (parentAircraft != null && parentAircraft.isControlling)
             {
                 radarBScopeDrawer?.Dispose();
                 radarPPIDrawer?.Dispose();
+                gimbalDrawer?.Dispose();
             }
             if (emptyMFDTexture != null)
             {
                 emptyMFDTexture.Release();
-                UnityEngine.Object.Destroy(emptyMFDTexture);
+                Destroy(emptyMFDTexture);
                 emptyMFDTexture = null;
             }
         }

@@ -7,41 +7,49 @@ using UnityEngine.Rendering;
 
 namespace AeroSim.Utils
 {
-    public class OriginKeeper : MonoBehaviour
+    public class FloatingOrigin : MonoBehaviour
     {
+        private static FloatingOrigin instance;
+        public static FloatingOrigin Instance => instance;
+
         public float limit;
         public Transform centerObject;
         public Transform[] externalObjects;
+        public Transform particleRoot;
 
         public static Vector3 origin;
 
         public static Action<Vector3> onOriginChange = (delta) => { };
 
-        public List<ParticleSystem> worldParticleSystems = new List<ParticleSystem>();
-        public List<TrailRenderer> worldTrailRenderers = new List<TrailRenderer>();
+        //public List<ParticleSystem> worldParticleSystems = new List<ParticleSystem>();
+        //public List<TrailRenderer> worldTrailRenderers = new List<TrailRenderer>();
         //public List<VisualEffect> worldVisualEffects = new List<VisualEffect>();
         
+        // Renderering
         public readonly int worldOffsetProp = Shader.PropertyToID("_WorldOriginOffset");
 
         public Material skyboxMaterial;
 
+        private void Awake()
+        {
+            instance = this;
+        }
 
-        // 在场景加载时注册粒子系统
         void Start()
         {
-            // 查找场景中所有模拟空间为 World 的粒子系统
-            ParticleSystem[] allPS = FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None);
-            foreach (var ps in allPS)
-            {
-                if (ps.main.simulationSpace == ParticleSystemSimulationSpace.World)
-                {
-                    worldParticleSystems.Add(ps);
-                }
-            }
+            //// 查找场景中所有模拟空间为 World 的粒子系统
+            //ParticleSystem[] allPS = FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None);
+            //foreach (var ps in allPS)
+            //{
+            //    if (ps.main.simulationSpace == ParticleSystemSimulationSpace.World)
+            //    {
+            //        worldParticleSystems.Add(ps);
+            //    }
+            //}
 
-            // 查找场景中所有拖尾渲染器
-            TrailRenderer[] allTR = FindObjectsByType<TrailRenderer>(FindObjectsSortMode.None);
-            worldTrailRenderers.AddRange(allTR);
+            //// 查找场景中所有拖尾渲染器
+            //TrailRenderer[] allTR = FindObjectsByType<TrailRenderer>(FindObjectsSortMode.None);
+            //worldTrailRenderers.AddRange(allTR);
 
             //// 查找场景中所有视觉效果
             //VisualEffect[] allVE = FindObjectsByType<VisualEffect>(FindObjectsSortMode.None);
@@ -99,35 +107,41 @@ namespace AeroSim.Utils
             foreach (Transform ext in externalObjects)
                 ext.position += delta;
 
-            // 手动偏移所有世界空间粒子
-            foreach (var ps in worldParticleSystems)
-            {
-                if (ps == null) continue;
-                ParticleSystem.Particle[] particles = new ParticleSystem.Particle[ps.particleCount];
-                int count = ps.GetParticles(particles);
-                for (int i = 0; i < count; i++)
-                {
-                    particles[i].position += delta;
-                }
-                ps.SetParticles(particles, count);
-            }
+            // make it into a better way
+            //// 手动偏移所有世界空间粒子
+            //foreach (var ps in worldParticleSystems)
+            //{
+            //    if (ps == null) continue;
+            //    ParticleSystem.Particle[] particles = new ParticleSystem.Particle[ps.particleCount];
+            //    int count = ps.GetParticles(particles);
+            //    for (int i = 0; i < count; i++)
+            //    {
+            //        particles[i].position += delta;
+            //    }
+            //    ps.SetParticles(particles, count);
+            //}
 
-            foreach (TrailRenderer trail in worldTrailRenderers)
-            {
-                Vector3[] points = new Vector3[trail.positionCount];
+            //foreach (TrailRenderer trail in worldTrailRenderers)
+            //{
+            //    Vector3[] points = new Vector3[trail.positionCount];
 
-                trail.GetPositions(points);
-                for (int i = 0; i < points.Length; i++)
-                {
-                    points[i] += delta;
-                }
-                trail.SetPositions(points);
-            }
+            //    trail.GetPositions(points);
+            //    for (int i = 0; i < points.Length; i++)
+            //    {
+            //        points[i] += delta;
+            //    }
+            //    trail.SetPositions(points);
+            //}
 
             if (skyboxMaterial != null)
             {
                 skyboxMaterial.SetFloat("_DeltaHeight", -origin.y / 1000);
             }
+        }
+
+        private void OnApplicationQuit()
+        {
+            onOriginChange -= ShiftOrigin;
         }
     }
 }

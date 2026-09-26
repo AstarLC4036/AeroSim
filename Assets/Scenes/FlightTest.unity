@@ -2287,11 +2287,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
-        type: 3}
-      propertyPath: levelModeThresholdDeg
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 782078534484423977, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: 'audioSources.Array.data[0]'
@@ -2396,6 +2391,11 @@ PrefabInstance:
         type: 3}
       propertyPath: thurst
       value: 120000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2619851623265575258, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: throttleLever
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 3418659054062061506, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -2671,6 +2671,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461631984622656303, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: initialLever
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 7934541409145376938, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -4526,11 +4531,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
-        type: 3}
-      propertyPath: levelModeThresholdDeg
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 782078534484423977, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: 'audioSources.Array.data[0]'
@@ -4635,6 +4635,11 @@ PrefabInstance:
         type: 3}
       propertyPath: thurst
       value: 120000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2619851623265575258, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: throttleLever
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 3418659054062061506, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -4910,6 +4915,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461631984622656303, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: initialLever
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 7934541409145376938, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -6136,7 +6146,7 @@ MonoBehaviour:
   size: {x: 512, y: 512}
   bgColor:
     serializedVersion: 2
-    rgba: 2348864000
+    rgba: 1006686720
   scanRangeColor:
     serializedVersion: 2
     rgba: 4278255360
@@ -6682,35 +6692,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 320407935}
-  - component: {fileID: 320407934}
+  - component: {fileID: 320407936}
   m_Layer: 0
-  m_Name: OriginKeeper
+  m_Name: FloatingOrigin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &320407934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 320407933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 051933890f2eb0b4094be88f5cad2012, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  limit: 1000
-  centerObject: {fileID: 330585546}
-  externalObjects:
-  - {fileID: 330585546}
-  - {fileID: 1839995248}
-  - {fileID: 969551426}
-  worldParticleSystems: []
-  worldTrailRenderers: []
-  skyboxMaterial: {fileID: 2100000, guid: f25021cabdf6a8449968dffdbb980122, type: 2}
 --- !u!4 &320407935
 Transform:
   m_ObjectHideFlags: 0
@@ -6726,6 +6715,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2004463653}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &320407936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320407933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdc53c63cf3bad140a975fe4e1461207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  limit: 1000
+  centerObject: {fileID: 330585546}
+  externalObjects:
+  - {fileID: 1839995248}
+  - {fileID: 969551426}
+  particleRoot: {fileID: 969551426}
+  skyboxMaterial: {fileID: 2100000, guid: f25021cabdf6a8449968dffdbb980122, type: 2}
 --- !u!1 &321064817
 GameObject:
   m_ObjectHideFlags: 0
@@ -20863,11 +20871,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
-        type: 3}
-      propertyPath: levelModeThresholdDeg
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 782078534484423977, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: 'audioSources.Array.data[0]'
@@ -20972,6 +20975,11 @@ PrefabInstance:
         type: 3}
       propertyPath: thurst
       value: 120000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2619851623265575258, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: throttleLever
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 3418659054062061506, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -21247,6 +21255,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461631984622656303, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: initialLever
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 7934541409145376938, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -65882,6 +65895,21 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 2086e2d8e324dd448a061a713204eeb5, type: 2}
+    - target: {fileID: 2787878717506805290, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: gimbalDrawer.rpmRadius
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2787878717506805290, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: gimbalDrawer.gimbalPos.x
+      value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 2787878717506805290, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: gimbalDrawer.gimbalPos.y
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 3373248549458947987, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_IsActive

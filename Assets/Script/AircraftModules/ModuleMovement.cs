@@ -1,4 +1,6 @@
-﻿using AeroSim.InputSystem;
+﻿using AeroSim.General;
+using AeroSim.InputSystem;
+using AeroSim.UI;
 using System.Collections;
 using UnityEngine;
 
@@ -26,10 +28,12 @@ namespace AeroSim.AircraftModules
             if (landingGear.time == 0)
             {
                 landingGear.Play();
+                VehicleLog.LogMsg("起落架 > 放下");
             }
             else if(landingGear.time == landingGear.duration)
             {
                 landingGear.Play(-1);
+                VehicleLog.LogMsg("起落架 > 收起");
             }
             else
             {

@@ -125,7 +125,7 @@ namespace AeroSim.AircraftModules
         void Start()
         {
             rb = GetComponent<Rigidbody>();
-            OriginKeeper.onOriginChange += OnOriginChange;
+            FloatingOrigin.onOriginChange += OnOriginChange;
             flightController.missile = this;
 
             foreach (AeroSurface surface in surfaces)
@@ -239,7 +239,7 @@ namespace AeroSim.AircraftModules
         protected void UpdateBaseState()
         {
             velo = rb.velocity.magnitude;
-            currentQ = 0.5f * AtmosphereEnv.Density(transform.position.y - OriginKeeper.origin.y) * velo * velo;
+            currentQ = 0.5f * AtmosphereEnv.Density(transform.position.y - FloatingOrigin.origin.y) * velo * velo;
         }
 
         protected virtual void UpdateInput(float dt)

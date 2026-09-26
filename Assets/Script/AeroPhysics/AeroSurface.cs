@@ -95,7 +95,7 @@ namespace AeroSim.AeroPhysics
 
         private void Awake()
         {
-            OriginKeeper.onOriginChange += OnOriginChanged;
+            FloatingOrigin.onOriginChange += OnOriginChanged;
         }
 
         private void Start()
@@ -138,7 +138,7 @@ namespace AeroSim.AeroPhysics
 
         public void CalcucateState()
         {
-            velocity = (transform.position - lastPos) / Time.deltaTime;
+            velocity = (transform.position - lastPos) / Time.fixedDeltaTime;
             localFlow = transform.InverseTransformVector(velocity);
             angleOfAttack = Mathf.Atan2(-localFlow.y, localFlow.z) * Mathf.Rad2Deg;
 
@@ -231,7 +231,8 @@ namespace AeroSim.AeroPhysics
         {
             LDMCoefficients coefficients = CalcucateCoiffients(angleOfAttack);
 
-            float dymaticPresure = 0.5f * 1.225f * velocity.sqrMagnitude;
+            float density = AtmosphereEnv.Density(transform.position.y - FloatingOrigin.origin.y);
+            float dymaticPresure = 0.5f * density * velocity.sqrMagnitude;
 
             float liftForce = dymaticPresure * coefficients.liftCoefficient * area;
             Vector3 lift = liftForce * transform.up;
@@ -256,7 +257,8 @@ namespace AeroSim.AeroPhysics
 
         public Vector3 CalcucateLift(Vector3 velocity, float LC)
         {
-            float dymaticPresure = 0.5f * 1.225f * velocity.sqrMagnitude;
+            float density = AtmosphereEnv.Density(transform.position.y - FloatingOrigin.origin.y);
+            float dymaticPresure = 0.5f * density * velocity.sqrMagnitude;
             float liftForce = dymaticPresure * LC * area;
             Vector3 liftDir = Vector3.Cross(transform.right, velocity).normalized;
             Vector3 lift = liftForce * liftDir;
@@ -265,7 +267,8 @@ namespace AeroSim.AeroPhysics
 
         public Vector3 CalcucateDrag(Vector3 velocity, float DC)
         {
-            float dymaticPresure = 0.5f * 1.225f * velocity.sqrMagnitude;
+            float density = AtmosphereEnv.Density(transform.position.y - FloatingOrigin.origin.y);
+            float dymaticPresure = 0.5f * density * velocity.sqrMagnitude;
             float dragForce = dymaticPresure * DC * area;
             Vector3 drag = dragForce * -velocity.normalized;
             return drag;
@@ -281,7 +284,7 @@ namespace AeroSim.AeroPhysics
 
         public Vector3 CalcucateTorque(Vector3 velocity, Vector3 totalForce, Vector3 worldCenterOfMass, float TC)
         {
-            float density = AtmosphereEnv.Density(transform.position.y - OriginKeeper.origin.y);
+            float density = AtmosphereEnv.Density(transform.position.y - FloatingOrigin.origin.y);
             float dymaticPresure = 0.5f * density * velocity.sqrMagnitude;
             Vector3 torque = transform.right * TC * dymaticPresure * area * chord;
             return Vector3.Cross(transform.position - worldCenterOfMass, totalForce) + torque;
