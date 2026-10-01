@@ -35,7 +35,7 @@ namespace AeroSim.AircraftModules
 
         void InitCanvas()
         {
-            hudDrawer?.Dispose();          // 重复 Init（切飞机/重载）时旧 drawer 的 Buffer/RT 会漏
+            hudDrawer?.Dispose();          // On a repeated Init (switching aircraft / reload) the old drawer's Buffer/RT would leak
             if (hudDrawer == null)
             {
                 hudDrawer = new DynamicHUDDrawer(new Vector2Int(1024, 1024), bgColor);
@@ -59,7 +59,7 @@ namespace AeroSim.AircraftModules
         private void OnApplicationQuit()
         {
             RenderPipelineManager.beginCameraRendering -= MoveHUD;
-            hudDrawer?.Dispose();          // 之前从不释放 → ComputeBuffer/RenderTexture 泄漏
+            hudDrawer?.Dispose();          // Was never released before → ComputeBuffer/RenderTexture leak
             hudDrawer = null;
         }
 

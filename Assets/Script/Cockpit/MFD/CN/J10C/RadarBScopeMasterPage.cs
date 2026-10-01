@@ -1,36 +1,37 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.AircraftModules;
+using AeroSim.UI;
+using AeroSim.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
-namespace AeroSim.UI
+namespace AeroSim.Cockpit.MFD.CN.J10C
 {
     [Serializable]
-    public class RadarBScopeMFD : MFDDrawer
+    public class RadarBScopeMasterPage : IMFD_Page
     {
+        private MFDDataContext data;
+        private MFDGraphicHelper drawer;
         private Aircraft parentAircraft;
         private RadarModule radar;
         private DatalinkModule datalink;
+        public Rect zone;
         public float maxDrawDistance;
         public Vector2Int cursorDisplayPosition;
-        private bool isDatalinkAvaliable => datalink != null;
+        public Vector2Int size;
+        public bool isDatalinkAvaliable => datalink != null;
 
-        public RadarBScopeMFD(Vector2Int size, Color32 bgColor) : base(size, bgColor)
+        public Rect Zone => zone;
+        public MFD_PageType Type => MFD_PageType.RadarBScope;
+
+        public void Init(MFDDataContext ctx, MFDGraphicHelper drawer)
         {
-            
-        }
+            data = ctx;
+            this.drawer = drawer;
 
-        public void Init(Aircraft aircraft)
-        {
-            parentAircraft = aircraft;
-            radar = aircraft.radar;
-
-            InitCanvas();
+            parentAircraft = ctx.aircraft;
+            radar = ctx.aircraft.radar;
 
             if (parentAircraft.datalink != null)
             {
@@ -38,9 +39,9 @@ namespace AeroSim.UI
             }
         }
 
-        public void SetFont(TMP_FontAsset font)
+        public void OnButtonClick(int buttonIndex)
         {
-            drawer.TextFont = font;
+
         }
 
         private void UpdateData()
@@ -54,16 +55,13 @@ namespace AeroSim.UI
             }
         }
 
-        public override void ProcessCanvas()
+        public void DrawPage()
         {
             UpdateData();
             DrawRadar();
-            //DrawBorder(3, Color.green);
-            //DrawBorder(2, bgColor);
         }
 
-        // For J-10C with AESA Radar
-        private void DrawRadar()
+        public void DrawRadar()
         {
             Vector2Int areaSize = new Vector2Int(size.x * 3 / 4, size.x * 3 / 4);
             Vector2Int areaOffset = new Vector2Int(size.x * 1 / 4 / 2, size.y * 9 / 20);
@@ -83,9 +81,9 @@ namespace AeroSim.UI
                 drawer.DrawRectFill(areaOffset.x + 2, areaOffset.y + areaSize.y / 4 * i - 3, 30, 5, Color.white);
                 drawer.DrawRectFill(areaOffset.x + areaSize.x - 30, areaOffset.y + areaSize.y / 4 * i - 2, 30, 5, Color.white);
 
-                if(i < 3)
+                if (i < 3)
                 {
-                    for(int j = 1; j < 3; j++)
+                    for (int j = 1; j < 3; j++)
                     {
                         drawer.DrawRectFill(areaOffset.x + 1, areaOffset.y + areaSize.y / 12 * (3 * i + j), 25, 5, Color.white); // i / 4 + j / 3 * (1 / 4) -> i/4 + j/12 -> 3i/12 + j/12 -> (3i + j) / 12
                     }
@@ -106,12 +104,12 @@ namespace AeroSim.UI
 
             // Draw Gimbal
             float roll = -parentAircraft.transform.eulerAngles.z * Mathf.Deg2Rad;
-            drawer.DrawLine(areaOffset.x + areaSize.x / 2 + (int)(Mathf.Cos(roll) * 15), 
+            drawer.DrawLine(areaOffset.x + areaSize.x / 2 + (int)(Mathf.Cos(roll) * 15),
                             areaOffset.y + areaSize.y / 2 + (int)(Mathf.Sin(roll) * 15),
                             areaOffset.x + areaSize.x / 2 + (int)(Mathf.Cos(roll) * (areaSize.x / 4 - 5)),
                             areaOffset.y + areaSize.y / 2 + (int)(Mathf.Sin(roll) * (areaSize.x / 4 - 5)),
                             Color.white);
-            drawer.DrawLine(areaOffset.x + areaSize.x / 2 - (int)(Mathf.Cos(roll) * 15), 
+            drawer.DrawLine(areaOffset.x + areaSize.x / 2 - (int)(Mathf.Cos(roll) * 15),
                             areaOffset.y + areaSize.y / 2 - (int)(Mathf.Sin(roll) * 15),
                             areaOffset.x + areaSize.x / 2 - (int)(Mathf.Cos(roll) * (areaSize.x / 4 - 5)),
                             areaOffset.y + areaSize.y / 2 - (int)(Mathf.Sin(roll) * (areaSize.x / 4 - 5)),
@@ -131,7 +129,7 @@ namespace AeroSim.UI
             Vector3 velocityDir = parentAircraft.Velocity.normalized;
             float pitchAngle = Mathf.Asin(velocityDir.y) * Mathf.Rad2Deg;
             float posVectorY = areaOffset.y + areaSize.y / 2 * (1 + (pitchAngle / radar.currentScanAngleY));
-            if(posVectorY > areaOffset.y && posVectorY < areaOffset.y + areaSize.y)
+            if (posVectorY > areaOffset.y && posVectorY < areaOffset.y + areaSize.y)
             {
                 drawer.DrawCircle(areaOffset.x + areaSize.x / 2, (int)posVectorY, 12, 4, Color.white);
                 drawer.DrawRectFillCenter(areaOffset.x + areaSize.x / 2, (int)posVectorY + 20, 2, 10, Color.white);
@@ -141,118 +139,34 @@ namespace AeroSim.UI
 
             DrawCursor(areaOffset.x + cursorDisplayPosition.x * areaSize.x / RadarHUDDrawer.Instance.size.x, areaOffset.y + cursorDisplayPosition.y * areaSize.y / RadarHUDDrawer.Instance.size.y);
 
-            for(int i = 0; i <  radar.ScannedAircrafts.Count; i++)
+            for (int i = 0; i < radar.ScannedAircrafts.Count; i++)
             {
                 Aircraft aircraft = radar.ScannedAircrafts[i];
                 var (posX, posY) = TransformWorldToRadar(aircraft.transform.position, areaSize);
 
                 drawer.DrawCircle(areaOffset.x + posX, areaOffset.y + posY, 28, 6, Color.white);
-                drawer.DrawText((i+1).ToString(), areaOffset.x + posX, areaOffset.y + posY - 18, Color.white, size: 36, anchor: MFDTextAnchor.Center);
+                drawer.DrawText((i + 1).ToString(), areaOffset.x + posX, areaOffset.y + posY - 18, Color.white, size: 36, anchor: MFDTextAnchor.Center);
             }
 
-            if(isDatalinkAvaliable)
+            if (isDatalinkAvaliable)
             {
-                foreach(var mslAndTarget in parentAircraft.datalink.mslTrackInfo)
+                foreach (var mslAndTarget in parentAircraft.datalink.mslTrackInfo)
                 {
                     Missile missile = mslAndTarget.Item1;
                     var (posX, posY) = TransformWorldToRadar(missile.transform.position, areaSize);
                     var (posTX, posTY) = TransformWorldToRadar(missile.target.position, areaSize);
 
                     drawer.DrawRectFillCenter(areaOffset.x + posX, areaOffset.y + posY, 4, 4, Color.white);
-                    if(missile.IsIgnited)
+                    if (missile.IsIgnited)
                         drawer.DrawLine(areaOffset.x + posX, areaOffset.y + posY, areaOffset.x + posTX, areaOffset.y + posTY, Color.white);
                     else
                         drawer.DrawDashedLine(areaOffset.x + posX, areaOffset.y + posY, areaOffset.x + posTX, areaOffset.y + posTY, Color.white, 8, 8);
                 }
             }
-
-            //// Draw grid for different mode
-            //if (radar.radarMode == RadarModule.RadarMode.HMD)
-            //{
-            //    Vector3 radarFwd = radar.transform.forward;
-            //    Vector3 hmdDir = radar.hmdPointer.forward;
-            //    int posX = size.x / 2 + (int)((Mathf.Atan2(hmdDir.x, hmdDir.z) - Mathf.Atan2(radarFwd.x, radarFwd.z)) * Mathf.Rad2Deg / radar.maxScanAngleX * (size.x / 2));
-            //    int width = (int)(radar.currentScanAngleX / radar.maxScanAngleX * (size.x / 2));
-            //    drawer.DrawLine(posX - width, 0, posX - width, size.y, scanRangeOutlineColor);
-            //    drawer.DrawLine(posX + width, 0, posX + width, size.y, scanRangeOutlineColor);
-            //}
-            //else
-            //{
-            //    // Draw grid
-            //    int girdGapHeight = (int)(gridAngleY / radar.displayAngleY * (size.y / 2));
-            //    int girdGapWidth = (int)(gridAngleX / radar.displayAngleX * (size.x / 2));
-
-            //    for (int i = 0; i <= (int)(radar.currentScanAngleX * 2 / gridAngleX); i++)
-            //    {
-            //        drawer.DrawLine(i * girdGapWidth, 0, i * girdGapWidth, size.y, new Color32(0, 255, 0, 255));
-            //    }
-            //    for (int i = 0; i <= (int)(radar.currentScanAngleY * 2 / gridAngleY); i++)
-            //    {
-            //        drawer.DrawLine(0, i * girdGapHeight, size.x, i * girdGapHeight, new Color32(0, 255, 0, 255));
-
-            //        drawer.DrawLine((int)(radar.currentScanAngleX / radar.displayAngleX * size.x) - 1, 0, (int)(radar.currentScanAngleX / radar.displayAngleX * size.x) - 1, size.y, new Color32(0, 255, 0, 255));
-            //        drawer.DrawLine(0, (int)(radar.currentScanAngleY / radar.displayAngleY * size.y) - 1, size.x, (int)(radar.currentScanAngleY / radar.displayAngleY * size.y) - 1, new Color32(0, 255, 0, 255));
-            //    }
-            //}
-
-            //// Draw vertical angle sign
-            //drawer.DrawRect(5, size.y * 3 / 4, 5, 2, new Color32(0, 255, 0, 196));
-            //drawer.DrawRect(5, size.y / 4, 5, 2, new Color32(0, 255, 0, 196));
-
-            //// Different target draw mode
-            //if (!radar.IsTracking) // TWS, SRC etc mode
-            //{
-            //    // Draw cursor
-            //    DrawCursor(cursorDisplayPosition);
-
-            //    // Draw all scanned aircrafts
-            //    foreach (Aircraft aircraft in radar.ScannedAircrafts)
-            //    {
-            //        //int posX, posY;
-            //        var (posX, posY) = TransformWorldToRadar(aircraft.transform.position);
-            //        Vector2Int acPos = new Vector2Int(posX, posY);
-
-            //        drawer.DrawRect(posX, posY, 7, 2, new Color32(0, 255, 0, 255));
-            //    }
-
-            //    // Datalink drawer
-            //    if (isDatalinkAvaliable)
-            //    {
-            //        // Missiles
-            //        foreach (Missile msl in datalink.missiles)
-            //        {
-            //            var (posX, posY) = TransformWorldToRadar(msl.transform.position);
-            //            var (posTX, posTY) = TransformWorldToRadar(msl.target.transform.position);
-
-            //            drawer.DrawRect(posX, posY, 3, 3, Color.green);
-            //            drawer.DrawLine(posX, posY, posTX, posTY, Color.green);
-            //        }
-            //    }
-            //}
-            //else // STT/TRK mode
-            //{
-            //    var (posX, posY) = TransformWorldToRadar(radar.lockedAircraft.transform.position);
-
-            //    Vector3 radarPos = parentAircraft.transform.InverseTransformPoint(radar.lockedAircraft.transform.position);
-            //    Vector3 radarVeloPos = parentAircraft.transform.InverseTransformPoint(radar.lockedAircraft.transform.position + radar.lockedAircraft.Velocity * 100);
-            //    Vector3 localVelo = (radarVeloPos - radarPos).normalized;
-
-            //    drawer.DrawCircle(posX, posY, 6, new Color32(0, 255, 0, 255), 2);
-            //    drawer.DrawLine(
-            //        posX,
-            //        posY,
-            //        posX + (int)(localVelo.x * vecLineLength),
-            //        posY + (int)(localVelo.z * vecLineLength),
-            //        new Color32(0, 255, 0, 255)
-            //        );
-            //    drawer.DrawDashedLine(posX, posY, posX, 0, new Color32(0, 255, 0, 96), 3, 3);
-            //}
         }
 
         private void DrawCursor(int x0, int y0)
         {
-            //drawer.DrawRect(x0 - 14, y0, 1, 7, new Color32(0, 255, 0, 255));
-            //drawer.DrawRect(x0 + 14, y0, 1, 7, new Color32(0, 255, 0, 255));
             drawer.DrawLine(x0 - 36, y0 - 36, x0 - 36, y0 + 36, Color.white);
             drawer.DrawLine(x0 + 36, y0 - 36, x0 + 36, y0 + 36, Color.white);
         }

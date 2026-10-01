@@ -27,7 +27,7 @@ namespace AeroSim.Cockpit
             {
                 engine = aircraft.engine;
             }
-            // 三 D 油门杆直接跟杆位走（原来乘 1.1 会让手柄转过印字刻度）
+            // The 3D throttle lever follows the lever position directly (the old 1.1 multiplier turned the grip past the printed markings)
             float percent = engine.ThrottleLever;
             transform.localEulerAngles = new Vector3(maxAngle * percent, transform.localEulerAngles.y, transform.localEulerAngles.z);
         }

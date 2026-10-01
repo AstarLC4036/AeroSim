@@ -3132,14 +3132,28 @@ MonoBehaviour:
     m_RotationOrder: 4
   densityExponent: 0.8
   idleRpm: 0.65
+  idleRpm2: 0.72
+  n2Response: 0.6
   idleThrustFraction: 0.05
   spoolUpTau: 5
   spoolDownTau: 6
   startTau: 10
   abSpoolTau: 1.5
   rpmRateLimit: 0.15
-  idleRpm2: 0.72
-  n2Response: 0.6
+  n2SpoolUpTau: 2
+  n2SpoolDownTau: 2.5
+  idleT4: 450
+  maxT4: 950
+  abT4Rise: 250
+  t4Tau: 5
+  t4Limit: 1000
+  startT4Peak: 220
+  abT4Peak: 80
+  t4PeakDecay: 2.5
+  oatInfluence: 1
+  initialStartState: 0
+  starterN2: 0.22
+  crankTau: 3.5
   idleLever: 0.14
   maxLever: 0.68
   minAbLever: 0.8
@@ -3150,11 +3164,15 @@ MonoBehaviour:
   initialLever: 0
   cutoffLever: 0.02
   throttleLever: 0
-  rpm: 0
+  rpm1: 0
+  rpm2: 0
+  startState: 0
+  t4: 0
+  t4Boost: 0
   abLevel: 0
   abEngaged: 0
   thurst: 145000
-  isEngineToggled: 0
+  isEngineToggled: 1
   audioController: {fileID: 6072705150273420287}
   maxPitch: 1
   minPitch: 0
@@ -39846,48 +39864,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2221025ea5b835e4f9cfa4381731b71c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  setup: {fileID: 11400000, guid: 34d89446152a40c489b3c2f1b5a85a39, type: 2}
   mfdScreens:
   - renderer: {fileID: 8198550585146499758}
     targetMaterialIndex: 1
     tiling: {x: 3, y: 2}
     offset: {x: -0.25, y: -1}
-    type: 3
+    size: {x: 1024, y: 1536}
+    activeBgColor: {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 1}
+    initialPages: 0200000003000000
   - renderer: {fileID: 6782223984701623289}
     targetMaterialIndex: 1
     tiling: {x: 3, y: 2}
     offset: {x: -1.75, y: -1}
-    type: 2
+    size: {x: 1024, y: 1536}
+    activeBgColor: {r: 0.098039225, g: 0.098039225, b: 0.098039225, a: 1}
+    initialPages: 0000000003000000
   - renderer: {fileID: 1245533672616090714}
     targetMaterialIndex: 1
     tiling: {x: 3, y: 2}
     offset: {x: -0.25, y: 0}
-    type: 1
+    size: {x: 1024, y: 1526}
+    activeBgColor: {r: 0.098039225, g: 0.098039225, b: 0.098039225, a: 1}
+    initialPages: 0100000003000000
   radarBScopeDrawer:
-    canvasTexture: {fileID: 0}
-    size: {x: 1024, y: 1536}
-    bgColor:
+    zone:
       serializedVersion: 2
-      rgba: 4279834905
+      x: 0
+      y: 0
+      width: 0
+      height: 0
     maxDrawDistance: 50
     cursorDisplayPosition: {x: 0, y: 0}
-  radarPPIDrawer:
-    canvasTexture: {fileID: 0}
     size: {x: 1024, y: 1536}
-    bgColor:
-      serializedVersion: 2
-      rgba: 4279834905
+  radarPPIDrawer:
     scanScalerColor:
       serializedVersion: 2
       rgba: 4294967295
+    size: {x: 1024, y: 1536}
+    zone:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
     maxDrawDistance: 50
     ppiRadius: 500
     scalerCount: 3
   gimbalDrawer:
-    canvasTexture: {fileID: 0}
-    size: {x: 1024, y: 1536}
-    bgColor:
+    zone:
       serializedVersion: 2
-      rgba: 4279834905
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    bgColor: {r: 0, g: 0, b: 0, a: 0}
     gimbalRect:
       serializedVersion: 2
       x: 512
@@ -39898,19 +39929,21 @@ MonoBehaviour:
     gimbalStencilRadius: 350
     skyColor: {r: 0.39308167, g: 0.7096313, b: 1, a: 1}
     groundColor: {r: 1, g: 0.44463545, b: 0.24842751, a: 1}
-    powerplantRect:
+  powerplantDrawer:
+    bgColor: {r: 0, g: 0, b: 0, a: 0}
+    rect:
       serializedVersion: 2
-      x: 512
-      y: 220
-      width: 1024
-      height: 400
-    rpmWidth: 30
-    rpmIndicatorSize: 150
-    rpmPaddingX: 310
-    rpmGapWidth: 360
-    fuelMarginWidth: 250
-    fuelGapWidth: 80
-    fuelDisplayWidth: 40
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    rpmWidth: 0
+    rpmIndicatorSize: 0
+    rpmPaddingX: 0
+    rpmGapWidth: 0
+    fuelMarginWidth: 0
+    fuelGapWidth: 0
+    fuelDisplayWidth: 0
   stdFont: {fileID: 11400000, guid: 2cb357f79b194b74f908e77597737df3, type: 2}
 --- !u!1 &5832543366307893450
 GameObject:
@@ -73061,10 +73094,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 3478950007619139510}
-    - targetCorrespondingSourceObject: {fileID: 3676727386611720973, guid: bc693af4e415ad64ebde753662688eb8,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8716751637120935932}
     - targetCorrespondingSourceObject: {fileID: 2249343051943305240, guid: bc693af4e415ad64ebde753662688eb8,
         type: 3}
       insertIndex: -1
@@ -73073,6 +73102,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4096690539342147348}
+    - targetCorrespondingSourceObject: {fileID: 3676727386611720973, guid: bc693af4e415ad64ebde753662688eb8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8716751637120935932}
+    - targetCorrespondingSourceObject: {fileID: 124663496407986662, guid: bc693af4e415ad64ebde753662688eb8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3387690689106511289}
     - targetCorrespondingSourceObject: {fileID: 5364152434893347344, guid: bc693af4e415ad64ebde753662688eb8,
         type: 3}
       insertIndex: -1
@@ -73160,6 +73197,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5929667917642793331}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &2606160242930551647 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 8529986345672509996, guid: bc693af4e415ad64ebde753662688eb8,
+    type: 3}
+  m_PrefabInstance: {fileID: 5929667917642793331}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3285080227168290576 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9213408822241494627, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73220,6 +73263,30 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5929667917642793331}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6048489639683698837 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 124663496407986662, guid: bc693af4e415ad64ebde753662688eb8,
+    type: 3}
+  m_PrefabInstance: {fileID: 5929667917642793331}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3387690689106511289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6048489639683698837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c31ffa72b1ef3448bf95c53ebb24902, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visualButton: {fileID: 6951808123872039798}
+  pressTrigger: {fileID: 2606160242930551647}
+  pushAxis: 2
+  pushDst: 0.003
+  triggerTime: 4
+  eventType: 0
 --- !u!114 &6728034450386719469 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1086684873047217054, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73235,6 +73302,12 @@ MonoBehaviour:
 --- !u!23 &6782223984701623289 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 888657501911206538, guid: bc693af4e415ad64ebde753662688eb8,
+    type: 3}
+  m_PrefabInstance: {fileID: 5929667917642793331}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6951808123872039798 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3617412109772542469, guid: bc693af4e415ad64ebde753662688eb8,
     type: 3}
   m_PrefabInstance: {fileID: 5929667917642793331}
   m_PrefabAsset: {fileID: 0}

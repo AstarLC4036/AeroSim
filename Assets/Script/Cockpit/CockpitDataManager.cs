@@ -14,6 +14,8 @@ namespace AeroSim.Cockpit
         private static CockpitDataManager instance;
         public static CockpitDataManager Instance => instance;
 
+        public static Action<InteractionEvent> onInteracion = (type) => { };
+
         public enum CockpitDataType
         {
             Altitude,
@@ -28,7 +30,11 @@ namespace AeroSim.Cockpit
             OilPressure,
             OilTemperature,
             CabinPressure,
-            CabinTemperature
+            CabinTemperature,
+            // Appended at the end on purpose: inserting in the middle shifts the integers serialised in
+            // prefabs and silently re-points every existing CockpitNeedle. (EngineRPM_N2 was inserted in
+            // the middle earlier, which moved OilPressure..CabinTemperature one slot down.)
+            T4
         }
 
         public enum WeaponState
@@ -39,6 +45,12 @@ namespace AeroSim.Cockpit
             Lock,
             InRange,
             Shoot
+        }
+
+        public enum InteractionEvent
+        {
+            StartEngine = 0
+            // TODO: Other types
         }
 
         public Aircraft playerAircraft;
@@ -102,15 +114,22 @@ namespace AeroSim.Cockpit
                 case CockpitDataType.Altitude:
                     return playerAircraft.transform.position.y - FloatingOrigin.origin.y;
                 case CockpitDataType.EngineRPM_N1:
-                    // N1 转速，归一化 0 -1
+                    // N1 spool speed, normalised 0 -1
                     if(playerAircraft.engine != null)
-                        return playerAircraft.engine.Rpm;
+                        return playerAircraft.engine.Rpm1;
                     else
                         return 0;
                 case CockpitDataType.EngineRPM_N2:
-                    // N2 转速
+                    // N2 spool speed
                     if(playerAircraft.engine != null)
                         return playerAircraft.engine.Rpm2;
+                    else
+                        return 0;
+                case CockpitDataType.T4:
+                    // Turbine-exit temperature in deg C (unlike N1/N2 this one is not normalised, because a
+                    // temperature gauge is read in degrees)
+                    if(playerAircraft.engine != null)
+                        return playerAircraft.engine.T4;
                     else
                         return 0;
                 default:

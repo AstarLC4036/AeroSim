@@ -5,17 +5,27 @@ namespace AeroSim.Cockpit
 {
     public class CockpitInteractable : MonoBehaviour
     {
-        public void FixedUpdate()
+        public virtual void FixedUpdate()
         {
             
         }
 
-        protected virtual void UpdateIndicator()
+        public virtual void Update()
         {
             
         }
 
-        protected virtual void UpdateInteraction()
+        public virtual void UpdateIndicator()
+        {
+            
+        }
+
+        public virtual void OnEnterInteraction()
+        {
+
+        }
+
+        public virtual void OnQuitInteraction()
         {
 
         }

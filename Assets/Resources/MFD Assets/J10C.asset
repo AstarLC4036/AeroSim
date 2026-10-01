@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7587212d3fc9c94d81be93e445e3f18, type: 3}
+  m_Name: J10C
+  m_EditorClassIdentifier: 
+  pageList:
+  - rid: 3950625575390675049
+  - rid: 3950625575390675050
+  - rid: 3950625575390675051
+  - rid: 3950625575390675052
+  references:
+    version: 2
+    RefIds:
+    - rid: 3950625575390675049
+      type: {class: RadarBScopeMasterPage, ns: AeroSim.Cockpit.MFD.CN.J10C, asm: Assembly-CSharp}
+      data:
+        zone:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        maxDrawDistance: 50
+        cursorDisplayPosition: {x: 0, y: 0}
+        size: {x: 1024, y: 1536}
+    - rid: 3950625575390675050
+      type: {class: RadarPPIMMasterPage, ns: AeroSim.Cockpit.MFD.CN.J10C, asm: Assembly-CSharp}
+      data:
+        scanScalerColor:
+          serializedVersion: 2
+          rgba: 4294967295
+        size: {x: 1024, y: 1536}
+        zone:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        posDelta: {x: 0, y: 200}
+        maxDrawDistance: 50
+        ppiRadius: 500
+        scalerCount: 3
+    - rid: 3950625575390675051
+      type: {class: GimbalMasterPage, ns: AeroSim.Cockpit.MFD.CN.J10C, asm: Assembly-CSharp}
+      data:
+        zone:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        bgColor: {r: 0, g: 0, b: 0, a: 0}
+        gimbalRect:
+          serializedVersion: 2
+          x: 512
+          y: 1000
+          width: 600
+          height: 800
+        gimbalContentW: 800
+        gimbalStencilRadius: 350
+        skyColor: {r: 0.3921569, g: 0.70980394, b: 1, a: 1}
+        groundColor: {r: 1, g: 0.4431373, b: 0.24705884, a: 1}
+    - rid: 3950625575390675052
+      type: {class: PowerplantSlavePage, ns: AeroSim.Cockpit.MFD.CN.J10C, asm: Assembly-CSharp}
+      data:
+        bgColor: {r: 0, g: 0, b: 0, a: 0}
+        rect:
+          serializedVersion: 2
+          x: 512
+          y: 220
+          width: 1024
+          height: 400
+        rpmWidth: 30
+        rpmIndicatorSize: 150
+        rpmPaddingX: 310
+        rpmGapWidth: 360
+        fuelMarginWidth: 250
+        fuelGapWidth: 80
+        fuelDisplayWidth: 40

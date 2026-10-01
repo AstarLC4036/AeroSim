@@ -148,18 +148,17 @@ namespace AeroSim.Render
         // --------------------------------------------------------------- internal
 
         /// <summary>
-        /// 加力段现在是 EngineModule 里的独立状态量：真机开加力时核心转速基本不变，
-        /// 所以不能再用「推力超过军用推力」来判断加力。
+        /// The afterburner stage is now an independent state variable inside EngineModule: on the real aircraft the core spool speed barely
+        /// changes when the burner lights, so "thrust above military thrust" can no longer be used to detect afterburner.
         /// </summary>
         float DriveTarget()
         {
             if (engine == null)
             {
-                // 引用断了（改过 prefab 层级 / 复制过物体就会出现）。不自己找一次的话，
-                // 这里会一直退回手动的 afterburner(=0)，表现就是"HUD 显示全加力，但尾焰只有干推那点亮度"。
+                // when there's no engine reference
                 engine = GetComponentInParent<EngineModule>();
                 if (engine != null)
-                    Debug.LogWarning("[MachDiamond] engine 引用为空，已自动从父级找到 EngineModule（建议在 Inspector 里重新指一下）。", this);
+                    Debug.LogWarning("[MachDiamond] engine 引用为空，已自动从父级找到 EngineModule（推荐重新指定）。", this);
                 else
                     return Mathf.Clamp01(afterburner);
             }

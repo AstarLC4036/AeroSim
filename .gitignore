@@ -24,6 +24,11 @@
 UpgradeLog.htm
 fmod_editor.log
 
+# DSH agent scratch / handoff material (never part of the project)
+.dsh-handoff/
+.dsh-scratch/
+.dsh-plugin-inspect/
+
 # OS generated files
 .DS_Store
 Thumbs.db

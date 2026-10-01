@@ -1,36 +1,39 @@
 ﻿using AeroSim.AeroPhysics;
 using AeroSim.AircraftModules;
+using AeroSim.UI;
+using AeroSim.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AeroSim.UI
+namespace AeroSim.Cockpit.MFD.CN.J10C
 {
     [Serializable]
-    public class RadarPPIMFD : MFDDrawer
+    public class RadarPPIMMasterPage : IMFD_Page
     {
+        private MFDDataContext data;
+        private MFDGraphicHelper drawer;
         private Aircraft parentAircraft;
         private RadarModule radar;
         private DatalinkModule datalink;
         public Color32 scanScalerColor = new Color(0, 185, 0, 180);
+        public Vector2Int size;
+        public Rect zone;
+        public Vector2 posDelta;
         public float maxDrawDistance;
         public int ppiRadius;
         public int scalerCount = 3;
 
-        public RadarPPIMFD(Vector2Int size, Color32 bgColor) : base(size, bgColor)
+        public Rect Zone => zone;
+        public MFD_PageType Type => MFD_PageType.RadarPPI;
+
+        public void Init(MFDDataContext ctx, MFDGraphicHelper drawer)
         {
-
-        }
-
-        public void Init(Aircraft aircraft)
-        {
-            parentAircraft = aircraft;
-            radar = aircraft.radar;
-
-            InitCanvas();
+            data = ctx;
+            
+            parentAircraft = ctx.aircraft;
+            radar = ctx.aircraft.radar;
+            this.drawer = drawer;
 
             if (parentAircraft.datalink != null)
             {
@@ -38,30 +41,35 @@ namespace AeroSim.UI
             }
         }
 
-        public override void ProcessCanvas()
+        public void DrawPage()
         {
             DrawRadar();
+        }
+
+        public void OnButtonClick(int buttonIndex)
+        {
+
         }
 
         void DrawRadar()
         {
             // draw border
-            drawer.DrawCircle(size.x / 2, size.y / 2, ppiRadius, 5, Color.white);
-            for(int i = 0; i < scalerCount; i++)
+            drawer.DrawCircle(size.x / 2 + posDelta.x, size.y / 2 + posDelta.y, ppiRadius, 5, Color.white);
+            for(int i = 1; i < scalerCount; i++) // 'i = 0' will draw a circle with radius 0, which is not needed
             {
                 int radius = (ppiRadius / scalerCount) * i;
-                drawer.DrawCircle(size.x / 2, size.y / 2, radius, 5, scanScalerColor);
+                drawer.DrawCircle(size.x / 2 + posDelta.x, size.y / 2 + posDelta.y, radius, 5, scanScalerColor);
             }
 
             // draw plane
-            drawer.DrawRectFillCenter(size.x / 2, size.y / 2 + 5, 3, 15, Color.white);
-            drawer.DrawRectFillCenter(size.x / 2, size.y / 2 + 8, 14, 3, Color.white);
-            drawer.DrawRectFillCenter(size.x / 2, size.y / 2 - 10, 8, 3, Color.white);
+            drawer.DrawRectFillCenter(size.x / 2 + posDelta.x, size.y / 2 + 5 + posDelta.y, 3, 15, Color.white);
+            drawer.DrawRectFillCenter(size.x / 2 + posDelta.x, size.y / 2 + 8 + posDelta.y, 14, 3, Color.white);
+            drawer.DrawRectFillCenter(size.x / 2 + posDelta.x, size.y / 2 - 10 + posDelta.y, 8, 3, Color.white);
 
             foreach(Aircraft aircraft in radar.ScannedAircrafts)
             {
                 Vector2Int pos = TransformPositionToPPI(aircraft.transform.position, size.x / 2, size.y / 2);
-                drawer.DrawRectFillCenter(pos.x, pos.y, 6, 6, Color.white);
+                drawer.DrawRectFillCenter(pos.x + posDelta.x, pos.y + posDelta.y, 6, 6, Color.white);
             }
         }
 

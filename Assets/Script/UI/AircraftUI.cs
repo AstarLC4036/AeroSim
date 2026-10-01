@@ -53,11 +53,11 @@ namespace AeroSim.UI
 
         private void Update()
         {
-            // 真实高度：和 Aircraft / AtmosphereEnv 用同一个口径
+            // True altitude: the same convention as Aircraft / AtmosphereEnv
             float altitude = aircraft.transform.position.y - FloatingOrigin.origin.y;
             float sonic = Mathf.Max(AtmosphereEnv.SonicSpeed(altitude), 1f);
 
-            // 节流阀显示「杆位 + 卡位名 + N1」：杆位是飞行员给的，N1 是发动机的响应
+            // Throttle readout: "lever position + detent name + N1" — the lever is what the pilot commands, N1 is the engine's response
             int leverPercent = Mathf.RoundToInt(aircraft.engine.ThrottlePercent);
             int n1Percent = Mathf.RoundToInt(aircraft.engine.N1Percent);
             float ias = aircraftRB.velocity.magnitude * Mathf.Sqrt(AtmosphereEnv.Density(altitude) / 1.225f);

@@ -1,0 +1,582 @@
+# Blender 5.2.2 LTS MTL File: 'j10c_wt.blend'
+# www.blender.org
+
+newmtl _1
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.207843 0.219608 0.423529
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl _2
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.309804 0.207843 0.423529
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl apu_13
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/apu_13_c.dds
+
+newmtl bullet_glass_holes
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/bullet_glass_holes.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/bullet_glass_holes.dds
+
+newmtl bulletholes
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/bulletholes_c.dds
+
+newmtl ch_1140l_drop_tank_pylon_bluegrey
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_1140l_drop_tank_pylon_bluegrey_c.dds
+
+newmtl ch_1600l_drop_tank_pylon
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_1600l_drop_tank_pylon_c.dds
+
+newmtl ch_df_4_launcher
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_df_4_launcher_c.dds
+
+newmtl ch_jdc03a
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_jdc03a_c.dds
+
+newmtl ch_kd88_datalink_pod
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_kd88_datalink_pod_c.dds
+
+newmtl ch_pft15_launcher
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_pft15_launcher_c.dds
+
+newmtl ch_pl12_launcher
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_pl12_launcher_c.dds
+
+newmtl ch_triple_bomb_adapter_j10c
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_triple_bomb_adapter_j10c_c.dds
+
+newmtl ch_yings_3_pod
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_yings_3_pod_c.dds
+
+newmtl ch_zl4_launcher_double_adapter
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/ch_zl4_launcher_double_adapter_c.dds
+
+newmtl cn_gauge_cabin_altitude_pressure
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_cabin_altitude_pressure_c.dds
+
+newmtl cn_gauge_cabin_temperature_type_tv45
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_cabin_temperature_type_tv45_c.dds
+
+newmtl cn_gauge_fuel_remaining_in_the_rear_fuselage_gas_tank
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_fuel_remaining_in_the_rear_fuselage_gas_tank_c.dds
+
+newmtl cn_gauge_hydraulic_pressure_j_10
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_hydraulic_pressure_j_10_c.dds
+
+newmtl cn_gauge_mach_number_indicator_j_10
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_mach_number_indicator_j_10_c.dds
+
+newmtl cn_gauge_mfi_j_10c
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_mfi_j_10c_c.dds
+
+newmtl cn_gauge_oil_pressure_type_2edm_250
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_oil_pressure_type_2edm_250_c.dds
+
+newmtl cn_gauge_oxygen_flow_indicator_type_ik_18k_china
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/cn_gauge_oxygen_flow_indicator_type_ik_18k_china_c.dds
+
+newmtl damaged_gauges
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/damaged_gauges_c.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/damaged_gauges_c.dds
+
+newmtl dynamic_glass_chrome
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.356863 0.356863 0.356863
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl dynamic_glass_tone
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.933333 0.580392 0.945098
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl dynamic_mfd
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.501961 0.501961 0.501961
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl dynamic_mfd_trans
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl dynamic_mirror
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl empty_glass
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/empty_glass.dds
+
+newmtl glass_dirt
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/glass_dirt.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/glass_dirt.dds
+
+newmtl gunfire
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/gunfire.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/gunfire.dds
+
+newmtl hud_j_10c
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/hud_j_10c_c.dds
+
+newmtl hud_j_10c_1
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/hud_j_10c_c.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/hud_j_10c_c.dds
+
+newmtl j_10a_cockpit_body
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_cockpit_body_c.dds
+
+newmtl j_10a_cockpit_labels
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_cockpit_labels_c.dds
+
+newmtl j_10a_fuse_pylon
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_fuse_pylon_c.dds
+
+newmtl j_10a_inside
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_inside_c.dds
+
+newmtl j_10a_pylon_gdj_1
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_pylon_gdj_1_c.dds
+
+newmtl j_10a_pylon_gdj_6
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_pylon_gdj_6_c.dds
+
+newmtl j_10a_twin_bomb_pylon
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_twin_bomb_pylon_c.dds
+
+newmtl j_10a_wing_twin_pylon
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10a_wing_twin_pylon_c.dds
+
+newmtl j_10c_aircraft_normal_detail_lo
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.518090 0.092313 0.176963
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl j_10c_cockpit_body
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10c_cockpit_body_c.dds
+
+newmtl j_10c_nozzle
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/j_10c_nozzle_c.dds
+
+newmtl jet_flame_diamonds
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/jet_flame_diamonds.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/jet_flame_diamonds.dds
+
+newmtl lanciamissili_mraam_white
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/lanciamissili_mraam_white_c.dds
+
+newmtl lau_7
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/lau_7_c.dds
+
+newmtl mesh1
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/mesh1_a.dds
+
+newmtl seat_type_hty_5
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/seat_type_hty_5_c.dds
+
+newmtl su_aku_58
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/su_aku_58_c.dds
+
+newmtl su_gauge_air_temperature_type_gr_3nk_sa
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/su_gauge_air_temperature_type_gr_3nk_sa_c.dds
+
+newmtl su_gauge_reserve_magnetic_compass
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/su_gauge_reserve_magnetic_compass_c.dds
+
+newmtl x_gauge_glass
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/x_gauge_glass_c.dds
+
+newmtl zflare_green
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/zflare_green.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/zflare_green.dds
+
+newmtl zflare_orange
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/zflare_orange.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/zflare_orange.dds
+
+newmtl zflare_red
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/zflare_red.dds
+map_d C:/Users/AstarLC/Downloads/j-10c-cookpit/j_10c/textures/zflare_red.dds
+
+newmtl 材质.002
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2

@@ -35,9 +35,12 @@ namespace AeroSim.Audio
 
         void UpdateEmit()
         {
-            // 音色由 N1 转速驱动（不是推力百分比：高空推力会衰减，但转速不该跟着变）
-            float n1 = Mathf.Clamp01(engine.Rpm);
-            float wepLevel = Mathf.Clamp01(engine.AbLevel);
+            // Timbre is driven by N1 spool speed (not by a thrust percentage: thrust decays at altitude, but spool speed should not follow it)
+            float n1 = Mathf.Clamp01(engine.Rpm1);
+            // wepLevel must be greater than 0.9 while in afterburner, because FMOD only plays the ignition sound when wepLevel exceeds 0.9
+            // (DeepSeek v4.1-flash has no Grep for FMOD files)
+            //float wepLevel = Mathf.Clamp01(engine.AbLevel);
+            int wepLevel = engine.AbLevel > 0 ? 1 : 0;
 
             //float volumeParam = 1;
             float dstToListener = 10000;

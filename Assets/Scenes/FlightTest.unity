@@ -9243,8 +9243,9 @@ GameObject:
   m_Component:
   - component: {fileID: 420133122}
   - component: {fileID: 420133123}
+  - component: {fileID: 420133124}
   m_Layer: 0
-  m_Name: CockpitDataManager
+  m_Name: CockpitManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9279,6 +9280,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAircraft: {fileID: 0}
   weaponState: 0
+--- !u!114 &420133124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420133121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6431e21ba51c2c4091b7bbdb12e56cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  maxDst: 50
 --- !u!1001 &430387070
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -65695,6 +65712,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 444138767742335168, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 499335562276563007, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: maxYawRate
@@ -65734,6 +65756,11 @@ PrefabInstance:
         type: 3}
       propertyPath: 'audioSources.Array.data[1]'
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1040392784895283090, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 1045570804883404071, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
@@ -65865,6 +65892,11 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: 2086e2d8e324dd448a061a713204eeb5, type: 2}
+    - target: {fileID: 2158331728552549025, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 2179019121674709648, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_IsActive
@@ -65885,6 +65917,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2547937450589427568, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 2619851623265575258, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: thurst
@@ -65895,21 +65932,6 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 2086e2d8e324dd448a061a713204eeb5, type: 2}
-    - target: {fileID: 2787878717506805290, guid: 4221c1db7874d52459bacdbba637d19a,
-        type: 3}
-      propertyPath: gimbalDrawer.rpmRadius
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 2787878717506805290, guid: 4221c1db7874d52459bacdbba637d19a,
-        type: 3}
-      propertyPath: gimbalDrawer.gimbalPos.x
-      value: 512
-      objectReference: {fileID: 0}
-    - target: {fileID: 2787878717506805290, guid: 4221c1db7874d52459bacdbba637d19a,
-        type: 3}
-      propertyPath: gimbalDrawer.gimbalPos.y
-      value: 500
-      objectReference: {fileID: 0}
     - target: {fileID: 3373248549458947987, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_IsActive
@@ -66150,6 +66172,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HydraulicController
       objectReference: {fileID: 0}
+    - target: {fileID: 6048489639683698837, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 6244564693527209493, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
@@ -66215,6 +66242,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7011037673130304126, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7060274183943501371, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_TranslationAtRest.x
@@ -66279,6 +66311,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.0021707113
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461631984622656303, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: isEngineToggled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7544705071075408140, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}

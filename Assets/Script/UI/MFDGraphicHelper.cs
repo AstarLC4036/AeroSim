@@ -12,41 +12,41 @@ using UnityEngine.TextCore;
 namespace AeroSim.UI
 {
     /// <summary>
-    /// 混合模式。写进 DrawCommand.layer（这个字段以前 C# 写了但 shader 从没读过，所以拿来复用，结构体布局不变）。
+    /// Blend mode. Written into DrawCommand.layer (C# used to assign this field but the shader never read it, so it is reused here and the struct layout stays unchanged).
     /// </summary>
     public enum MFDBlend
     {
-        /// <summary>正常 alpha 混合（默认，行为不变）。</summary>
+        /// <summary>Normal alpha blending (the default; behaviour unchanged).</summary>
         Over = 0,
-        /// <summary>destination-out：只削减已画内容的 alpha，不写入颜色 —— 用来"抠掉"一块区域。</summary>
+        /// <summary>destination-out: only reduces the alpha of what is already drawn and writes no colour — used to "cut out" a region.</summary>
         Erase = 1,
-        /// <summary>直接覆盖，不做混合（alpha=1 时等于用该颜色顶掉已有像素）。</summary>
+        /// <summary>Straight overwrite, no blending (with alpha=1 it replaces the existing pixel with this colour).</summary>
         Replace = 2,
         /// <summary>
-        /// "形状以外"生效的擦除：和 Erase 同一套数学，但覆盖率取反。
-        /// 用途是把已画内容**裁剪到某个形状里**（先大范围画，再用它擦掉形状外的部分）。
-        /// 注意：擦完形状外会变成**透明**（露出后面的黑底）—— 想保留背景色请用 <see cref="FillOutsideDisc"/> 或 OverOutside。
-        /// 只有 3/4/5 这三个值有"形状以外"的语义，其它 layer 值（包括误传的 int）都按 0 处理，不会突然生效。
+        /// Erase that applies "outside the shape": the same maths as Erase, but with the coverage inverted.
+        /// Its purpose is to **clip what has already been drawn into a shape** (draw a wide area first, then use this to erase the part outside the shape).
+        /// Note: erasing outside the shape leaves it **transparent** (revealing the black background behind) — use <see cref="FillOutsideDisc"/> or OverOutside to keep a background colour.
+        /// Only the three values 3/4/5 carry the "outside the shape" semantics; any other layer value (including a mistyped int) is treated as 0 and will not suddenly take effect.
         /// </summary>
         EraseOutside = 3,
         /// <summary>
-        /// 在形状**以外**做正常 alpha 覆盖（和 Over 同一套数学，覆盖率取反）。
-        /// 典型用途：姿态球画完天地之后，把圆外刷回 MFD 的灰背景色 ✓ 任何图元都能这么用。
+        /// Normal alpha coverage **outside** the shape (the same maths as Over, with the coverage inverted).
+        /// Typical use: after the attitude ball has drawn sky and ground, paint the area outside the circle back to the MFD grey background ✓ works for any primitive.
         /// </summary>
         OverOutside = 4,
-        /// <summary>在形状**以外**直接覆盖，不做混合（Replace 的反相版）。</summary>
+        /// <summary>Straight overwrite **outside** the shape, no blending (the inverted version of Replace).</summary>
         ReplaceOutside = 5,
     }
 
-    /// <summary>文字的水平锚点：x 指的是文字的哪一边。Default = 用 MFDGraphicHelper.DefaultAnchor。</summary>
+    /// <summary>Horizontal anchor for text: which edge of the text x refers to. Default = use MFDGraphicHelper.DefaultAnchor.</summary>
     public enum MFDTextAnchor
     {
         Default = 0,
-        /// <summary>x 是文字左端（默认）。</summary>
+        /// <summary>x is the left edge of the text (default).</summary>
         Left = 1,
-        /// <summary>x 是文字水平中心（右对齐时把同一个 x 传进来，两段文字就能对齐在同一条右边界上）。</summary>
+        /// <summary>x is the horizontal centre of the text (when right-aligning, pass the same x and two runs of text line up on the same right edge).</summary>
         Center = 2,
-        /// <summary>x 是文字右端。</summary>
+        /// <summary>x is the right edge of the text.</summary>
         Right = 3,
     }
 
@@ -88,7 +88,7 @@ namespace AeroSim.UI
             public Vector4 color;
             public int dashLength;
             public int gapLength;
-            public int layer;       // 混合模式，见 MFDBlend（0=Over 1=Erase 2=Replace）。绘制顺序 = 命令顺序
+            public int layer;       // Blend mode, see MFDBlend (0=Over 1=Erase 2=Replace). Draw order = command order
         }
 
         public ComputeShader mfdCompute;
@@ -104,33 +104,33 @@ namespace AeroSim.UI
         private bool registered;
         private static readonly List<MFDGraphicHelper> liveHelpers = new List<MFDGraphicHelper>();
 
-        // ================= 设计分辨率缩放 =================
-        // 页面按 designSize 写坐标/尺寸/字号，实际画布（构造时的 width/height）自动缩放。
-        // 默认 (0,0) = 关闭 → 所有参数 ×1，输出与加这个功能之前逐像素一致。
+        // ================= Design resolution scaling =================
+        // Pages write coordinates/sizes/font sizes against designSize; the real canvas (the width/height given at construction) scales automatically.
+        // Default (0,0) = disabled → every parameter is ×1 and the output is pixel-identical to before this feature existed.
         private Vector2Int designSize = Vector2Int.zero;
 
-        /// <summary>当前设计分辨率；(0,0) 表示未启用缩放。</summary>
+        /// <summary>Current design resolution; (0,0) means scaling is not enabled.</summary>
         public Vector2Int DesignSize => designSize;
 
-        /// <summary>设备像素 / 设计单位。未启用缩放时恒为 1。</summary>
+        /// <summary>Device pixels per design unit. Always 1 while scaling is not enabled.</summary>
         public float DesignScale
         {
             get
             {
                 if (designSize.x <= 0 || designSize.y <= 0 || width <= 0 || height <= 0) return 1f;
-                // 取两轴中较小的缩放比：万一宽高比不一致，宁可留白，也不会把内容裁掉
+                // Take the smaller of the two axis ratios: should the aspect ratios ever disagree, leaving blank space beats cropping content
                 return Mathf.Min((float)width / designSize.x, (float)height / designSize.y);
             }
         }
 
         /// <summary>
-        /// 设定设计分辨率：页面按这个尺寸写坐标与字号，画布分辨率可以随时改（宽高比要和画布一致）。
-        /// 传 (0,0) 关闭缩放。返回的水平推进量仍以设计单位计。
+        /// Set the design resolution: pages write coordinates and font sizes against this size while the canvas resolution can change at any time (keep the aspect ratio matching the canvas).
+        /// Pass (0,0) to disable scaling. The returned horizontal advance is still measured in design units.
         /// </summary>
         public void SetDesignSize(int w, int h) { designSize = new Vector2Int(w, h); }
         public void SetDesignSize(Vector2Int size) { designSize = size; }
 
-        // 设计单位 → 设备像素（关闭缩放时 ×1）
+        // Design units → device pixels (×1 while scaling is off)
         private float Scale(float v) => v * DesignScale;
         private Vector2 Scale(Vector2 v) => v * DesignScale;
 
@@ -213,22 +213,22 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 带线宽的重载，width 是**像素直径**（1 = 原来的细线，<=1 时观感与原来完全一致）。
-        /// 本质是胶囊 SDF，所以两个端点自动是圆头，拐角处把宽线的两端重叠画即可自然接上。
+        /// Overload with a line width; width is the **diameter in pixels** (1 = the original thin line, and <=1 looks exactly as it did before).
+        /// It is a capsule SDF underneath, so both endpoints are round caps automatically; at corners, draw the ends of the wide lines overlapping and they join up naturally.
         /// </summary>
         public void DrawLine(Vector2 a, Vector2 b, Color color, float width, int layer = 0)
         {
             DrawLine(a.x, a.y, b.x, b.y, color, width, layer);
         }
 
-        /// <summary>带线宽的重载（见上）。width 用 float 传就不和 <c>int layer</c> 那个重载歧义。</summary>
+        /// <summary>Overload with a line width (see above). Passing width as a float avoids ambiguity with the <c>int layer</c> overload.</summary>
         public void DrawLine(float x0, float y0, float x1, float y1, Color color, float width, int layer = 0)
         {
             commands.Add(new DrawCommand
             {
                 type = 0,
                 param1 = new Vector4(Scale(x0), Scale(y0), Scale(x1), Scale(y1)),
-                param2 = new Vector4(Scale(width), 0, 0, 0),   // param2 之前对 Line 是空的，正好拿来放线宽
+                param2 = new Vector4(Scale(width), 0, 0, 0),   // param2 used to be unused for Line, so it carries the line width
                 color = new Vector4(color.r, color.g, color.b, color.a),
                 layer = layer
             });
@@ -269,8 +269,8 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 实心圆（disc）。param1 = 圆心 + 半径，抗锯齿和圆环同一套（1px）。
-        /// 配合 <see cref="MFDBlend.Erase"/> 就是"圆形挖洞" —— 画姿态球、把矩形裁成圆、瞄准光环遮罩都用得上。
+        /// Filled disc. param1 = centre + radius; the antialiasing is the same as for the ring (1px).
+        /// Combined with <see cref="MFDBlend.Erase"/> it becomes a "circular hole punch" — useful for the attitude ball, for clipping a rectangle into a circle, and for a reticle mask.
         /// </summary>
         public void DrawDisc(Vector2 center, float radius, Color color, int layer = 0)
         {
@@ -288,15 +288,15 @@ namespace AeroSim.UI
             });
         }
 
-        /// <summary>实心圆擦除（destination-out，不混合）：alpha=1 完全挖穿，0.5 只挖一半。</summary>
+        /// <summary>Filled-disc erase (destination-out, no blending): alpha=1 punches straight through, 0.5 removes only half.</summary>
         public void DrawDiscErase(float x0, float y0, float radius, float alpha = 1f)
         {
             DrawDisc(x0, y0, radius, new Color(0f, 0f, 0f, Mathf.Clamp01(alpha)), (int)MFDBlend.Erase);
         }
 
         /// <summary>
-        /// 只保留圆内的内容：把圆**以外**全部擦掉。等价于"裁剪到圆形"（stencil）。
-        /// 用法：先随便大范围画，然后调一次这个，超出的部分就没了。
+        /// Keep only what is inside the circle: erase everything **outside** it. Equivalent to "clipping to a circle" (stencil).
+        /// Usage: draw over a wide area first, then call this once and the excess is gone.
         /// </summary>
         public void DrawDiscStencil(float x0, float y0, float radius, float alpha = 1f)
         {
@@ -304,9 +304,9 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 把圆**以外**刷成指定颜色（正常 alpha 覆盖）——<see cref="DrawDiscStencil"/> 的"不露黑底"版本。
-        /// 姿态球的标准用法：画完天/地（会溢出）之后调一次，圆外就恢复成 MFD 背景色 ✓
-        /// 其它形状同理：<c>DrawRectFill(..., (int)MFDBlend.OverOutside)</c> 就是把矩形外刷掉。
+        /// Paint everything **outside** the circle in the given colour (normal alpha coverage) — the "no black background showing" version of <see cref="DrawDiscStencil"/>.
+        /// The standard attitude-ball usage: after drawing sky/ground (which overflows), call this once and the area outside the circle returns to the MFD background colour ✓
+        /// Other shapes work the same way: <c>DrawRectFill(..., (int)MFDBlend.OverOutside)</c> paints away the area outside a rectangle.
         /// </summary>
         public void FillOutsideDisc(Vector2 center, float radius, Color color)
         {
@@ -319,10 +319,10 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 圆弧：只在一个角度范围内填充的**环带**（转速表那种绿弧）。
-        /// 角度用度，0° = +X 方向，逆时针为正（和 Mathf.Cos/Sin 一致）✓
-        /// endDeg &lt; startDeg 就是顺时针扫 ✓ 角度边缘是硬边（径向仍然是 1px 抗锯齿 ✓）
-        /// thickness &lt;= 0 时变成**扇形**（从圆心一直填到半径）✓
+        /// Arc: an **annulus** filled only within an angular range (the green arc on a tachometer).
+        /// Angles are in degrees, 0° = +X direction, counter-clockwise positive (matching Mathf.Cos/Sin) ✓
+        /// endDeg &lt; startDeg sweeps clockwise ✓ the angular edges are hard (the radial edges still get 1px antialiasing ✓)
+        /// thickness &lt;= 0 turns it into a **sector** (filled from the centre all the way out to the radius) ✓
         /// </summary>
         public void DrawArc(Vector2 center, float radius, float thickness,
                             float startDeg, float endDeg, Color color, int layer = 0)
@@ -343,7 +343,7 @@ namespace AeroSim.UI
             });
         }
 
-        /// <summary>按 0~1 的值填一段弧（仪表盘最常用）：value=0 时画空、1 时画满整段 ✓</summary>
+        /// <summary>Fill an arc by a 0~1 value (the most common gauge case): value=0 draws nothing, 1 fills the whole span ✓</summary>
         public void DrawArcValue(Vector2 center, float radius, float thickness,
                                  float startDeg, float endDeg, float value01,
                                  Color color, int layer = 0)
@@ -359,22 +359,22 @@ namespace AeroSim.UI
             DrawArc(cx, cy, radius, thickness, startDeg, end, color, layer);
         }
 
-        /// <summary>扇形（从圆心填到半径，thickness 传 0 的封装 ✓）。</summary>
+        /// <summary>Sector (filled from the centre out to the radius; a wrapper that passes thickness = 0 ✓).</summary>
         public void DrawSector(Vector2 center, float radius, float startDeg, float endDeg,
                                Color color, int layer = 0)
         {
             DrawArc(center.x, center.y, radius, 0f, startDeg, endDeg, color, layer);
         }
 
-        // ================= 三角形 / 任意多边形（path 填充） =================
+        // ================= Triangles / arbitrary polygons (path filling) =================
 
         /// <summary>
-        /// 实心三角形（1px 抗锯齿）。绕向无所谓，内部会自动统一成逆时针。
-        /// 这是 <see cref="FillPolygon"/> 的基础图元，也可以直接用来画三角符号。
+        /// Filled triangle (1px antialiasing). The winding order does not matter; it is normalised to counter-clockwise internally.
+        /// This is the base primitive of <see cref="FillPolygon"/> and can also be used directly to draw triangular markers.
         /// </summary>
         public void DrawTriangle(Vector2 a, Vector2 b, Vector2 c, Color color, int layer = 0)
         {
-            // 统一成逆时针（shader 里的半平面 SDF 依赖绕向）
+            // Normalise to counter-clockwise (the half-plane SDF in the shader depends on the winding)
             float cross = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
             if (cross < 0f) { Vector2 tmp = b; b = c; c = tmp; }
 
@@ -389,16 +389,16 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 用一串点连成闭合路径并**填充内部**（凸的、凹的都能处理：内部做耳切三角化）。
-        /// 返回生成了多少个三角形命令（= 点数 - 2；自交/退化多边形会提前收手）。
-        /// 注意：每次调用会分配少量临时 List；每帧画很多大多边形的话建议缓存顶点数组再来。
-        /// 小技巧：填完再补一圈 <see cref="DrawPolygonOutline"/> 可以盖掉三角形之间的 AA 接缝。
+        /// Join a list of points into a closed path and **fill the interior** (convex and concave both work: ear-clipping triangulation internally).
+        /// Returns how many triangle commands were produced (= point count - 2; self-intersecting or degenerate polygons bail out early).
+        /// Note: every call allocates a few temporary Lists; if you draw many large polygons per frame, cache the vertex array instead.
+        /// Tip: after filling, add a <see cref="DrawPolygonOutline"/> pass to cover the AA seams between adjacent triangles.
         /// </summary>
         public int FillPolygon(IList<Vector2> points, Color color, int layer = 0)
         {
             if (points == null || points.Count < 3) return 0;
 
-            // 有符号面积 → 决定索引顺序（统一成逆时针）
+            // Signed area → decides the index order (normalised to counter-clockwise)
             float area = 0f;
             for (int i = 0; i < points.Count; i++)
             {
@@ -411,7 +411,7 @@ namespace AeroSim.UI
                 idx.Add(area >= 0f ? i : points.Count - 1 - i);
 
             int made = 0;
-            int guard = idx.Count * idx.Count + 8;      // 防止退化输入死循环
+            int guard = idx.Count * idx.Count + 8;      // Guards against an infinite loop on degenerate input
 
             while (idx.Count > 3 && guard-- > 0)
             {
@@ -423,7 +423,7 @@ namespace AeroSim.UI
                     int i2 = idx[(i + 1) % idx.Count];
                     Vector2 a = points[i0], b = points[i1], c = points[i2];
 
-                    // 逆时针下 cross > 0 才是凸耳
+                    // Under counter-clockwise winding only cross > 0 is a convex ear
                     if ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) <= 0f) continue;
 
                     bool isEar = true;
@@ -441,7 +441,7 @@ namespace AeroSim.UI
                     clipped = true;
                     break;
                 }
-                if (!clipped) break;    // 自交或退化：剩下的放弃，避免死循环
+                if (!clipped) break;    // Self-intersecting or degenerate: drop the rest to avoid an infinite loop
             }
 
             if (idx.Count == 3)
@@ -452,7 +452,7 @@ namespace AeroSim.UI
             return made;
         }
 
-        /// <summary>把一串点连成线（默认闭合），用作轮廓。width &lt;= 1 时就是原来的 1px 细线。</summary>
+        /// <summary>Join a list of points into a line (closed by default) to use as an outline. width &lt;= 1 gives the original 1px hairline.</summary>
         public void DrawPolygonOutline(IList<Vector2> points, float width, Color color,
                                        int layer = 0, bool closed = true)
         {
@@ -477,9 +477,9 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 设置裁剪矩形：之后的绘制**只在矩形内生效**（等于 scissor）。
-        /// 参数和 <see cref="DrawRectFill(float,float,float,float,Color,int)"/> 一致：(x0,y0) 是角，w/h 是完整宽高。
-        /// 一页里想做好几个各自裁剪的区域就靠它；用完记得 <see cref="ClearClip"/>（每帧命令流清空时也会自动恢复）。
+        /// Set the clip rectangle: drawing afterwards **only takes effect inside the rectangle** (the equivalent of scissor).
+        /// The parameters match <see cref="DrawRectFill(float,float,float,float,Color,int)"/>: (x0,y0) is a corner and w/h are the full width and height.
+        /// This is how you build several individually clipped regions on one page; remember to <see cref="ClearClip"/> afterwards (it is also restored automatically when the per-frame command stream is cleared).
         /// </summary>
         public void SetClipRect(float x0, float y0, float w0, float h0)
         {
@@ -496,15 +496,15 @@ namespace AeroSim.UI
             SetClipRect(rect.xMin, rect.yMin, rect.width, rect.height);
         }
 
-        /// <summary>取消裁剪，恢复整屏。</summary>
+        /// <summary>Clear the clip and restore the full screen.</summary>
         public void ClearClip()
         {
             commands.Add(new DrawCommand { type = 10, layer = 0 });
         }
 
         /// <summary>
-        /// 旋转实心矩形：中心 + 半尺寸 + 旋转角（度）。旋转以 (cos, sin) 传进 param2，shader 每像素不用三角函数。
-        /// 配合 <see cref="MFDBlend.Erase"/> 可以擦一个斜的矩形；配合 EraseOutside 可以做斜的裁剪框。
+        /// Rotated filled rectangle: centre + half size + rotation angle (degrees). The rotation is passed into param2 as (cos, sin), so the shader needs no trigonometry per pixel.
+        /// With <see cref="MFDBlend.Erase"/> it erases a slanted rectangle; with EraseOutside it makes a slanted clipping frame.
         /// </summary>
         public void DrawRotatedRectFill(Vector2 center, Vector2 halfSize, float angleDeg, Color color, int layer = 0)
         {
@@ -519,23 +519,23 @@ namespace AeroSim.UI
             });
         }
 
-        /// <summary>旋转实心矩形擦除。</summary>
+        /// <summary>Rotated filled-rectangle erase.</summary>
         public void DrawRotatedRectErase(Vector2 center, Vector2 halfSize, float angleDeg, float alpha = 1f)
         {
             DrawRotatedRectFill(center, halfSize, angleDeg, new Color(0f, 0f, 0f, Mathf.Clamp01(alpha)), (int)MFDBlend.Erase);
         }
 
         /// <summary>
-        /// 半平面填充：(x0, y0) 是分界线上的一个点，angleDeg 是分界线的倾角，
-        /// 填充**法线负侧**（局部 -Y 那一边，也就是"线下方"）。姿态球的天地分割就用这个：
-        /// 分界点随俯仰上下移、倾角随滚转反向转，地下半片就跟着对上了。
+        /// Half-plane fill: (x0, y0) is a point on the dividing line and angleDeg is that line's tilt;
+        /// it fills the **negative normal side** (the local -Y side, i.e. "below the line"). The attitude ball uses this for its sky/ground split:
+        /// the dividing point moves up and down with pitch, the tilt rotates inversely with roll, and the lower half follows along.
         /// </summary>
         public void DrawHalfPlane(float x0, float y0, float angleDeg, float size, Color color, int layer = 0)
         {
             float rad = angleDeg * Mathf.Deg2Rad;
             float c = Mathf.Cos(rad);
             float s = Mathf.Sin(rad);
-            // 局部 -Y 方向 = (s, -c)；把矩形中心推到界线的一侧，让它的上边正好压在分界线上
+            // Local -Y direction = (s, -c); push the rectangle centre to one side of the line so that its top edge rests exactly on the dividing line
             Vector2 below = new Vector2(s, -c);
             Vector2 center = new Vector2(x0, y0) + below * size;
             DrawRotatedRectFill(center, new Vector2(size, size), angleDeg, color, layer);
@@ -608,17 +608,17 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 把一块矩形区域从已画内容里"抠掉"（destination-out，不做 alpha 混合）。
-        /// 参数与 <see cref="DrawRectFill(float,float,float,float,Color,int)"/> 一致：(x0,y0) 是角，w/h 是完整宽高。
-        /// 顺序很关键：必须先画内容、再擦除（每帧画布内容是按命令顺序累加的）。
-        /// alpha=1 完全挖穿，0.5 只擦掉一半 alpha。
+        /// "Cut" a rectangular region out of what has already been drawn (destination-out, no alpha blending).
+        /// The parameters match <see cref="DrawRectFill(float,float,float,float,Color,int)"/>: (x0,y0) is a corner and w/h are the full width and height.
+        /// Order matters: draw the content first, erase afterwards (each frame the canvas accumulates in command order).
+        /// alpha=1 cuts straight through, 0.5 removes only half the alpha.
         /// </summary>
         public void DrawRectErase(float x0, float y0, float w0, float h0, float alpha = 1f)
         {
             DrawRectFill(x0, y0, w0, h0, new Color(0f, 0f, 0f, Mathf.Clamp01(alpha)), (int)MFDBlend.Erase);
         }
 
-        /// <summary>擦除（中心 + 半宽半高版本，参数与 <see cref="DrawRectFillCenter(float,float,float,float,Color,int)"/> 一致）。</summary>
+        /// <summary>Erase (centre + half-width/half-height version; the parameters match <see cref="DrawRectFillCenter(float,float,float,float,Color,int)"/>).</summary>
         public void DrawRectEraseCenter(float cx, float cy, float halfW, float halfH, float alpha = 1f)
         {
             DrawRectFillCenter(cx, cy, halfW, halfH, new Color(0f, 0f, 0f, Mathf.Clamp01(alpha)), (int)MFDBlend.Erase);
@@ -628,7 +628,7 @@ namespace AeroSim.UI
         {
             if (!registered)
             {
-                RegisterHelper();      // 兜底：退出时统一释放（即使 owner 忘了 Dispose）
+                RegisterHelper();      // Safety net: release everything on quit (even if the owner forgets to Dispose)
             }
 
             mfdCompute.SetTexture(kernelIndex, "_Result", outputRT);
@@ -641,7 +641,7 @@ namespace AeroSim.UI
             if (commandBuffer == null || commandBuffer.count < commands.Count)
             {
                 commandBuffer?.Release();
-                // 容量按 2 的幂增长，避免命令数逐条增长时反复重建 native buffer
+                // Grow the capacity in powers of two so the native buffer is not rebuilt over and over as commands are added one at a time
                 int capacity = Mathf.Max(Mathf.NextPowerOfTwo(Mathf.Max(commands.Count, 1)), 64);
                 commandBuffer = new ComputeBuffer(capacity,
                     System.Runtime.InteropServices.Marshal.SizeOf(typeof(DrawCommand)));
@@ -651,7 +651,7 @@ namespace AeroSim.UI
             mfdCompute.SetBuffer(kernelIndex, "_Commands", commandBuffer);
             mfdCompute.SetInt("_CommandCount", commands.Count);
 
-            // 文字字体图集（只有画了 type==6 才真正用到）
+            // Text font atlas (only actually needed when a type==6 command is drawn)
             TMP_FontAsset font = TextFont;
             if (font != null && font.atlasTexture != null)
             {
@@ -661,7 +661,7 @@ namespace AeroSim.UI
             }
             else
             {
-                // 兜底：避免 _FontAtlas 悬空（D3D 下未绑定 SRV 采样会刷 NULL SRV 警告）
+                // Safety net: keeps _FontAtlas from dangling (sampling an unbound SRV under D3D spams NULL SRV warnings)
                 mfdCompute.SetTexture(kernelIndex, "_FontAtlas", Texture2D.whiteTexture);
                 mfdCompute.SetInt("_FontAtlasChannel", 0);
             }
@@ -681,7 +681,7 @@ namespace AeroSim.UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetHelperRegistry()
         {
-            liveHelpers.Clear();                 // 关掉 Domain Reload 时静态字段会跨播放残留
+            liveHelpers.Clear();                 // With Domain Reload disabled, static fields survive across play sessions
             Application.quitting -= ReleaseAllHelpers;
             Application.quitting += ReleaseAllHelpers;
         }
@@ -704,19 +704,19 @@ namespace AeroSim.UI
             commandBuffer = null;
         }
 
-        // ===================== 文字绘制（TMP SDF 图集，单次 Dispatch） =====================
+        // ===================== Text drawing (TMP SDF atlas, single Dispatch) =====================
         public const float DefaultTextSharpness = 0.1f;
 
         /// <summary>
-        /// 图集 glyphRect.y 是否以"顶部"为原点。TMP 官方是左下原点（见 TMP_Text.cs 里 vertex_BL.uv = glyphRect.y/H），
-        /// 所以默认 false。若某个字体画出来是空白/错位，可以先翻一下这个开关。
+        /// Whether the atlas glyphRect.y is measured from the "top". TMP officially uses a bottom-left origin (see vertex_BL.uv = glyphRect.y/H in TMP_Text.cs),
+        /// hence the default of false. If a particular font renders blank or misplaced, try flipping this switch first.
         /// </summary>
         public static bool FlipGlyphV = false;
 
-        /// <summary>是否把 SDF 图集的 padding 边距也画进四边形（TMP 的做法，边缘更柔和完整）。</summary>
+        /// <summary>Whether the SDF atlas padding margin is drawn into the quad as well (what TMP does; softer, more complete edges).</summary>
         public static bool TextUseAtlasPadding = true;
 
-        /// <summary>调试用：>=0 时强制覆盖图集通道。0=alpha, 1=red, 2=整块实心（确认四边形位置）。</summary>
+        /// <summary>Debug only: when >=0, force the atlas channel. 0=alpha, 1=red, 2=solid block (to confirm quad placement).</summary>
         public static int FontAtlasChannelOverride = -1;
 
         private TMP_FontAsset textFont;
@@ -732,7 +732,7 @@ namespace AeroSim.UI
         private static TMP_FontAsset fallbackFont;
         private static bool fallbackSearched;
 
-        /// <summary>最后一道兜底：Resources 里的 MFD/HUD 字体，保证不配置也能画字。</summary>
+        /// <summary>Last-resort fallback: the MFD/HUD font in Resources, so text still draws with no configuration.</summary>
         private static TMP_FontAsset FallbackFont()
         {
             if (!fallbackSearched)
@@ -744,7 +744,7 @@ namespace AeroSim.UI
             return fallbackFont;
         }
 
-        /// <summary>本绘制器使用的字体；未设置时回退到 MFDGraphicHelperSettings.defaultFont，再回退到 Resources 默认字体。</summary>
+        /// <summary>Font used by this drawer; when unset it falls back to MFDGraphicHelperSettings.defaultFont and then to the default Resources font.</summary>
         public TMP_FontAsset TextFont
         {
             get
@@ -758,19 +758,19 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 字距（tracking）：每个字符之间额外增加的间距，单位是**字号的比例**（em）。
-        /// 0.05 = 每个字之间多空 5% 字号；负值收紧。0 就是字体本身的 advance。
-        /// 只加在"字与字之间"，所以 MeasureText / DrawTextCentered 的宽度与居中都是对的。
+        /// Letter spacing (tracking): the extra spacing added between each character, measured as a **fraction of the font size** (em).
+        /// 0.05 = 5% of the font size of extra space between characters; negative values tighten it. 0 is the font's own advance.
+        /// It is only added between characters, so the widths and centring of MeasureText / DrawTextCentered stay correct.
         /// </summary>
         public float LetterSpacing = 0f;
 
-        /// <summary>DrawText 不显式给 anchor 时用的默认锚点（只影响水平方向）。</summary>
+        /// <summary>Default anchor used when DrawText is not given an explicit anchor (horizontal direction only).</summary>
         public MFDTextAnchor DefaultAnchor = MFDTextAnchor.Left;
 
         /// <summary>
-        /// 在 (x, y) 画一行文字。坐标系与其它 Draw* 一致：y 向上，(x, y) 是该行 **baseline** 的起点。
-        /// anchor 决定 x 指的是文字的哪一边：Left（默认，x=左端）/ Center（x=水平中心）/ Right（x=右端）。
-        /// 返回水平推进量（像素），方便接着画下一段。
+        /// Draw one line of text at (x, y). The coordinate system matches the other Draw* calls: y points up and (x, y) is the start of the line's **baseline**.
+        /// anchor decides which edge of the text x refers to: Left (default, x = left edge) / Center (x = horizontal centre) / Right (x = right edge).
+        /// Returns the horizontal advance (in pixels) so the next run can be drawn straight after it.
         /// </summary>
         public float DrawText(string text, float x, float y, Color color,
                               float size = 16f, float sharpness = DefaultTextSharpness,
@@ -781,7 +781,7 @@ namespace AeroSim.UI
                               ResolveAnchor(anchor), false, 0f, letterSpacing) / DesignScale;
         }
 
-        /// <summary>同上（位置参数版，第 7 个参数是字距）。anchor 用 <see cref="DefaultAnchor"/>。</summary>
+        /// <summary>Same as above (positional-parameter version; the 7th parameter is the letter spacing). The anchor comes from <see cref="DefaultAnchor"/>.</summary>
         public float DrawText(string text, float x, float y, Color color,
                               float size, float sharpness, float tracking)
         {
@@ -789,7 +789,7 @@ namespace AeroSim.UI
                               ResolveAnchor(MFDTextAnchor.Default), false, 0f, tracking) / DesignScale;
         }
 
-        /// <summary>以 (cx, cy) 为中心画一行文字（水平居中，垂直按大写字高居中）。</summary>
+        /// <summary>Draw one line of text centred on (cx, cy) (horizontally centred, vertically centred on the cap height).</summary>
         public float DrawTextCentered(string text, float cx, float cy, Color color,
                                       float size = 16f, float sharpness = DefaultTextSharpness,
                                       float letterSpacing = float.NaN)
@@ -803,19 +803,19 @@ namespace AeroSim.UI
             return anchor == MFDTextAnchor.Default ? DefaultAnchor : anchor;
         }
 
-        /// <summary>只量宽度（像素），不产生绘制命令。用当前的 <see cref="LetterSpacing"/>。</summary>
+        /// <summary>Measure the width only (in pixels) without producing draw commands. Uses the current <see cref="LetterSpacing"/>.</summary>
         public float MeasureText(string text, float size)
         {
             return MeasureText(text, size, LetterSpacing);
         }
 
-        /// <summary>只量宽度（设计单位）。tracking 与 DrawText 的 letterSpacing 同义。</summary>
+        /// <summary>Measure the width only (in design units). tracking means the same as DrawText's letterSpacing.</summary>
         public float MeasureText(string text, float size, float letterSpacing)
         {
             return MeasureTextDevice(text, Scale(size), letterSpacing) / DesignScale;
         }
 
-        // 设备像素空间的测量（内部用：LayoutText 已经在设备空间里工作）
+        // Measurement in device-pixel space (internal: LayoutText already works in device space)
         private float MeasureTextDevice(string text, float size, float letterSpacing)
         {
             TMP_FontAsset font = TextFont;
@@ -829,7 +829,7 @@ namespace AeroSim.UI
             {
                 if (font.characterLookupTable.TryGetValue(text[i], out TMP_Character c) && c != null)
                     w += c.glyph.metrics.horizontalAdvance * px;
-                if (i < text.Length - 1) w += tracking;      // 字距只算字与字之间
+                if (i < text.Length - 1) w += tracking;      // Letter spacing is only counted between characters
             }
             return w;
         }
@@ -843,7 +843,7 @@ namespace AeroSim.UI
             if (font == null) { WarnNoFont(); return 0f; }
             if (string.IsNullOrEmpty(text)) return 0f;
 
-            // 动态字体：字形可能还没进图集（characterLookupTable 里查不到 → 静默画不出来）
+            // Dynamic font: a glyph may not be in the atlas yet (not found in characterLookupTable → it silently fails to draw)
             if (font.atlasPopulationMode == AtlasPopulationMode.Dynamic)
                 font.TryAddCharacters(text, out string _);
 
@@ -856,9 +856,9 @@ namespace AeroSim.UI
             int sharp = Mathf.Clamp(Mathf.RoundToInt(sharpness * 1000f), 1, 8000);
 
             float lineWidth = MeasureTextDevice(text, size, letterSpacing);
-            float tracking = letterSpacing * size;          // 像素
+            float tracking = letterSpacing * size;          // pixels
 
-            // 水平锚点：x 指左端 / 中心 / 右端
+            // Horizontal anchor: x means left edge / centre / right edge
             float originX = anchor == MFDTextAnchor.Right ? x - lineWidth
                           : anchor == MFDTextAnchor.Center ? x - lineWidth * 0.5f
                           : x;
@@ -876,20 +876,20 @@ namespace AeroSim.UI
 
                     if (r.width > 0 && r.height > 0)
                     {
-                        // 目标矩形（像素对齐是清晰的关键）
+                        // Target rectangle (pixel alignment is the key to crisp text)
                         float x0 = Mathf.Round(penX + glyph.metrics.horizontalBearingX * px);
                         float x1 = Mathf.Round(penX + (glyph.metrics.horizontalBearingX + r.width) * px);
-                        float y1 = Mathf.Round(baseline + glyph.metrics.horizontalBearingY * px);   // 顶
-                        float y0 = Mathf.Round(y1 - r.height * px);                                  // 底
+                        float y1 = Mathf.Round(baseline + glyph.metrics.horizontalBearingY * px);   // top
+                        float y0 = Mathf.Round(y1 - r.height * px);                                  // bottom
 
                         float u0 = r.x / atlasW;
                         float u1 = (r.x + r.width) / atlasW;
-                        float vA = r.y / atlasH;                        // glyphRect 底边（TMP：左下原点）
-                        float vB = (r.y + r.height) / atlasH;           // glyphRect 顶边
+                        float vA = r.y / atlasH;                        // glyphRect bottom edge (TMP: bottom-left origin)
+                        float vB = (r.y + r.height) / atlasH;           // glyphRect top edge
                         float v0 = FlipGlyphV ? 1f - vB : vA;
                         float v1 = FlipGlyphV ? 1f - vA : vB;
 
-                        // SDF padding：把图集里字形周围的距离场边距一起采样/一起画，边缘过渡才完整
+                        // SDF padding: sample and draw the distance-field margin around the glyph in the atlas as well, so the edge transition is complete
                         if (TextUseAtlasPadding && font.atlasPadding > 0)
                         {
                             float pad = font.atlasPadding;
@@ -913,7 +913,7 @@ namespace AeroSim.UI
                             param1 = new Vector4(x0, y0, x1, y1),
                             param2 = new Vector4(u0, v0, u1, v1),
                             color = new Vector4(color.r, color.g, color.b, color.a),
-                            dashLength = sharp,     // 复用为 sharpness*1000（保持 DrawCommand 布局不变）
+                            dashLength = sharp,     // Reused as sharpness*1000 (keeps the DrawCommand layout unchanged)
                             gapLength = 0,
                             layer = 0
                         });
@@ -922,12 +922,12 @@ namespace AeroSim.UI
                     penX += glyph.metrics.horizontalAdvance * px;
                 }
 
-                if (i < text.Length - 1) penX += tracking;      // 字距只加在字与字之间（和 MeasureText 一致）
+                if (i < text.Length - 1) penX += tracking;      // Letter spacing is only added between characters (consistent with MeasureText)
             }
             return lineWidth;
         }
 
-        /// <summary>TMP 图集里 SDF 值所在通道：Alpha8 → alpha(0)，R8/R16 → red(1)。</summary>
+        /// <summary>Channel holding the SDF value in the TMP atlas: Alpha8 → alpha(0), R8/R16 → red(1).</summary>
         private static int AtlasChannel(TMP_FontAsset font)
         {
             Texture2D t = font != null ? font.atlasTexture : null;
@@ -1049,30 +1049,30 @@ namespace AeroSim.UI
             int sx = x0 < x1 ? 1 : -1;
             int sy = y0 < y1 ? 1 : -1;
             int err = dx + dy;
-            int step = 0;          // 总步数计数器
+            int step = 0;          // Total step counter
             int cycle = dashLength + gapLength;
-            bool drawing = true;   // 当前是否在画实线段
+            bool drawing = true;   // Whether a solid dash is currently being drawn
 
             while (true)
             {
-                // 根据步数决定是否绘制当前像素
+                // Decide from the step count whether to plot the current pixel
                 if (drawing)
                 {
                     if (x0 >= 0 && x0 < width && y0 >= 0 && y0 < height)
                         canvas[y0 * width + x0] = color;
                 }
 
-                // 到达终点
+                // Reached the end point
                 if (x0 == x1 && y0 == y1) break;
 
-                // 步进
+                // Step
                 int e2 = 2 * err;
                 if (e2 >= dy) { err += dy; x0 += sx; }
                 if (e2 <= dx) { err += dx; y0 += sy; }
 
                 step++;
 
-                // 切换绘制状态
+                // Toggle the drawing state
                 if (step >= (drawing ? dashLength : gapLength))
                 {
                     drawing = !drawing;
@@ -1107,11 +1107,11 @@ namespace AeroSim.UI
             }
         }
 
-        //这是ds写的，能用，很好
+        // Written by ds; it works, and it works well
         public static void DrawLine(Color32[] canvas, int x0, int y0, int x1, int y1, int width, int height, Color32 color)
         {
-            int w = width;  // 纹理宽度
-            int h = height; // 纹理高度
+            int w = width;  // texture width
+            int h = height; // texture height
 
             int dx = Mathf.Abs(x1 - x0);
             int dy = -Mathf.Abs(y1 - y0);
@@ -1122,7 +1122,7 @@ namespace AeroSim.UI
 
             while (true)
             {
-                // 画点（带边界检查）
+                // Plot the point (with bounds check)
                 if (x0 >= 0 && x0 < w && y0 >= 0 && y0 < h)
                     canvas[y0 * w + x0] = color;
 
@@ -1135,13 +1135,13 @@ namespace AeroSim.UI
 
         public void DrawTexture(Color32[] canvas, Texture2D source, Rect targetRect, int width, int height)
         {
-            // 读取源纹理所有像素
+            // Read all pixels of the source texture
             UnityEngine.Color[] srcPixels = source.GetPixels();
 
             int srcWidth = source.width;
             int srcHeight = source.height;
 
-            // 计算目标区域
+            // Compute the destination region
             int startX = Mathf.Max(0, (int)targetRect.x);
             int startY = Mathf.Max(0, (int)targetRect.y);
             int endX = Mathf.Min(width, (int)(targetRect.x + targetRect.width));
@@ -1151,7 +1151,7 @@ namespace AeroSim.UI
             {
                 for (int x = startX; x < endX; x++)
                 {
-                    // 将目标像素坐标映射到源纹理坐标
+                    // Map the destination pixel coordinates to source texture coordinates
                     float u = (x - targetRect.x) / targetRect.width;
                     float v = (y - targetRect.y) / targetRect.height;
 
@@ -1165,11 +1165,11 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 绘制实心矩形（内部使用）。
+        /// Draw a filled rectangle (internal use).
         /// </summary>
         public static void FillRect(Color32[] canvas, int x, int y, int w, int h, int canvasW, int canvasH, Color32 color)
         {
-            // 裁剪
+            // Clip
             int sx = Mathf.Max(0, x);
             int sy = Mathf.Max(0, y);
             int ex = Mathf.Min(canvasW, x + w);
@@ -1184,17 +1184,17 @@ namespace AeroSim.UI
         }
 
         /// <summary>
-        /// 绘制带厚度的矩形边框（保持原始参数签名）。
+        /// Draw a rectangle border with thickness (keeping the original parameter signature).
         /// </summary>
         public static void DrawRect(Color32[] canvas, int x0, int y0, int width, int height, int w0, int h0, int thickness, Color32 color)
         {
             thickness = Mathf.Clamp(thickness, 1, Mathf.Min(width, height) / 2);
 
-            // 四边
-            FillRect(canvas, x0, y0, width, thickness, w0, h0, color); // 上
-            FillRect(canvas, x0, y0 + height - thickness, width, thickness, w0, h0, color); // 下
-            FillRect(canvas, x0, y0 + thickness, thickness, height - 2 * thickness, w0, h0, color); // 左
-            FillRect(canvas, x0 + width - thickness, y0 + thickness, thickness, height - 2 * thickness, w0, h0, color); // 右
+            // Four sides
+            FillRect(canvas, x0, y0, width, thickness, w0, h0, color); // top
+            FillRect(canvas, x0, y0 + height - thickness, width, thickness, w0, h0, color); // bottom
+            FillRect(canvas, x0, y0 + thickness, thickness, height - 2 * thickness, w0, h0, color); // left
+            FillRect(canvas, x0 + width - thickness, y0 + thickness, thickness, height - 2 * thickness, w0, h0, color); // right
         }
 
         public static int PixelIndex(int x, int y, int width, int height)

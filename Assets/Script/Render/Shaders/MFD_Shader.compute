@@ -4,12 +4,12 @@ RWTexture2D<float4> _Result;
 uint _Width;
 uint _Height;
 
-// 绘制命令
+// Draw commands
 struct DrawCommand
 {
     int type;           // 0=Line, 1=DashedLine, 2=Circle, 3=RectOutline, 4=RectFill, 5=Texture
-    float4 param1;      // x0,y0,x1,y1 或 cx,cy,radius,thickness
-    float4 param2;      // 额外参数（矩形宽高，纹理区域等）
+    float4 param1;      // x0,y0,x1,y1 or cx,cy,radius,thickness
+    float4 param2;      // Extra parameters (rect width/height, texture region, etc.)
     float4 color;
     int dashLength;
     int gapLength;
@@ -19,16 +19,16 @@ struct DrawCommand
 StructuredBuffer<DrawCommand> _Commands;
 int _CommandCount;
 
-// 纹理绘制
+// Texture drawing
 Texture2D<float4> _SourceTex;
 SamplerState sampler_SourceTex;
 
-// 字体图集（TMP SDF）。_FontAtlasChannel: 0 = alpha(Alpha8 图集), 1 = red(R8 图集)
-// 用 Load 取样，所以不需要 sampler_FontAtlas
+// Font atlas (TMP SDF). _FontAtlasChannel: 0 = alpha (Alpha8 atlas), 1 = red (R8 atlas)
+// Sampling uses Load, so no sampler_FontAtlas is needed
 Texture2D<float4> _FontAtlas;
 int _FontAtlasChannel;
 
-// 辅助函数
+// Helper functions
 float DistanceToLine(float2 p, float2 a, float2 b)
 {
     float2 ab = b - a;
@@ -54,10 +54,10 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= _Width || id.y >= _Height) return;
 
-    float2 pixelPos = float2(id.x, id.y) + 0.5;  // 像素中心
+    float2 pixelPos = float2(id.x, id.y) + 0.5;  // Pixel centre
     float4 finalColor = float4(0, 0, 0, 0);
 
-    // 裁剪矩形状态：type 9 设置、type 10 清除；之后所有命令只在矩形内生效（scissor）
+    // Clip rectangle state: set by type 9, cleared by type 10; all later commands only take effect inside the rectangle (scissor)
     float2 clipMin = float2(0.0, 0.0);
     float2 clipMax = float2(_Width, _Height);
 
@@ -80,11 +80,11 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
 
         float4 cmdColor = cmd.color;
 
-        // ---- 包围盒剔除：像素不在命令范围内直接跳过（省掉 SDF 与图集采样，字多了非常关键）----
+        // ---- Bounding-box rejection: skip pixels outside the command's range outright (saves the SDF and atlas sampling; crucial with lots of text) ----
         float2 bMin, bMax;
         if (cmd.type == 0 || cmd.type == 1)          // Line / DashedLine
         {
-            float pad = 2.0 + max(cmd.param2.x, 0.0) * 0.5;   // + 线宽的一半（type 1 的 param2.x 恒为 0）
+            float pad = 2.0 + max(cmd.param2.x, 0.0) * 0.5;   // + half the line width (param2.x is always 0 for type 1)
             bMin = min(cmd.param1.xy, cmd.param1.zw) - pad;
             bMax = max(cmd.param1.xy, cmd.param1.zw) + pad;
         }
@@ -100,18 +100,18 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
             bMin = cmd.param1.xy - e;
             bMax = cmd.param1.xy + e;
         }
-        else if (cmd.type == 4)                      // RectFill（param1 = 中心 + 半尺寸）
+        else if (cmd.type == 4)                      // RectFill (param1 = centre + half size)
         {
             bMin = cmd.param1.xy - cmd.param1.zw;
             bMax = cmd.param1.xy + cmd.param1.zw;
         }
-        else if (cmd.type == 7)                      // Disc（param1 = 圆心 + 半径）
+        else if (cmd.type == 7)                      // Disc (param1 = centre + radius)
         {
             float rr = max(cmd.param1.z, 0.0) + 2.0;
             bMin = cmd.param1.xy - rr;
             bMax = cmd.param1.xy + rr;
         }
-        else if (cmd.type == 8)                      // RotatedRectFill（param1 = 中心 + 半尺寸；param2.xy = cos/sin）
+        else if (cmd.type == 8)                      // RotatedRectFill (param1 = centre + half size; param2.xy = cos/sin)
         {
             float2 cc = cmd.param2.xy;
             float2 ax = float2(cc.x, cc.y) * cmd.param1.z;
@@ -120,13 +120,13 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
             bMin = cmd.param1.xy - e;
             bMax = cmd.param1.xy + e;
         }
-        else if (cmd.type == 11)                     // Arc（param1 = 圆心 + 半径 + 厚度；param2.xy = 起止角(度)）
+        else if (cmd.type == 11)                     // Arc (param1 = centre + radius + thickness; param2.xy = start/end angle in degrees)
         {
             float rr = max(cmd.param1.z, 0.0) + max(cmd.param1.w, 0.0) * 0.5 + 2.0;
             bMin = cmd.param1.xy - rr;
             bMax = cmd.param1.xy + rr;
         }
-        else if (cmd.type == 12)                     // Triangle（param1.xy / param1.zw / param2.xy = 三个顶点）
+        else if (cmd.type == 12)                     // Triangle (param1.xy / param1.zw / param2.xy = the three vertices)
         {
             float2 t0 = cmd.param1.xy;
             float2 t1 = cmd.param1.zw;
@@ -134,20 +134,20 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
             bMin = min(min(t0, t1), t2) - 2.0;
             bMax = max(max(t0, t1), t2) + 2.0;
         }
-        else                                         // Texture / Text：param1 本身是 min/max
+        else                                         // Texture / Text: param1 is itself min/max
         {
             bMin = cmd.param1.xy;
             bMax = cmd.param1.zw;
         }
 
-        // 只有 3/4/5 是"在形状以外生效"，其它 layer 值（包括代码里误传的任意 int）都当成 0 = 普通覆盖，
-        // 这样历史代码里 `layer` 从没被用过的那些写法不会因为这次改动而突然有语义。
+        // Only 3/4/5 mean "take effect outside the shape"; every other layer value (including any mistyped int) is treated as 0 = plain coverage,
+        // so the old call sites where `layer` was never used do not suddenly gain semantics from this change.
         bool outsideShape = (cmd.layer == 3 || cmd.layer == 4 || cmd.layer == 5);
         if (!outsideShape &&
             (pixelPos.x < bMin.x || pixelPos.x > bMax.x ||
              pixelPos.y < bMin.y || pixelPos.y > bMax.y)) continue;
 
-        // 裁剪矩形对所有命令都生效（包括 EraseOutside）
+        // The clip rectangle applies to every command (including EraseOutside)
         if (pixelPos.x < clipMin.x || pixelPos.x > clipMax.x ||
             pixelPos.y < clipMin.y || pixelPos.y > clipMax.y) continue;
 
@@ -156,7 +156,7 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
 
         switch (cmd.type)
         {
-            case 0: // Line（param2.x = 线宽，像素；<=1 时保持原来的 1px 观感）
+            case 0: // Line (param2.x = line width in pixels; <=1 keeps the original 1px look)
             {
                 float2 a = cmd.param1.xy;
                 float2 b = cmd.param1.zw;
@@ -169,7 +169,7 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 }
                 else
                 {
-                    alpha = 1.0 - smoothstep(0.5, 1.5, dist);   // 原行为，一字不改
+                    alpha = 1.0 - smoothstep(0.5, 1.5, dist);   // Original behaviour, not a character changed
                 }
                 break;
             }
@@ -180,7 +180,7 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 float2 b = cmd.param1.zw;
                 dist = DistanceToLine(pixelPos, a, b);
                 
-                // 简化：用屏幕坐标做 dash 判断
+                // Simplified: use screen coordinates to decide the dash
                 float lineLength = length(b - a);
                 float t = clamp(dot(pixelPos - a, b - a) / max(lineLength * lineLength, 0.0001), 0.0, 1.0);
                 float dashPos = t * lineLength;
@@ -202,7 +202,7 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 break;
             }
 
-            case 7: // Disc（实心圆：param1 = 圆心 + 半径）
+            case 7: // Disc (filled circle: param1 = centre + radius)
             {
                 float2 center = cmd.param1.xy;
                 float radius = max(cmd.param1.z, 0.0);
@@ -217,7 +217,7 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 float2 halfSize = cmd.param1.zw;
                 float thickness = cmd.param2.x;
                 dist = RectSDF(pixelPos, center, halfSize);
-                // 空心：abs(dist) - thickness
+                // Hollow: abs(dist) - thickness
                 dist = abs(dist) - thickness * 0.5;
                 alpha = 1.0 - smoothstep(-0.5, 0.5, dist);
                 break;
@@ -232,22 +232,22 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 break;
             }
 
-            case 8: // RotatedRectFill（param1 = 中心 + 半尺寸；param2.xy = (cos, sin)）
+            case 8: // RotatedRectFill (param1 = centre + half size; param2.xy = (cos, sin))
             {
                 float2 center = cmd.param1.xy;
                 float2 halfSize = cmd.param1.zw;
                 float2 cs = cmd.param2.xy;
                 float2 d = pixelPos - center;
-                // 把像素转回矩形局部坐标（旋转 -angle），再套普通矩形 SDF
+                // Rotate the pixel back into the rectangle's local space (by -angle), then apply the plain rectangle SDF
                 float2 local = float2(d.x * cs.x + d.y * cs.y, -d.x * cs.y + d.y * cs.x);
                 dist = RectSDF(local, float2(0.0, 0.0), halfSize);
                 alpha = dist < 0 ? 1.0 : 0.0;
                 break;
             }
 
-            case 11: // Arc（圆环弧 / 扇形）
-                     // param1 = 圆心 + 半径 + 厚度（thickness <= 0 时是从圆心填到半径的扇形）
-                     // param2.xy = 起始角、结束角（度，0° = +X，逆时针为正；end < start 即顺时针扫）
+            case 11: // Arc (ring arc / sector)
+                     // param1 = centre + radius + thickness (when thickness <= 0 it is a sector filled from the centre out to the radius)
+                     // param2.xy = start angle, end angle (degrees, 0° = +X, counter-clockwise positive; end < start sweeps clockwise)
             {
                 float2 center = cmd.param1.xy;
                 float radius = max(cmd.param1.z, 0.0);
@@ -261,13 +261,13 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
 
                 float sweep = endDeg - startDeg;
                 float rel = aDeg - startDeg;
-                // 把相对角折叠到和扫掠方向同号的一侧
+                // Fold the relative angle onto the side that shares the sign of the sweep direction
                 rel = (sweep >= 0.0)
                     ? fmod(rel + 1440.0, 360.0)
                     : -fmod(-rel + 1440.0, 360.0);
                 bool inAngle = (sweep >= 0.0) ? (rel <= sweep) : (rel >= sweep);
 
-                // 径向：厚度 > 0 是环带（和 DrawCircle 同一套），否则从圆心填满
+                // Radial: thickness > 0 makes a ring (the same maths as DrawCircle), otherwise fill from the centre outwards
                 float rdist = (thickness > 0.0)
                     ? (abs(len - radius) - thickness * 0.5)
                     : (len - radius);
@@ -276,12 +276,12 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 break;
             }
 
-            case 12: // Triangle（实心三角；三个顶点按逆时针给，C# 侧已保证绕向）
+            case 12: // Triangle (filled triangle; the three vertices arrive counter-clockwise, the C# side guarantees the winding)
             {
                 float2 t0 = cmd.param1.xy;
                 float2 t1 = cmd.param1.zw;
                 float2 t2 = cmd.param2.xy;
-                // 三条边的"向内"有符号距离（逆时针时内部为正）→ 取 min 再取负，才是"内部为负"的 SDF
+                // Signed "inward" distance of the three edges (positive inside under counter-clockwise winding) → take the min and negate it to get an SDF that is negative inside
                 float2 e0 = t1 - t0, e1 = t2 - t1, e2 = t0 - t2;
                 float d0 = (e0.x * (pixelPos.y - t0.y) - e0.y * (pixelPos.x - t0.x)) / max(length(e0), 1e-5);
                 float d1 = (e1.x * (pixelPos.y - t1.y) - e1.y * (pixelPos.x - t1.x)) / max(length(e1), 1e-5);
@@ -310,38 +310,38 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
                 }
                 break;
             }
-            case 6: // Text 单字形：param1 = (x0,y0,x1,y1) 目标矩形, param2 = (u0,v0,u1,v1) 图集UV
+            case 6: // Text single glyph: param1 = (x0,y0,x1,y1) target rectangle, param2 = (u0,v0,u1,v1) atlas UV
             {
                 float2 tMin = cmd.param1.xy;
                 float2 tMax = cmd.param1.zw;
                 float2 uv = (pixelPos - tMin) / max(tMax - tMin, 0.0001);
                 uv = lerp(cmd.param2.xy, cmd.param2.zw, uv);
 
-                // 用 Load（texel fetch）而不是 Sample：不需要 sampler 绑定，
-                // 也不受图集 filterMode/wrapMode 影响，字边缘由 smoothstep 自己控制 → 更脆更可控
+                // Use Load (texel fetch) instead of Sample: no sampler binding is needed,
+                // and it is unaffected by the atlas filterMode/wrapMode — smoothstep controls the glyph edges itself → crisper and more predictable
                 uint aw, ah;
                 _FontAtlas.GetDimensions(aw, ah);
                 int2 texel = clamp(int2(uv * float2(aw, ah)), int2(0, 0), int2(aw - 1, ah - 1));
                 float4 s = _FontAtlas.Load(int3(texel, 0));
-                // _FontAtlasChannel: 0 = alpha(Alpha8 图集), 1 = red(R8 图集), 2 = 调试(整块实心，用来确认四边形位置对不对)
+                // _FontAtlasChannel: 0 = alpha (Alpha8 atlas), 1 = red (R8 atlas), 2 = debug (solid block, to confirm the quad placement is correct)
                 float sd = (_FontAtlasChannel == 1) ? s.r : (_FontAtlasChannel == 2 ? 0.75 : s.a);
 
-                // dashLength 复用为 sharpness * 1000（保持 DrawCommand 布局不变）
+                // dashLength is reused as sharpness * 1000 (keeps the DrawCommand layout unchanged)
                 float soft = max((float)cmd.dashLength, 1.0) * 0.001;
                 alpha = smoothstep(0.5 - soft, 0.5 + soft, sd);
                 break;
             }
         }
 
-        // layer 3/4/5：覆盖率取反 —— 命令在形状"以外"生效
-        //   3 = EraseOutside   擦掉形状外（裁剪到形状里）
-        //   4 = OverOutside    在形状外做正常 alpha 覆盖（把圆外刷回背景色，不会露黑底）
-        //   5 = ReplaceOutside 在形状外直接覆盖，不混合
-        // 其它值（包括误传的 int）保持普通覆盖，语义和 layer 字段从未被使用前一致
+        // layer 3/4/5: the coverage is inverted — the command takes effect "outside" the shape
+        //   3 = EraseOutside   erase everything outside the shape (clip to the shape)
+        //   4 = OverOutside    normal alpha coverage outside the shape (paints outside a circle back to the background colour, with no black showing through)
+        //   5 = ReplaceOutside straight overwrite outside the shape, no blending
+        // Any other value (including a mistyped int) keeps plain coverage, matching the semantics from before the layer field was ever used
         if (outsideShape) alpha = 1.0 - alpha;
 
-        // 混合。注意 finalColor 内部是 **预乘 alpha** 累加的（最后才除回 alpha），
-        // 所以 Erase 必须把 rgb 和 a 一起缩，否则会越擦越亮。
+        // Blending. Note that finalColor accumulates **premultiplied alpha** internally (alpha is only divided back out at the very end),
+        // so Erase must scale rgb together with a, otherwise repeated erasing gets brighter and brighter.
         if (alpha > 0.0)
         {
             float a = saturate(cmdColor.a * alpha);
@@ -350,7 +350,7 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
             {
                 finalColor *= (1.0 - a);
             }
-            else if (cmd.layer == 2 || cmd.layer == 5)   // Replace / ReplaceOutside：直接覆盖，不混合
+            else if (cmd.layer == 2 || cmd.layer == 5)   // Replace / ReplaceOutside: straight overwrite, no blending
             {
                 finalColor = float4(cmdColor.rgb * a, a);
             }
@@ -362,7 +362,7 @@ void DrawMFD (uint3 id : SV_DispatchThreadID)
         }
     }
 
-    // 输出 straight alpha：rgb 内部是预乘累加，除回 alpha 才能被 UI/Default 正确合成
+    // Output straight alpha: rgb is accumulated premultiplied internally, so alpha must be divided back out for UI/Default to composite it correctly
     if (finalColor.a > 0.0001) finalColor.rgb /= finalColor.a;
     _Result[id.xy] = finalColor;
 }

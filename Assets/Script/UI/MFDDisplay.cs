@@ -9,20 +9,6 @@ using UnityEngine.UI;
 namespace AeroSim.UI
 {
     /// <summary>
-    /// MFD Display content types
-    /// </summary>
-    public enum MFDType
-    {
-        None,
-        RadarPPI,
-        RadarBScope,
-        Gimbal,
-        RWR,
-        Weapon,
-        TargetingPod,
-    }
-
-    /// <summary>
     /// Component version of <see cref="MFDDrawer"/>, for UI on the screen.
     /// </summary>
     public class MFDDisplay : MonoBehaviour
@@ -36,9 +22,9 @@ namespace AeroSim.UI
         public void InitCanvas()
         {
             Dispose();
-            if (canvasTexture != null) // 重复初始化 = 旧 RT 永久泄漏（Persistent allocation）
+            if (canvasTexture != null) // Re-initialising = the old RT leaks permanently (Persistent allocation)
             {
-                drawer?.Dispose();     // 旧的 helper 也要释放，否则它的 ComputeBuffer 一样会漏
+                drawer?.Dispose();     // The old helper has to be released too, or its ComputeBuffer leaks just the same
                 drawer = null;
                 canvasTexture.Release();
                 GameObject.Destroy(canvasTexture);
@@ -91,7 +77,7 @@ namespace AeroSim.UI
             if (drawer != null) { drawer.Dispose(); drawer = null; }
             if (canvasTexture != null)
             {
-                canvasTexture.Release();                     // 释放 native/GPU 内存（Leak Detected 的元凶）
+                canvasTexture.Release();                     // Release native/GPU memory (the culprit behind "Leak Detected")
                 if (Application.isPlaying) Destroy(canvasTexture);
                 else DestroyImmediate(canvasTexture);
                 canvasTexture = null;
@@ -131,7 +117,7 @@ namespace AeroSim.UI
             Dispose();
             if (canvasTexture != null)
             {
-                drawer?.Dispose();     // 旧的 helper 也要释放，否则它的 ComputeBuffer 一样会漏
+                drawer?.Dispose();     // The old helper has to be released too, or its ComputeBuffer leaks just the same
                 drawer = null;
                 canvasTexture.Release();
                 GameObject.Destroy(canvasTexture);

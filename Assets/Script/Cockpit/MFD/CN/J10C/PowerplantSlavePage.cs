@@ -1,24 +1,23 @@
-﻿using AeroSim.AeroPhysics;
-using AeroSim.Cockpit;
+﻿using AeroSim.Cockpit.MFD;
+using AeroSim.UI;
+using AeroSim.Utils;
 using System;
-using System.Collections;
-using TMPro;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AeroSim.UI
+namespace AeroSim.Cockpit.MFD.CN.J10C
 {
     [Serializable]
-    public class GimbalMFD : MFDDrawer
+    public class PowerplantSlavePage : IMFD_Page
     {
-        private Aircraft parentAircraft;
-        [Header("Top - Gimbal")]
-        public Rect gimbalRect;
-        public float gimbalContentW;
-        public float gimbalStencilRadius;
-        public Color skyColor;
-        public Color groundColor;
-        [Header("Bottom - Powerrplant")]
-        public Rect powerplantRect;
+        private MFDDataContext data;
+        private MFDGraphicHelper drawer;
+
+        public Color bgColor;
+        public Rect rect;
         public float rpmWidth;
         public float rpmIndicatorSize;
         public float rpmPaddingX;
@@ -27,56 +26,42 @@ namespace AeroSim.UI
         public float fuelGapWidth;
         public float fuelDisplayWidth;
 
-        public GimbalMFD(Vector2Int size, Color bgColor) : base(size,bgColor)
+        public Rect Zone => rect;
+        public MFD_PageType Type => MFD_PageType.Powerplant;
+
+        public void Init(MFDDataContext ctx, MFDGraphicHelper drawer)
         {
-            
+            data = ctx;
+            this.drawer = drawer;
+            bgColor = ctx.mfdDrawer.bgColor;
         }
 
-        public void Init(Aircraft parentAircraft)
+        public void OnButtonClick(int buttonIndex)
         {
-            this.parentAircraft = parentAircraft;
-            InitCanvas();
-            drawer.SetDesignSize(1024, 1536);
+
         }
 
-        public void SetFont(TMP_FontAsset font)
+        public void DrawPage()
         {
-            drawer.TextFont = font;
-        }
-
-        public override void ProcessCanvas()
-        {
-            DrawGimbal();
-            drawer.DrawRectFillCenter(512, gimbalRect.y - gimbalRect.height / 2 - 40, 512, 3, Color.green);
             DrawPowerplant();
-        }
-
-        void DrawGimbal()
-        {
-            float rollAngle = parentAircraft.transform.eulerAngles.z;
-            drawer.SetClipRect(gimbalRect.x - gimbalRect.width / 2, gimbalRect.y - gimbalRect.height / 2, gimbalRect.width, gimbalRect.height);
-            drawer.DrawHalfPlane(gimbalRect.x, gimbalRect.y, -rollAngle + 180, gimbalContentW, skyColor);
-            drawer.DrawHalfPlane(gimbalRect.x, gimbalRect.y, -rollAngle, gimbalContentW, groundColor);
-            drawer.FillOutsideDisc(gimbalRect.x, gimbalRect.y, gimbalStencilRadius, bgColor);
-            drawer.ClearClip();
         }
 
         void DrawPowerplant()
         {
             float N1 = CockpitDataManager.GetDataFloat(CockpitDataManager.CockpitDataType.EngineRPM_N1);
             float N2 = CockpitDataManager.GetDataFloat(CockpitDataManager.CockpitDataType.EngineRPM_N2);
-            DrawRPMIndicator(powerplantRect.x - rpmPaddingX, powerplantRect.y, N1); // -1/2 + 1/4
-            DrawRPMIndicator(powerplantRect.x - rpmPaddingX + rpmGapWidth, powerplantRect.y, N2); // -1/2 + 2/4
+            DrawRPMIndicator(rect.x - rpmPaddingX, rect.y, N1); // -1/2 + 1/4
+            DrawRPMIndicator(rect.x - rpmPaddingX + rpmGapWidth, rect.y, N2); // -1/2 + 2/4
             drawer.DrawRectFill(
-                powerplantRect.x - rpmPaddingX + rpmGapWidth + fuelMarginWidth, 
-                powerplantRect.y - rpmIndicatorSize / 2, fuelDisplayWidth,
+                rect.x - rpmPaddingX + rpmGapWidth + fuelMarginWidth,
+                rect.y - rpmIndicatorSize / 2, fuelDisplayWidth,
                 rpmIndicatorSize, Color.green);
             drawer.DrawRectFill(
-                powerplantRect.x - rpmPaddingX + rpmGapWidth + fuelMarginWidth + fuelGapWidth, 
-                powerplantRect.y - rpmIndicatorSize / 2, fuelDisplayWidth,
+                rect.x - rpmPaddingX + rpmGapWidth + fuelMarginWidth + fuelGapWidth,
+                rect.y - rpmIndicatorSize / 2, fuelDisplayWidth,
                 rpmIndicatorSize, Color.green);
-            DrawRPMTextLabel(powerplantRect.x - rpmPaddingX, powerplantRect.y + rpmIndicatorSize / 2 + 20, "N1", N1);
-            DrawRPMTextLabel(powerplantRect.x - rpmPaddingX + rpmGapWidth, powerplantRect.y + rpmIndicatorSize / 2 + 20, "N2", N2);
+            DrawRPMTextLabel(rect.x - rpmPaddingX, rect.y + rpmIndicatorSize / 2 + 20, "N1", N1);
+            DrawRPMTextLabel(rect.x - rpmPaddingX + rpmGapWidth, rect.y + rpmIndicatorSize / 2 + 20, "N2", N2);
         }
 
         void DrawRPMIndicator(float x0, float y0, float N)
@@ -110,7 +95,7 @@ namespace AeroSim.UI
         {
             drawer.DrawText(label, x0, y0 + 10, Color.green, anchor: MFDTextAnchor.Right, size: 48);
             drawer.DrawRectOutline(x0 + 5, y0, 120, 50, 3f, Color.green);
-            drawer.DrawText($"{ (int)(rpm * 1000) / 10 }", x0 + 15, y0 + 10, Color.green, anchor: MFDTextAnchor.Left, size: 48);
+            drawer.DrawText($"{(int)(rpm * 1000) / 10}", x0 + 15, y0 + 10, Color.green, anchor: MFDTextAnchor.Left, size: 48);
         }
     }
 }

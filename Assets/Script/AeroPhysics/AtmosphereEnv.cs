@@ -13,11 +13,11 @@ namespace AeroSim.AeroPhysics
         public const float gamma = 1.4f;
         public const float g = 9.8f; // m/(s^2)
 
-        public const float H11 = 11000f;   // 对流层顶
-        public const float H25 = 25000f;   // 等温层顶
-        public const float T11 = 216.65f;  // 11~25 km 等温层温度 (K)
-        public const float P11 = 22632f;   // 11 km 处压力 (Pa)
-        public const float L2 = 0.00299f;  // 25 km 以上升温率 (K/m)
+        public const float H11 = 11000f;   // Tropopause
+        public const float H25 = 25000f;   // Top of the isothermal layer
+        public const float T11 = 216.65f;  // Isothermal layer temperature 11~25 km (K)
+        public const float P11 = 22632f;   // Pressure at 11 km (Pa)
+        public const float L2 = 0.00299f;  // Warming rate above 25 km (K/m)
 
         public static float Temperature(float altitude)
         {
@@ -65,9 +65,9 @@ namespace AeroSim.AeroPhysics
             if (altitude < H25)
                 return P11 * Mathf.Exp(-g * (altitude - H11) / (R * T11));
 
-            // 25 km 以上（升温段）：先算出 25 km 处的基准压力，再用幂律。
-            // 注意：这里千万别写 Pressure(H25) —— 它同样会落进本分支，造成无限递归，
-            // StackOverflowException 会直接把 Unity 进程干掉（编辑器崩溃、没有崩溃转储）。
+            // Above 25 km (the warming layer): first work out the reference pressure at 25 km, then apply the power law.
+            // Careful: never write Pressure(H25) here — it would fall into this same branch and recurse forever, and a
+            // StackOverflowException takes the Unity process down outright (editor crash, no crash dump).
             float p25 = P11 * Mathf.Exp(-g * (H25 - H11) / (R * T11));
             return p25 * Mathf.Pow(T11 / (T11 + L2 * (altitude - H25)), g / (R * L2));
         }

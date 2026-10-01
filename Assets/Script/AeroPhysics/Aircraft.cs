@@ -58,7 +58,7 @@ namespace AeroSim.AeroPhysics
         public MissileModule mslManager;
         public FlightController flightController;
         public HUDHolder hud;
-        public MFDDisplays mfdDisplay;
+        public MFDModule mfdDisplay;
         public ModuleMovement movement;
         public CountermeasureModule countermeasure;
 
