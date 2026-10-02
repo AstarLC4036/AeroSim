@@ -247,8 +247,6 @@ namespace AeroSim.AircraftModules
 
             if (flameEffect != null)
                 flameEffect.Play();
-
-            CockpitDataManager.onInteracion += UpdateInteracionEvent;
         }
 
         void Start()
@@ -285,9 +283,13 @@ namespace AeroSim.AircraftModules
             UpdateThrust(dt);
         }
 
-        private void OnApplicationQuit()
+        public void StartEngine()
         {
-            CockpitDataManager.onInteracion -= UpdateInteracionEvent;
+            bool leverOff = throttleLever <= cutoffLever;
+            if (startState == EngineStartState.Off && !leverOff && isEngineToggled)
+            {
+                startState = EngineStartState.Crank;
+            }
         }
 
         void UpdateInput()
@@ -303,14 +305,6 @@ namespace AeroSim.AircraftModules
                 throttleLever = Mathf.Clamp(throttleLever + dir * leverSlewRate * Time.deltaTime, 0f, 1f);
         }
 
-        void UpdateInteracionEvent(CockpitDataManager.InteractionEvent e)
-        {
-            if(e == CockpitDataManager.InteractionEvent.StartEngine)
-            {
-                isEngineToggled = true;
-            }
-        }
-
         // ---------------------------------------------------------------- Spool / afterburner
 
         void UpdateSpool(float dt)
@@ -322,7 +316,7 @@ namespace AeroSim.AircraftModules
             switch (startState)
             {
                 case EngineStartState.Off:
-                    if (!leverOff && isEngineToggled) startState = EngineStartState.Crank;
+                    //if (!leverOff && isEngineToggled) startState = EngineStartState.Crank; // See 'StartEngine()'
                     break;
                 case EngineStartState.Crank:
                     if (leverOff) startState = EngineStartState.Shutdown;

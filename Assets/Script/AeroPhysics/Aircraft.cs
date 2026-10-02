@@ -5,6 +5,7 @@ using UnityEngine;
 using AeroSim.AircraftModules;
 using AeroSim.UI;
 using AeroSim.Cockpit;
+using AeroSim.AircraftModules.Power;
 
 namespace AeroSim.AeroPhysics
 {
@@ -49,6 +50,9 @@ namespace AeroSim.AeroPhysics
         private Vector3 actualInput;
 
         [Header("Modules")]
+        public AircraftModule[] modules; // TODO
+        public CockpitInteracionHandler cockpitInteracion;
+        public ElectricalModule electrical;
         public EngineModule engine;
         public RadarModule radar;
         public DatalinkModule datalink;
@@ -91,8 +95,10 @@ namespace AeroSim.AeroPhysics
 
             rb = GetComponent<Rigidbody>();
 
-            //use 'try' block instead
             //Init modules
+            // TODO: Use list to init modules
+            cockpitInteracion?.Init(this);
+            electrical?.Init(this);
             radar?.Init(this);
             datalink?.Init(this);
             targetingPod?.Init(this);

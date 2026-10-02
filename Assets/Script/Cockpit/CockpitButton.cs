@@ -15,6 +15,7 @@ namespace AeroSim.Cockpit
         public float pushDst;
         public float triggerTime;
         public CockpitDataManager.InteractionEvent eventType;
+        public int eventState;
 
         private float triggerTimer;
         private bool interacting = false;
@@ -35,7 +36,8 @@ namespace AeroSim.Cockpit
                 }
                 else
                 {
-                    CockpitDataManager.onInteracion(eventType);
+                    CockpitActionContext ctx = new CockpitActionContext(eventType, eventState);
+                    CockpitDataManager.onInteracion(ctx);
                     triggerTimer = 0;
                     interacting = false;
                 }

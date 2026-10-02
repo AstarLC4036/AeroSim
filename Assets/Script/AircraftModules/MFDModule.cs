@@ -1,4 +1,5 @@
 using AeroSim.AeroPhysics;
+using AeroSim.AircraftModules.Power;
 using AeroSim.Cockpit.MFD;
 using AeroSim.Cockpit.MFD.CN.J10C;
 using AeroSim.UI;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 
 namespace AeroSim.AircraftModules
 {
-    public class MFDModule : MonoBehaviour
+    public class MFDModule : AircraftModule
     {
         [Serializable]
         public class ScreenProperty
@@ -33,33 +34,41 @@ namespace AeroSim.AircraftModules
             public MaterialPropertyBlock mpb;
         }
 
+        [Header("Display")]
         public MFDPageSetup setup;
         public List<ScreenProperty> mfdScreens = new List<ScreenProperty>();
         public List<ScreenRuntime> mfdRuntime = new List<ScreenRuntime>();
-
-        //参数参考 稍后删除:
-        [SerializeField, HideInInspector]
-        public RadarBScopeMasterPage radarBScopeDrawer;
-        [SerializeField, HideInInspector]
-        public RadarPPIMMasterPage radarPPIDrawer;
-        [SerializeField, HideInInspector]
-        public GimbalMasterPage gimbalDrawer;
-        [SerializeField, HideInInspector]
-        public PowerplantSlavePage powerplantDrawer;
-
         public TMP_FontAsset stdFont;
         // TODO: Chinese font
 
-        private Aircraft parentAircraft;
+        [Header("Power")]
+        public PowerLink link;
+        public ElectricalModule.PowerPort port;
 
-        public void Init(Aircraft aircraft)
+        ////参数参考 稍后删除:
+        //[SerializeField, HideInInspector]
+        //public RadarBScopeMasterPage radarBScopeDrawer;
+        //[SerializeField, HideInInspector]
+        //public RadarPPIMMasterPage radarPPIDrawer;
+        //[SerializeField, HideInInspector]
+        //public GimbalMasterPage gimbalDrawer;
+        //[SerializeField, HideInInspector]
+        //public PowerplantSlavePage powerplantDrawer;
+
+        public override void Init(Aircraft aircraft)
         {
-            parentAircraft = aircraft;
+            base.Init(aircraft);
+            InitPower();
 
             if (aircraft.isControlling)
             {
                 InitMFD();
             }
+        }
+
+        private void InitPower()
+        {
+            port = parentAircraft.electrical.mainBus.GetPort(link.portId);
         }
 
         /// <summary>
@@ -101,7 +110,10 @@ namespace AeroSim.AircraftModules
             {
                 foreach (ScreenRuntime mfd in mfdRuntime)
                 {
-                    mfd.drawer.UpdateCanvas();
+                    if (port.Powered)
+                    {
+                        mfd.drawer.UpdateCanvas();
+                    }
                 }
             }
         }

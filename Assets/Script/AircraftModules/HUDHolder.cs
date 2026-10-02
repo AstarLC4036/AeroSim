@@ -1,5 +1,6 @@
 using AeroSim.AeroPhysics;
 using AeroSim.AircraftModules;
+using AeroSim.AircraftModules.Power;
 using AeroSim.Cockpit;
 using AeroSim.InputSystem;
 using System.Collections;
@@ -21,6 +22,10 @@ namespace AeroSim.AircraftModules
 
         public float hudPhysicalSize = 1;
 
+        [Header("Power")]
+        public PowerLink link;
+        public ElectricalModule.PowerPort port;
+
         void Start()
         {
             RenderPipelineManager.beginCameraRendering += MoveHUD;
@@ -29,8 +34,14 @@ namespace AeroSim.AircraftModules
         public override void Init(Aircraft aircraft)
         {
             base.Init(aircraft);
+            InitPower();
             if (parentAircraft.isControlling)
                 InitCanvas();
+        }
+
+        void InitPower()
+        {
+            port = parentAircraft.electrical.mainBus.GetPort(link.portId);
         }
 
         void InitCanvas()
@@ -72,7 +83,7 @@ namespace AeroSim.AircraftModules
 
         public void Update()
         {
-            if (parentAircraft != null && parentAircraft.isControlling && hudDrawer != null)
+            if (parentAircraft != null && parentAircraft.isControlling && hudDrawer != null && port.Powered)
                 hudDrawer.UpdateCanvas();
         }
 
@@ -82,15 +93,22 @@ namespace AeroSim.AircraftModules
             {
                 if (CameraController.CurrentView.view == CameraController.CameraView.ViewType.Cockpit)
                 {
-                    if (!hudTransform.gameObject.activeSelf)
+                    if (port.Powered)
                     {
-                        hudTransform.gameObject.SetActive(true);
-                    }
+                        if (!hudTransform.gameObject.activeSelf)
+                        {
+                            hudTransform.gameObject.SetActive(true);
+                        }
 
-                    hudTransform.position = Camera.main.transform.position 
-                        + position.x * parentAircraft.transform.right
-                        + position.y * parentAircraft.transform.up
-                        + position.z * parentAircraft.transform.forward;
+                        hudTransform.position = Camera.main.transform.position
+                            + position.x * parentAircraft.transform.right
+                            + position.y * parentAircraft.transform.up
+                            + position.z * parentAircraft.transform.forward;
+                    }
+                    else if(hudTransform.gameObject.activeSelf)
+                    {
+                        hudTransform.gameObject.SetActive(false);
+                    }
                 }
                 else
                 {

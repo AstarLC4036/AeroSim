@@ -18,6 +18,7 @@
 .vscode/
 *.csproj
 *.sln
+*.slnx
 .vsconfig
 
 # Local tools and upgrade output
