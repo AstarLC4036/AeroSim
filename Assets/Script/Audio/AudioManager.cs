@@ -15,13 +15,18 @@ namespace AeroSim.Audio
         public AudioSource rwrAudio;
         public StudioEventEmitter irMslScanAudio;
         public StudioEventEmitter irMslTrackAudio;
-        public AudioClip rwrScan;
-        public AudioClip rwrLock;
-        public AudioClip rwrMsl;
-        public AudioClip irSearch;
-        public AudioClip irLock;
+        public StudioEventEmitter rwrScan;
+        public StudioEventEmitter rwrLock;
+        public StudioEventEmitter rwrMsl;
+        //public AudioClip irSearch;
+        //public AudioClip irLock;
 
-        public static bool IsPlayingRwr => Instance.rwrAudio.isPlaying;
+        public string cockpitSwitchClickPath;
+        public string cockpitButtonClickPath;
+
+        public static bool IsPlayingRwr => rwrState != 0;
+
+        private static int rwrState = 0;
 
         public void Awake()
         {
@@ -37,44 +42,44 @@ namespace AeroSim.Audio
 
         public static void RWRScan()
         {
-            if (Instance.rwrAudio.clip == Instance.rwrScan && IsPlayingRwr)
+            if (rwrState == 1 && instance.rwrScan.IsPlaying())
                 return;
 
             RWRStop();
 
-            Instance.rwrAudio.clip = Instance.rwrScan;
-            Instance.rwrAudio.loop = false;
-            Instance.rwrAudio.Play();
+            instance.rwrScan.Play();
+            rwrState = 1;
         }
 
         public static void RWRLock()
         {
-            if (Instance.rwrAudio.clip == Instance.rwrLock && IsPlayingRwr)
+            if (rwrState == 2)
                 return;
 
             RWRStop();
 
-            Instance.rwrAudio.clip = Instance.rwrLock;
-            Instance.rwrAudio.loop = true;
-            Instance.rwrAudio.Play();
+            instance.rwrLock.Play();
+            rwrState = 2;
         }
 
         public static void RWRMsl()
         {
-            if (Instance.rwrAudio.clip == Instance.rwrMsl && IsPlayingRwr)
+            if (rwrState == 3)
                 return;
 
             RWRStop();
 
-            Instance.rwrAudio.clip = Instance.rwrMsl;
-            Instance.rwrAudio.loop = true;
-            Instance.rwrAudio.Play();
+            instance.rwrMsl.Play();
+            rwrState = 3;
         }
 
         public static void RWRStop()
         {
-            if (Instance.rwrAudio.isPlaying)
-                Instance.rwrAudio.Stop();
+            instance.rwrScan.Stop();
+            instance.rwrLock.Stop();
+            instance.rwrMsl.Stop();
+
+            rwrState = 0;
         }
 
         public static void MissileIRSearch()
@@ -93,6 +98,16 @@ namespace AeroSim.Audio
         {
             Instance.irMslScanAudio.Stop();
             Instance.irMslTrackAudio.Stop();
+        }
+
+        public static void CockpitButtonClick(Vector3 position)
+        {
+            RuntimeManager.PlayOneShot(instance.cockpitButtonClickPath, position);
+        }
+
+        public static void CockpitSwitchClick(Vector3 position)
+        {
+            RuntimeManager.PlayOneShot(instance.cockpitSwitchClickPath, position);
         }
     }
 }

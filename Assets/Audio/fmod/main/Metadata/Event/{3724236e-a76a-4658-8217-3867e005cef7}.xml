@@ -28,6 +28,9 @@
 		<relationship name="timeline">
 			<destination>{2fc8c3a8-624b-4a0a-a75d-6ac3ade00980}</destination>
 		</relationship>
+		<relationship name="parameters">
+			<destination>{2a4d4836-1632-4994-b3b7-3eba5a964ef6}</destination>
+		</relationship>
 		<relationship name="banks">
 			<destination>{cc352382-048b-43a4-a2f9-29c798792571}</destination>
 		</relationship>
@@ -39,7 +42,7 @@
 	</object>
 	<object class="MasterTrack" id="{a5c87591-2604-476c-acff-eda1b381218d}">
 		<relationship name="modules">
-			<destination>{f05cd299-671f-4c29-8225-f670437c5105}</destination>
+			<destination>{6a39f6db-3baa-4393-a590-19155f68a81d}</destination>
 		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{814d2702-93b2-4314-8e0d-a64c592346ea}</destination>
@@ -58,9 +61,13 @@
 	</object>
 	<object class="EventAutomatableProperties" id="{0cafa061-cff5-424f-90ef-bf9c6b9b8a56}" />
 	<object class="MarkerTrack" id="{57ec835c-7665-4cbd-ac83-7ba08d0e16ba}" />
-	<object class="Timeline" id="{2fc8c3a8-624b-4a0a-a75d-6ac3ade00980}">
+	<object class="Timeline" id="{2fc8c3a8-624b-4a0a-a75d-6ac3ade00980}" />
+	<object class="ParameterProxy" id="{2a4d4836-1632-4994-b3b7-3eba5a964ef6}">
 		<relationship name="modules">
-			<destination>{f05cd299-671f-4c29-8225-f670437c5105}</destination>
+			<destination>{6a39f6db-3baa-4393-a590-19155f68a81d}</destination>
+		</relationship>
+		<relationship name="preset">
+			<destination>{7b5aa795-faf3-437a-895f-bf1e71d9701c}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{814d2702-93b2-4314-8e0d-a64c592346ea}">
@@ -74,12 +81,15 @@
 			<destination>{7ce3937f-63c9-40b1-88a1-3b0d4a166587}</destination>
 		</relationship>
 	</object>
-	<object class="SingleSound" id="{f05cd299-671f-4c29-8225-f670437c5105}">
+	<object class="SingleSound" id="{6a39f6db-3baa-4393-a590-19155f68a81d}">
 		<property name="length">
-			<value>0.40825058076142973</value>
+			<value>0.050000000000000003</value>
+		</property>
+		<property name="looping">
+			<value>true</value>
 		</property>
 		<relationship name="audioFile">
-			<destination>{e2d84644-2c8e-4241-ba71-34044d84e794}</destination>
+			<destination>{ba0b4d48-db75-4943-9802-dc5e97520e28}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusEffectChain" id="{69ace205-7138-4652-a694-3d30c3b0672c}">

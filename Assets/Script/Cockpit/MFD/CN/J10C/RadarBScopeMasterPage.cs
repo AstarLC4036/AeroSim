@@ -73,6 +73,8 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
             drawer.DrawRectFill(areaOffset.x, areaOffset.y - 9, areaSize.x, 12, new Color32(255, 100, 240, 130));
             drawer.DrawRectFill(areaOffset.x, areaOffset.y - 3, areaSize.x, 12, new Color32(50, 255, 50, 130));
 
+            drawer.SetClipRect(new Rect(areaOffset, areaSize));
+
             // Scaler
             for (int i = 1; i < 4; i++)
             {
@@ -143,9 +145,12 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
             {
                 Aircraft aircraft = radar.ScannedAircrafts[i];
                 var (posX, posY) = TransformWorldToRadar(aircraft.transform.position, areaSize);
+                Vector3 veloDir = data.aircraft.transform.InverseTransformDirection(aircraft.Velocity);
+                float dirAngle = Mathf.Atan2(veloDir.x, veloDir.z);
 
-                drawer.DrawCircle(areaOffset.x + posX, areaOffset.y + posY, 28, 6, Color.white);
-                drawer.DrawText((i + 1).ToString(), areaOffset.x + posX, areaOffset.y + posY - 18, Color.white, size: 36, anchor: MFDTextAnchor.Center);
+                //drawer.DrawCircle(areaOffset.x + posX, areaOffset.y + posY, 28, 6, Color.white);
+                //drawer.DrawText((i + 1).ToString(), areaOffset.x + posX, areaOffset.y + posY - 18, Color.white, size: 36, anchor: MFDTextAnchor.Center);
+                DrawScanTarget(new Vector2(areaOffset.x + posX, areaOffset.y + posY), dirAngle * Mathf.Rad2Deg + 90);
             }
 
             if (isDatalinkAvaliable)
@@ -163,12 +168,33 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
                         drawer.DrawDashedLine(areaOffset.x + posX, areaOffset.y + posY, areaOffset.x + posTX, areaOffset.y + posTY, Color.white, 8, 8);
                 }
             }
+
+            drawer.ClearClip();
         }
 
         private void DrawCursor(int x0, int y0)
         {
             drawer.DrawLine(x0 - 36, y0 - 36, x0 - 36, y0 + 36, Color.white);
             drawer.DrawLine(x0 + 36, y0 - 36, x0 + 36, y0 + 36, Color.white);
+        }
+
+        private void DrawScanTarget(Vector2 pos, float angle)
+        {
+            const float size = 50;
+            angle = 180 - angle;
+            float angle1 = angle + 180 + 30;
+            float angle2 = angle + 180 - 30;
+            Vector2 dir = new Vector2(Mathf.Cos(Mathf.Deg2Rad * angle), Mathf.Sin(Mathf.Deg2Rad * angle));
+            Vector2 delta = dir * (size / 1.7321f); // 1.7321 -> about sqrt3
+            Vector2 p1 = pos + new Vector2(Mathf.Cos(Mathf.Deg2Rad * angle1), Mathf.Sin(Mathf.Deg2Rad * angle1)) * size + delta;
+            Vector2 p2 = pos + new Vector2(Mathf.Cos(Mathf.Deg2Rad * angle2), Mathf.Sin(Mathf.Deg2Rad * angle2)) * size + delta;
+            Vector2 p3 = pos + dir * size + delta;
+
+
+            drawer.DrawLine(pos + delta, p1, Color.yellow, width: 5);
+            drawer.DrawLine(pos + delta, p2, Color.yellow, width: 5);
+            drawer.DrawLine(p1, p2, Color.yellow, width: 5);
+            drawer.DrawLine(pos + delta, p3, Color.yellow, width: 5);
         }
 
         private (int, int) TransformWorldToRadar(Vector3 worldPos, Vector2Int size = new Vector2Int())

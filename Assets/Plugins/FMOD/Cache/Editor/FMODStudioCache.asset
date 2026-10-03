@@ -92,7 +92,7 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639235618364374365
+  lastModified: 639266723706951561
   FileSizes: []
   Exists: 1
 --- !u!114 &-5437177343942480124
@@ -112,6 +112,30 @@ MonoBehaviour:
   StudioPath: bank:/Master
   lastModified: 639233675329354029
   FileSizes: []
+  Exists: 1
+--- !u!114 &-5390924392890503925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/rwr_track/blank
+  m_EditorClassIdentifier: 
+  Name: blank
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2846286456
+    data2: 462634448
+  Type: 0
+  IsGlobal: 0
+  Labels: []
   Exists: 1
 --- !u!114 &-5360262192105973563
 MonoBehaviour:
@@ -133,6 +157,30 @@ MonoBehaviour:
   ID:
     data1: 2907424955
     data2: 274653565
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &-5155790523902498870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/rwr_msl/blank
+  m_EditorClassIdentifier: 
+  Name: blank
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2846286456
+    data2: 462634448
   Type: 0
   IsGlobal: 0
   Labels: []
@@ -160,10 +208,38 @@ MonoBehaviour:
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
+  Parameters:
+  - {fileID: 2091702345481394317}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-4558748108912523774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/cockpit-interaction/switch
+  m_EditorClassIdentifier: 
+  Path: event:/cockpit-interaction/switch
+  Guid:
+    Data1: -1493914882
+    Data2: 1282349125
+    Data3: 2093819070
+    Data4: 1262132292
+  Banks:
+  - {fileID: 1183586304176978361}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
   Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 120
+  Length: 20
 --- !u!114 &-4203807877551022969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,10 +275,10 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639238005522590017
+  lastModified: 639266723706961535
   FileSizes:
   - Name: 
-    Value: 1408
+    Value: 1514
   Exists: 1
 --- !u!114 &-3642360278734224667
 MonoBehaviour:
@@ -333,7 +409,7 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/CombatUI.bank
   Name: CombatUI
   StudioPath: bank:/CombatUI
-  lastModified: 639238005522570010
+  lastModified: 639266741055293468
   FileSizes: []
   Exists: 1
 --- !u!114 &11400000
@@ -362,13 +438,15 @@ MonoBehaviour:
   - {fileID: 4402453616846562763}
   - {fileID: 6352135963291469518}
   - {fileID: -4914593333746297946}
+  - {fileID: -4558748108912523774}
+  - {fileID: 5427571187722906849}
   EditorParameters: []
   MasterBanks:
   - {fileID: -6168637905536723244}
   StringsBanks:
   - {fileID: -4193965246906987305}
   cacheVersion: 131860
-  cacheTime: 639238005522590017
+  cacheTime: 639266741055293468
   SerializableEventsDict:
   - key: event:/engine
     index: 0
@@ -386,6 +464,8 @@ MonoBehaviour:
     index: 6
   - key: event:/rwr_scan
     index: 7
+  - key: event:/cockpit-interaction/switch
+    index: 8
 --- !u!114 &44477123413855831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,11 +488,12 @@ MonoBehaviour:
   - {fileID: -539519499582093801}
   IsStream: 0
   Is3D: 0
-  IsOneShot: 1
-  Parameters: []
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -5390924392890503925}
   MinDistance: 1
   MaxDistance: 20
-  Length: 408
+  Length: 0
 --- !u!114 &820947333350387991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -482,8 +563,32 @@ MonoBehaviour:
   Path: Assets/Audio/fmod/main/Build/Desktop/Aircraft.bank
   Name: Aircraft
   StudioPath: bank:/Aircraft
-  lastModified: 639238005522570010
+  lastModified: 639266723706906453
   FileSizes: []
+  Exists: 1
+--- !u!114 &2091702345481394317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/rwr_scan/blank
+  m_EditorClassIdentifier: 
+  Name: blank
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2846286456
+    data2: 462634448
+  Type: 0
+  IsGlobal: 0
+  Labels: []
   Exists: 1
 --- !u!114 &2932350167665549742
 MonoBehaviour:
@@ -646,6 +751,33 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &5427571187722906849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/cockpit-interaction/button
+  m_EditorClassIdentifier: 
+  Path: event:/cockpit-interaction/button
+  Guid:
+    Data1: 1125089368
+    Data2: 1290952556
+    Data3: 2112744331
+    Data4: -448829641
+  Banks:
+  - {fileID: 1183586304176978361}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 2000
 --- !u!114 &6009559897295882839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -692,11 +824,12 @@ MonoBehaviour:
   - {fileID: -539519499582093801}
   IsStream: 0
   Is3D: 0
-  IsOneShot: 1
-  Parameters: []
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -5155790523902498870}
   MinDistance: 1
   MaxDistance: 20
-  Length: 210
+  Length: 0
 --- !u!114 &7743342770985938294
 MonoBehaviour:
   m_ObjectHideFlags: 0

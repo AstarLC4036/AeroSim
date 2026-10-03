@@ -108,9 +108,9 @@ namespace AeroSim.AircraftModules
         {
             if (parentAircraft.isControlling)
             {
-                foreach (ScreenRuntime mfd in mfdRuntime)
+                if (port.Powered)
                 {
-                    if (port.Powered)
+                    foreach (ScreenRuntime mfd in mfdRuntime)
                     {
                         mfd.drawer.UpdateCanvas();
                     }

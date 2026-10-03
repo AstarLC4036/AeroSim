@@ -9,13 +9,17 @@ namespace AeroSim.Cockpit
 {
     public class CockpitButton : CockpitInteractable
     {
+        [Header("Interaction")]
+        public float triggerTime;
+        public CockpitDataManager.InteractionEvent eventType;
+        public int eventState;
+        [Header("Visual")]
         public Transform visualButton;
         public Collider pressTrigger;
         public Axis pushAxis;
         public float pushDst;
-        public float triggerTime;
-        public CockpitDataManager.InteractionEvent eventType;
-        public int eventState;
+        [Header("Audio")]
+        public bool playSoundEffect = false;
 
         private float triggerTimer;
         private bool interacting = false;

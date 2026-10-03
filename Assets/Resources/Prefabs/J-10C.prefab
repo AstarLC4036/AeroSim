@@ -73370,11 +73370,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 961737dbefce2dc4bae6c60ccd14f541, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  eventType: 2
   visualSwitch: {fileID: 4660900614890297735}
   pressTrigger: {fileID: 892361249658961527}
   rotateAxis: 2
   rotateAngle: 180
-  eventType: 2
+  playSoundEffect: 1
 --- !u!65 &892361249658961527 stripped
 BoxCollider:
   m_CorrespondingSourceObject: {fileID: 6784712806695436036, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73445,13 +73446,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c31ffa72b1ef3448bf95c53ebb24902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerTime: 0
+  eventType: 5
+  eventState: 0
   visualButton: {fileID: 4556072992255712971}
   pressTrigger: {fileID: 4715631941119115462}
   pushAxis: 2
   pushDst: 0.001
-  triggerTime: 0
-  eventType: 5
-  eventState: 0
+  playSoundEffect: 0
 --- !u!4 &1535992594340269670 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5123575397172727573, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73530,11 +73532,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 961737dbefce2dc4bae6c60ccd14f541, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  eventType: 3
   visualSwitch: {fileID: 7827894554038311084}
   pressTrigger: {fileID: 970765575829352253}
   rotateAxis: 2
   rotateAngle: 180
-  eventType: 3
+  playSoundEffect: 1
 --- !u!1 &3285080227168290576 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9213408822241494627, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73643,13 +73646,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c31ffa72b1ef3448bf95c53ebb24902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerTime: 4
+  eventType: 1
+  eventState: 0
   visualButton: {fileID: 6951808123872039798}
   pressTrigger: {fileID: 2606160242930551647}
   pushAxis: 2
   pushDst: 0.003
-  triggerTime: 4
-  eventType: 1
-  eventState: 0
+  playSoundEffect: 0
 --- !u!1 &6533932499609636619 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 641579811956706936, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73668,13 +73672,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c31ffa72b1ef3448bf95c53ebb24902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerTime: 0
+  eventType: 5
+  eventState: 2
   visualButton: {fileID: 1157964573698280035}
   pressTrigger: {fileID: 7117975362454265465}
   pushAxis: 2
   pushDst: 0.001
-  triggerTime: 0
-  eventType: 5
-  eventState: 2
+  playSoundEffect: 0
 --- !u!114 &6728034450386719469 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1086684873047217054, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73767,13 +73772,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c31ffa72b1ef3448bf95c53ebb24902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerTime: 0
+  eventType: 5
+  eventState: 1
   visualButton: {fileID: 1535992594340269670}
   pressTrigger: {fileID: 3669796375184550250}
   pushAxis: 2
   pushDst: 0.001
-  triggerTime: 0
-  eventType: 5
-  eventState: 1
+  playSoundEffect: 0
 --- !u!4 &7827894554038311084 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4532922582756366815, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73822,11 +73828,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 961737dbefce2dc4bae6c60ccd14f541, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  eventType: 0
   visualSwitch: {fileID: 6881609184501629339}
   pressTrigger: {fileID: 3332263719012045583}
   rotateAxis: 2
   rotateAngle: 180
-  eventType: 0
+  playSoundEffect: 1
 --- !u!1 &8958934680861850528 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3323355455737281235, guid: bc693af4e415ad64ebde753662688eb8,
@@ -73845,11 +73852,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 961737dbefce2dc4bae6c60ccd14f541, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  eventType: 4
   visualSwitch: {fileID: 6749748149766500857}
   pressTrigger: {fileID: 2800700604202354625}
   rotateAxis: 2
   rotateAngle: 180
-  eventType: 4
+  playSoundEffect: 1
 --- !u!4 &9020457677489586244 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3415263414054240567, guid: bc693af4e415ad64ebde753662688eb8,

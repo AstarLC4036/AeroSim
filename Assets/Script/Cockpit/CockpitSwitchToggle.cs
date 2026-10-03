@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AeroSim.Audio;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -7,11 +8,15 @@ namespace AeroSim.Cockpit
 {
     public class CockpitSwitchToggle : CockpitInteractable
     {
+        [Header("Interaction")]
+        public CockpitDataManager.InteractionEvent eventType;
+        [Header("Visual")]
         public Transform visualSwitch;
         public Collider pressTrigger;
         public Axis rotateAxis;
         public float rotateAngle = 180;
-        public CockpitDataManager.InteractionEvent eventType;
+        [Header("Audio")]
+        public bool playSoundEffect = false;
 
         private bool toggled = false;
 
@@ -50,6 +55,9 @@ namespace AeroSim.Cockpit
                 ) * rotateAngle;
                 visualSwitch.localEulerAngles -= dir;
             }
+
+            if (playSoundEffect)
+                AudioManager.CockpitSwitchClick(transform.position);
         }
 
         public override void OnQuitInteraction()

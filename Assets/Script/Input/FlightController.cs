@@ -129,13 +129,21 @@ namespace AeroSim.InputSystem
 
         public void Update()
         {
-            if(!isOperationMode && Cursor.visible)
+            if (!isOperationMode)
             {
-                Cursor.visible = false;
+                if(Cursor.lockState != CursorLockMode.Confined)
+                    Cursor.lockState = CursorLockMode.Confined;
+                
+                if(Cursor.visible)
+                    Cursor.visible = false;
             }
-            else if (isOperationMode && !Cursor.visible)
+            else if (isOperationMode)
             {
-                Cursor.visible = true;
+                if (Cursor.lockState != CursorLockMode.Locked)
+                    Cursor.lockState = CursorLockMode.Locked;
+
+                if (!Cursor.visible)
+                    Cursor.visible = true;
             }
 
             if(aircraft != null && aircraft.isControlling)
