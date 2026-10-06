@@ -53,6 +53,12 @@ namespace AeroSim.UI
 
         private void Update()
         {
+            UpdateText();
+            UpdateRWRUIAvailable();
+        }
+
+        private void UpdateText()
+        {
             // True altitude: the same convention as Aircraft / AtmosphereEnv
             float altitude = aircraft.transform.position.y - FloatingOrigin.origin.y;
             float sonic = Mathf.Max(AtmosphereEnv.SonicSpeed(altitude), 1f);
@@ -68,6 +74,18 @@ namespace AeroSim.UI
             iasText.text = $"{((int)(ias / 1000 * 3600 * 100)) / 100} <size=16>km/h</size>";
             machSpdText.text = $"{(int)(aircraftRB.velocity.magnitude / sonic * 100) / 100f} <size=16>Mach</size>";
             overloadText.text = $"{(int)(aircraft.G * 10) / 10f} <size=16>G</size>";
+        }
+
+        private void UpdateRWRUIAvailable()
+        {
+            if(aircraft.rwr.port.Powered && !rwr.gameObject.activeSelf)
+            {
+                rwr.gameObject.SetActive(true);
+            }
+            else if (!aircraft.rwr.port.Powered && rwr.gameObject.activeSelf)
+            {
+                rwr.gameObject.SetActive(false);
+            }
         }
 
         public void DisplayRWRMsgBG(bool display = true)

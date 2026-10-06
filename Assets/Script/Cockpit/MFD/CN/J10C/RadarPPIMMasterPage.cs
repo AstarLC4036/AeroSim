@@ -34,6 +34,7 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
             parentAircraft = ctx.aircraft;
             radar = ctx.aircraft.radar;
             this.drawer = drawer;
+            size = ctx.mfdDrawer.size;
 
             if (parentAircraft.datalink != null)
             {
@@ -44,6 +45,7 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
         public void DrawPage()
         {
             DrawRadar();
+            DrawSeparator();
         }
 
         public void OnButtonClick(int buttonIndex)
@@ -90,6 +92,11 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
         Vector2Int TransformPositionToPPI(Vector3 position, Vector2Int center)
         {
             return TransformPositionToPPI(position, center.x, center.y);
+        }
+
+        void DrawSeparator()
+        {
+            drawer.DrawRectFillCenter(512, size.y - 1024, 512, 2, Color.white);
         }
     }
 }

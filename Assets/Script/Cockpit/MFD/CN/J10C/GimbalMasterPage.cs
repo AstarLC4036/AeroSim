@@ -15,6 +15,7 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
         private MFDGraphicHelper drawer;
         private Aircraft parentAircraft;
         public Rect zone;
+        public Vector2Int size;
         public Color bgColor;
         public Rect gimbalRect;
         public float gimbalContentW;
@@ -31,11 +32,13 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
             this.drawer = drawer;
             this.parentAircraft = ctx.aircraft;
             bgColor = ctx.mfdDrawer.bgColor;
+            size = ctx.mfdDrawer.size;
         }
 
         public void DrawPage()
         {
             DrawGimbal();
+            DrawSeparator();
         }
 
         public void OnButtonClick(int buttonIndex)
@@ -51,6 +54,11 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
             drawer.DrawHalfPlane(gimbalRect.x, gimbalRect.y, -rollAngle, gimbalContentW, groundColor);
             drawer.FillOutsideDisc(gimbalRect.x, gimbalRect.y, gimbalStencilRadius, bgColor);
             drawer.ClearClip();
+        }
+
+        void DrawSeparator()
+        {
+            drawer.DrawRectFillCenter(512, size.y - 1024, 512, 2, Color.white);
         }
     }
 }

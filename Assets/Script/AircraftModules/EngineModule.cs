@@ -1,4 +1,5 @@
 using AeroSim.AeroPhysics;
+using AeroSim.AircraftModules.Power;
 using AeroSim.Audio;
 using AeroSim.Cockpit;
 using AeroSim.InputSystem;

@@ -224,7 +224,7 @@ namespace AeroSim.InputSystem
 
             if (!enableMoveCameraDirectly)
             {
-                fwd = Vector3.Lerp(fwd, Aircraft.main.targetDir, aimLerpParam * Time.fixedDeltaTime);
+                fwd = Vector3.Lerp(fwd, Aircraft.main.targetDir, aimLerpParam * Time.deltaTime);
             }
             else if (isStableTargetAvaliable && !isMoveingView)
             {

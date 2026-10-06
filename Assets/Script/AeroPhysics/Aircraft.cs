@@ -51,7 +51,7 @@ namespace AeroSim.AeroPhysics
 
         [Header("Modules")]
         public AircraftModule[] modules; // TODO
-        public CockpitInteracionHandler cockpitInteracion;
+        public CockpitInteractionHandler cockpitInteracion;
         public ElectricalModule electrical;
         public EngineModule engine;
         public RadarModule radar;

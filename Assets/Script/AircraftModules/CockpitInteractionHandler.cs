@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AeroSim.AircraftModules
 {
-    public class CockpitInteracionHandler : AircraftModule
+    public class CockpitInteractionHandler : AircraftModule
     {
         public void Start()
         {

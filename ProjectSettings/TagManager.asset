@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - PW - Nature
+  - PW - Prop
+  - PW - Building
   layers:
   - Default
   - TransparentFX
@@ -14,10 +17,10 @@ TagManager:
   - Aircraft
   - Missle
   - Cockpit
-  - 
-  - 
-  - 
-  - 
+  - PW_VFX
+  - PW_Object_Small
+  - PW_Object_Medium
+  - PW_Object_Large
   - 
   - 
   - 

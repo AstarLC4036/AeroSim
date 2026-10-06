@@ -1,4 +1,5 @@
 ﻿using AeroSim.AeroPhysics;
+using AeroSim.AircraftModules.Power;
 using AeroSim.InputSystem;
 using AeroSim.UI;
 using System;
@@ -81,6 +82,11 @@ namespace AeroSim.AircraftModules
         public Aircraft lockedAircraft;
         protected List<Missile> trackingMsls = new List<Missile>();
 
+
+        [Header("Power")]
+        public PowerLink link;
+        public ElectricalModule.PowerPort port;
+
         protected bool isLocked = false;
         public bool IsLocked => isLocked;
 
@@ -95,6 +101,9 @@ namespace AeroSim.AircraftModules
         private bool isLockedTargetOutOfRange = false;
         [SerializeField]
         private float unlockTimer = 0;
+
+        [Header("Debug")]
+        public bool noPowerSupply; // work without power
 
         protected virtual void Awake()
         {
@@ -143,17 +152,36 @@ namespace AeroSim.AircraftModules
                 case RadarCarrier.Ground:
                     break;
             }
+
+            InitPower();
+        }
+
+        private void InitPower()
+        {
+            port = parentAircraft.electrical.mainBus.GetPort(link.portId);
         }
 
         private void Update()
         {
-            UpdateInput();
+            if (noPowerSupply || (port != null && port.Powered))
+            {
+                UpdateInput();
+            }
         }
 
         private void FixedUpdate()
         {
-            UpdateScan();
-            UpdateTransmisson();
+            if (noPowerSupply || (port != null && port.Powered))
+            {
+                UpdateScan();
+                UpdateTransmisson();
+            }
+
+            if(noPowerSupply || (port != null && !port.Powered && (scannedAircrafts.Count > 0 || scannedMissles.Count > 0)))
+            {
+                scannedAircrafts.Clear();
+                scannedMissles.Clear();
+            }
         }
 
         public virtual bool TargetDetect(Vector3 position, bool isLocal = false)

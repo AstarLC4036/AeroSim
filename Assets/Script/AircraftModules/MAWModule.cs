@@ -1,4 +1,5 @@
 ﻿using AeroSim.AeroPhysics;
+using AeroSim.AircraftModules.Power;
 using AeroSim.UI;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,19 +40,46 @@ namespace AeroSim.AircraftModules
         public MAWType type = MAWType.None;
         public List<Missile> mslDetected = new List<Missile>();
 
+        [Header("Power")]
+        public PowerLink link;
+        public ElectricalModule.PowerPort port;
+
+        public override void Init(Aircraft aircraft)
+        {
+            base.Init(aircraft);
+            InitPower();
+        }
+
+        void InitPower()
+        {
+            port = parentAircraft.electrical.mainBus.GetPort(link.portId);
+        }
+
         private void FixedUpdate()
         {
-            foreach(Missile msl in AircraftManager.Missles)
+            UpdateMAWS();
+        }
+
+        void UpdateMAWS()
+        {
+            if (port.Powered)
             {
-                bool detected = IsDetectable(msl);
-                if (detected && !mslDetected.Exists(x => x == msl))
+                foreach (Missile msl in AircraftManager.Missles)
                 {
-                    mslDetected.Add(msl);
+                    bool detected = IsDetectable(msl);
+                    if (detected && !mslDetected.Exists(x => x == msl))
+                    {
+                        mslDetected.Add(msl);
+                    }
+                    else if (!detected && mslDetected.Exists(x => x == msl))
+                    {
+                        mslDetected.Remove(msl);
+                    }
                 }
-                else if(!detected && mslDetected.Exists(x => x == msl))
-                {
-                    mslDetected.Remove(msl);
-                }
+            }
+            else if(mslDetected.Count > 0)
+            {
+                mslDetected.Clear();
             }
         }
 

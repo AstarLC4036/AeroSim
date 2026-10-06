@@ -29,7 +29,12 @@ fmod_editor.log
 .dsh-handoff/
 .dsh-scratch/
 .dsh-plugin-inspect/
+Tools/
 
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Plugins but never used
+Procedural Worlds/
+Gaia User Data/

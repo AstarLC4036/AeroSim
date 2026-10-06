@@ -1,12 +1,13 @@
-﻿using System.Collections;
-using AeroSim.UI;
-using AeroSim.AeroPhysics;
-using UnityEngine;
+﻿using AeroSim.AeroPhysics;
+using AeroSim.AircraftModules.Power;
 using AeroSim.Audio;
-using System.Collections.Generic;
-using System;
+using AeroSim.UI;
 using AeroSim.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEngine;
 
 namespace AeroSim.AircraftModules
 {
@@ -50,9 +51,12 @@ namespace AeroSim.AircraftModules
 
         public float range = 20;
 
-        //private RadarModule radar; //rwr只是一个接收机，不依赖机载雷达
-
+        [Header("Basic")]
         public List<ReceivedObjectData> receivedObjects = new List<ReceivedObjectData>();
+
+        [Header("Power")]
+        public PowerLink link;
+        public ElectricalModule.PowerPort port;
 
         private void Start()
         {
@@ -62,13 +66,25 @@ namespace AeroSim.AircraftModules
         // Update is called once per frame
         void Update()
         {
-            UpdateObjectsLifetime();
+            if(port != null && port.Powered)
+                UpdateObjectsLifetime();
         }
 
         void OnGUI()
         {
-            if(parentAircraft.isControlling)
+            if(parentAircraft.isControlling && port != null && port.Powered)
                 UpdateObjects();
+        }
+
+        public override void Init(Aircraft aircraft)
+        {
+            base.Init(aircraft);
+            InitPower();
+        }
+
+        private void InitPower()
+        {
+            port = parentAircraft.electrical.mainBus.GetPort(link.portId);
         }
 
         // actually it receives object data from other object

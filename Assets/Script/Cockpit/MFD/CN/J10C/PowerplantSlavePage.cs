@@ -17,6 +17,7 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
         private MFDGraphicHelper drawer;
 
         public Color bgColor;
+        public Vector2Int size;
         public Rect rect;
         public float rpmWidth;
         public float rpmIndicatorSize;
@@ -34,6 +35,7 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
             data = ctx;
             this.drawer = drawer;
             bgColor = ctx.mfdDrawer.bgColor;
+            size = ctx.mfdDrawer.size;
         }
 
         public void OnButtonClick(int buttonIndex)

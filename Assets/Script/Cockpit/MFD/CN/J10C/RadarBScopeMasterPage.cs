@@ -59,6 +59,7 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
         {
             UpdateData();
             DrawRadar();
+            DrawSeparator();
         }
 
         public void DrawRadar()
@@ -206,6 +207,11 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
             int posY = (int)(Mathf.Clamp01(dst / maxDrawDistance / 1000) * size.y);
 
             return (posX, posY);
+        }
+
+        void DrawSeparator()
+        {
+            drawer.DrawRectFillCenter(512, size.y - 1024, 512, 2, Color.white);
         }
     }
 }

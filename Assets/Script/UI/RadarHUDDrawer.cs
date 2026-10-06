@@ -38,6 +38,7 @@ namespace AeroSim.UI
         public int vecLineLength = 30;
 
         [Header("Config - UI")]
+        public GameObject radarObject;
         public TMP_Text modeLabel; 
         public TMP_Text searchRangeLabel;
         public TMP_Text minAngleXLabel;
@@ -65,6 +66,18 @@ namespace AeroSim.UI
         public static void UpdateStatusLabel()
         {
             Instance.OnRadarStatusChange();
+        }
+
+        private void UpdateUIAvailable()
+        {
+            if (radar.port.Powered && !radarObject.activeSelf)
+            {
+                radarObject.SetActive(true);
+            }
+            else if (!radar.port.Powered && radarObject.activeSelf)
+            {
+                radarObject.SetActive(false);
+            }
         }
 
         public void Init(Aircraft aircraft)
@@ -100,6 +113,7 @@ namespace AeroSim.UI
             {
                 UpdateCanvas();
                 UpdateInput();
+                UpdateUIAvailable();
             }
         }
 
