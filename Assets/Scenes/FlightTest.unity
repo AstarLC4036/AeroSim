@@ -67271,6 +67271,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: J-10C
       objectReference: {fileID: 0}
+    - target: {fileID: 328785237261412725, guid: 4221c1db7874d52459bacdbba637d19a,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 351221970579404809, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}
       propertyPath: m_IsActive
@@ -68080,11 +68085,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.000988841
-      objectReference: {fileID: 0}
-    - target: {fileID: 7461631984622656303, guid: 4221c1db7874d52459bacdbba637d19a,
-        type: 3}
-      propertyPath: isEngineToggled
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7544705071075408140, guid: 4221c1db7874d52459bacdbba637d19a,
         type: 3}

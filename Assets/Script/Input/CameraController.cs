@@ -219,9 +219,6 @@ namespace AeroSim.InputSystem
 
         void LateUpdate()
         {
-            Vector3 rootPos = target.position + currentView.deltaPos.z * fwd + Vector3.up * currentView.deltaPos.y + target.forward * currentView.offset.z + target.right * currentView.offset.x + target.up * currentView.offset.y;
-            transform.position = rootPos + fwd * currentView.eyeDist;
-
             if (!enableMoveCameraDirectly)
             {
                 fwd = Vector3.Lerp(fwd, Aircraft.main.targetDir, aimLerpParam * Time.deltaTime);
@@ -232,6 +229,9 @@ namespace AeroSim.InputSystem
             }
 
             transform.LookAt(transform.position + fwd, currentView.followRotation ? target.up : Vector3.up);
+
+            Vector3 rootPos = target.position + currentView.deltaPos.z * fwd + Vector3.up * currentView.deltaPos.y + target.forward * currentView.offset.z + target.right * currentView.offset.x + target.up * currentView.offset.y;
+            transform.position = rootPos + fwd * currentView.eyeDist;
         }
 
         private void OnDrawGizmosSelected()

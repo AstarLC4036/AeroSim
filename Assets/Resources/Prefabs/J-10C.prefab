@@ -3175,7 +3175,7 @@ MonoBehaviour:
   abLevel: 0
   abEngaged: 0
   thurst: 145000
-  isEngineToggled: 1
+  isEngineToggled: 0
   audioController: {fileID: 6072705150273420287}
   maxPitch: 1
   minPitch: 0

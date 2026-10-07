@@ -125,15 +125,15 @@ namespace AeroSim.AircraftModules
                     if (lockingTimer != 0)
                         lockingTimer = 0;
 
-                    float minWeight = float.MaxValue;
+                    float maxWeight = float.MinValue;
                     IRSource tempTarget = null;
                     foreach (var irSrc in irList)
                     {
                         float totalWeight = irSrc.intensity * 1f + 1 / Mathf.Max(Vector3.Angle(seekerTransform.forward, irSrc.transform.position - seekerTransform.position), 0.001f) * 1f;
-                        if (totalWeight < minWeight)
+                        if (totalWeight > maxWeight)
                         {
                             tempTarget = irSrc;
-                            minWeight = totalWeight;
+                            maxWeight = totalWeight;
                         }
                     }
 
@@ -143,7 +143,7 @@ namespace AeroSim.AircraftModules
                         float intensityFactor = Mathf.Clamp01(tempTarget.intensity / 5f);   // range 0 ~ 5
                         float intensityMultiplier = Mathf.Lerp(1.5f, 0.5f, intensityFactor);
 
-                        float distanceFactor = Mathf.Clamp01(Vector3.Distance(transform.position, tempTarget.transform.position) / maxRange); // 0 ~ 1
+                        float distanceFactor = Mathf.Clamp01(maxRange / Vector3.Distance(transform.position, tempTarget.transform.position)); // 0 ~ 1
                         float distanceMultiplier = Mathf.Lerp(0.4f, 1.0f, distanceFactor);
 
                         SetTarget(tempTarget.transform);

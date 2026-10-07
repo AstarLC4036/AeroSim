@@ -41,8 +41,8 @@ namespace AeroSim.AircraftModules
             {
                 if (currentMissle.lockState != Missile.MissileState.None)
                 {
-                    currentMissle.ShutdownSeeker();
-                    VehicleLog.LogMsg($"{currentMissle.nameId} > 导引头关机");
+                    if(ShutdownSeeker())
+                        VehicleLog.LogMsg($"{currentMissle.nameId} > 导引头关机");
                 }
             }
 
@@ -150,6 +150,27 @@ namespace AeroSim.AircraftModules
                 if (currentMissle.hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
                 {
                     parentAircraft.datalink.RegisterDatalink(currentMissle, target);
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ShutdownSeeker()
+        {
+            if (currentMissle.type == Missile.MissileType.IR)
+            {
+                currentMissle.ShutdownSeeker();
+                return true;
+            }
+            else if (currentMissle.type == Missile.MissileType.Active && target != null)
+            {
+                currentMissle.ShutdownSeeker();
+
+                if (currentMissle.hasDatalink && parentAircraft != null && parentAircraft.datalink != null)
+                {
+                    parentAircraft.datalink.UnregisterDatalink(currentMissle);
                 }
                 return true;
             }

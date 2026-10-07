@@ -421,6 +421,7 @@ namespace AeroSim.AircraftModules
         {
             if (lockState != MissileState.None)
             {
+                target = null;
                 lockState = MissileState.None;
                 lockTimer = lockTime;
                 lockingTimer = 0;

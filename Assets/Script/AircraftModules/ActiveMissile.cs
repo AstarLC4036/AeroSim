@@ -27,6 +27,12 @@ namespace AeroSim.AircraftModules
             base.ActiveSeeker();
         }
 
+        public override void ShutdownSeeker()
+        {
+            base.ShutdownSeeker();
+            status = 0;
+        }
+
         protected override void UpdateState(float dt)
         {
             UpdateBaseState();
