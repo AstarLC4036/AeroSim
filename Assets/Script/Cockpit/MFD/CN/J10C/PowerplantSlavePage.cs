@@ -50,10 +50,11 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
 
         void DrawPowerplant()
         {
-            float N1 = CockpitDataManager.GetDataFloat(CockpitDataManager.CockpitDataType.EngineRPM_N1);
+            //float N1 = CockpitDataManager.GetDataFloat(CockpitDataManager.CockpitDataType.EngineRPM_N1);
             float N2 = CockpitDataManager.GetDataFloat(CockpitDataManager.CockpitDataType.EngineRPM_N2);
-            DrawRPMIndicator(rect.x - rpmPaddingX, rect.y, N1); // -1/2 + 1/4
-            DrawRPMIndicator(rect.x - rpmPaddingX + rpmGapWidth, rect.y, N2); // -1/2 + 2/4
+            float T4 = CockpitDataManager.GetDataFloat(CockpitDataManager.CockpitDataType.EngineT4);
+            DrawRPMIndicator(rect.x - rpmPaddingX, rect.y, N2); // -1/2 + 1/4
+            DrawRPMIndicator(rect.x - rpmPaddingX + rpmGapWidth, rect.y, Mathf.Min(T4, 1500) / 1500); // -1/2 + 2/4
             drawer.DrawRectFill(
                 rect.x - rpmPaddingX + rpmGapWidth + fuelMarginWidth,
                 rect.y - rpmIndicatorSize / 2, fuelDisplayWidth,
@@ -62,14 +63,13 @@ namespace AeroSim.Cockpit.MFD.CN.J10C
                 rect.x - rpmPaddingX + rpmGapWidth + fuelMarginWidth + fuelGapWidth,
                 rect.y - rpmIndicatorSize / 2, fuelDisplayWidth,
                 rpmIndicatorSize, Color.green);
-            DrawRPMTextLabel(rect.x - rpmPaddingX, rect.y + rpmIndicatorSize / 2 + 20, "N1", N1);
-            DrawRPMTextLabel(rect.x - rpmPaddingX + rpmGapWidth, rect.y + rpmIndicatorSize / 2 + 20, "N2", N2);
+            DrawRPMTextLabel(rect.x - rpmPaddingX, rect.y + rpmIndicatorSize / 2 + 20, "N2", N2);
+            DrawRPMTextLabel(rect.x - rpmPaddingX + rpmGapWidth, rect.y + rpmIndicatorSize / 2 + 20, "T4", T4 / 100);
         }
 
-        void DrawRPMIndicator(float x0, float y0, float N)
+        void DrawRPMIndicator(float x0, float y0, float param)
         {
-
-            float angle = N * 0.91f * -180;
+            float angle = param * 0.91f * -180;
             drawer.DrawArc(x0, y0 + rpmIndicatorSize / 2, rpmIndicatorSize, rpmWidth, -180, 0, Color.green);
             drawer.DrawArc(x0, y0 + rpmIndicatorSize / 2, rpmIndicatorSize, rpmWidth - 10, -179, -1, bgColor, (int)MFDBlend.Replace);
             drawer.DrawArc(x0, y0 + rpmIndicatorSize / 2, rpmIndicatorSize, rpmWidth - 10, 0, angle, Color.green);
