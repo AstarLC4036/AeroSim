@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   skipIterations:
     m_OverrideState: 0
     m_Value: 1
@@ -411,6 +411,58 @@ MonoBehaviour:
   fadeInDistance:
     m_OverrideState: 0
     m_Value: 5000
+--- !u!114 &-210776797529074585
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b47656bfa7ea445bab9cb233d2d111, type: 3}
+  m_Name: AtomosphereScatteringEffect
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  worldOffset:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0}
+  center:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: -6371, z: 0}
+  height:
+    m_OverrideState: 1
+    m_Value: 100
+  radius:
+    m_OverrideState: 1
+    m_Value: 6371
+  exposure:
+    m_OverrideState: 1
+    m_Value: 20
+  rayleighHeight:
+    m_OverrideState: 1
+    m_Value: 8
+  rayleighScatteringCoeff:
+    m_OverrideState: 1
+    m_Value: {x: 0.0055, y: 0.013, z: 0.0224}
+  mieHeight:
+    m_OverrideState: 1
+    m_Value: 1.2
+  mieScatteringCoeff:
+    m_OverrideState: 1
+    m_Value: 0.004
+  anisotropicParam:
+    m_OverrideState: 1
+    m_Value: 0.76
+  viewSteps:
+    m_OverrideState: 1
+    m_Value: 32
+  lightSteps:
+    m_OverrideState: 1
+    m_Value: 8
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,6 +481,7 @@ MonoBehaviour:
   - {fileID: -7011558710299706105}
   - {fileID: -4868662932838349906}
   - {fileID: -6724765990067523996}
+  - {fileID: -210776797529074585}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3

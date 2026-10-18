@@ -26,9 +26,10 @@ namespace AeroSim.Utils
         //public List<VisualEffect> worldVisualEffects = new List<VisualEffect>();
         
         // Renderering
-        public readonly int worldOffsetProp = Shader.PropertyToID("_WorldOriginOffset");
+        public readonly int worldOffsetPropSkybox = Shader.PropertyToID("_WorldOriginOffset");
 
         public Material skyboxMaterial;
+        public Material terrainMaterial;
 
         private void Awake()
         {
@@ -56,12 +57,6 @@ namespace AeroSim.Utils
             //worldVisualEffects.AddRange(allVE);
 
             onOriginChange += ShiftOrigin;
-
-            //Set atmosphere height offset for skybox shader
-            if (skyboxMaterial != null)
-            {
-                skyboxMaterial.SetFloat("_DeltaHeight", -origin.y / 1000);
-            }
         }
 
         // Update is called once per frame
@@ -133,14 +128,21 @@ namespace AeroSim.Utils
             //    trail.SetPositions(points);
             //}
 
+            //Set atmosphere height offset for skybox shader
             if (skyboxMaterial != null)
             {
                 skyboxMaterial.SetFloat("_DeltaHeight", -origin.y / 1000);
+
+            }
+            if (terrainMaterial != null)
+            {
+                terrainMaterial.SetVector("_WorldOffset", -origin);
             }
         }
 
         private void OnApplicationQuit()
         {
+            origin = Vector3.zero;
             onOriginChange -= ShiftOrigin;
         }
     }

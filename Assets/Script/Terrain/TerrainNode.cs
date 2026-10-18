@@ -216,7 +216,8 @@ namespace AeroSim.Terrain
         /// </summary>
         /// <param name="layers">Noise layers, owned and kept alive by the generator.</param>
         /// <param name="indexBuffer">Index buffer for this chunk's res, shared with every chunk of the same res.</param>
-        public bool ScheduleBuild(NativeArray<NoiseLayer> layers, NativeArray<int> indexBuffer)
+        /// <param name="demLevel">DEM level this chunk should sample, or a default one to use the noise layers.</param>
+        public bool ScheduleBuild(NativeArray<NoiseLayer> layers, NativeArray<int> indexBuffer, DemLevel demLevel)
         {
             if (filter == null)
             {
@@ -239,13 +240,36 @@ namespace AeroSim.Terrain
                 builtRes = Res;
             }
 
-            heights = new NativeArray<float>(apSide * apSide, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            boundsData = new NativeArray<Bounds>(1, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            // Persistent and reused per node - NOT Allocator.TempJob. A TempJob allocation may not
+            // outlive 4 frames, and a chunk can legitimately sit in flight longer than that (the ring
+            // retires it, or the camera moves on), which Unity reports as "deleting an allocation that
+            // is older than its permitted lifetime". Both are small scratch buffers.
+            int heightCount = apSide * apSide;
+            if (!heights.IsCreated || heights.Length != heightCount)
+            {
+                if (heights.IsCreated) heights.Dispose();
+                heights = new NativeArray<float>(heightCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            }
+
+            if (!boundsData.IsCreated)
+            {
+                boundsData = new NativeArray<Bounds>(1, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            }
+
             indices = indexBuffer;
 
             var heightJob = new HeightFieldJob
             {
                 layers = layers,
+                demHeights = demLevel.heights,
+                useDem = demLevel.active,
+                demWidth = demLevel.width,
+                demHeight = demLevel.height,
+                demMetersPerPixel = demLevel.metersPerPixel,
+                demBaseMeters = demLevel.baseMeters,
+                demMetersPerUnit = demLevel.metersPerUnit,
+                demOriginX = demLevel.originX,
+                demOriginZ = demLevel.originZ,
                 originX = offset.x,
                 originZ = offset.y,
                 spacing = Spacing,
@@ -301,9 +325,6 @@ namespace AeroSim.Terrain
 
             UploadMesh();
 
-            if (heights.IsCreated) heights.Dispose();
-            if (boundsData.IsCreated) boundsData.Dispose();
-
             CompleteMarker.End();
         }
 
@@ -311,8 +332,11 @@ namespace AeroSim.Terrain
         /// Sum of every noise layer at a point in noise space, for cpu side queries (the ground
         /// height under the aircraft, for example). The jobs do not use this path.
         /// </summary>
-        public float GetHeight(NoiseLayer[] layers, float posX, float posY)
+        public float GetHeight(NoiseLayer[] layers, float posX, float posY, DemLevel demLevel)
         {
+            // Same source as the chunk job, so a query and the mesh never disagree.
+            if (demLevel.active) return demLevel.Sample(posX, posY);
+
             if (layers == null) return 0f;
 
             float height = 0f;
@@ -329,11 +353,16 @@ namespace AeroSim.Terrain
         /// </summary>
         public void Dispose()
         {
-            if (hasPendingJob) CompleteBuild(); // a job must not outlive the buffers it writes into
+            // A job must not outlive the buffers it writes into, so it is waited for here. Do NOT use
+            // CompleteBuild(): that would upload a mesh for a node which is being thrown away, and its
+            // view may already be back in the pool by now (filter == null).
+            if (hasPendingJob)
+            {
+                handle.Complete();
+                hasPendingJob = false;
+            }
 
-            DisposeMeshBuffers();               // vertices / normals
-            if (heights.IsCreated) heights.Dispose();
-            if (boundsData.IsCreated) boundsData.Dispose();
+            DisposeMeshBuffers();               // vertices / normals / heights / bounds
             indices = default;                  // borrowed, NOT ours to dispose
 
             // Only what belongs to this node's pooled view is released here. A hand placed chunk is a
@@ -376,6 +405,14 @@ namespace AeroSim.Terrain
 
         private void UploadMesh()
         {
+            // The view can be gone before the job lands: the ring retires chunks while they are still
+            // building, and a retired node returns its pooled view right away.
+            if (filter == null || !vertices.IsCreated || !normals.IsCreated || !indices.IsCreated ||
+                !boundsData.IsCreated)
+            {
+                return;
+            }
+
             UploadMarker.Begin();
 
             if (mesh == null) mesh = new Mesh { name = "Chunk" };
@@ -403,6 +440,8 @@ namespace AeroSim.Terrain
         {
             if (vertices.IsCreated) vertices.Dispose();
             if (normals.IsCreated) normals.Dispose();
+            if (heights.IsCreated) heights.Dispose();
+            if (boundsData.IsCreated) boundsData.Dispose();
             builtRes = 0;
         }
     }

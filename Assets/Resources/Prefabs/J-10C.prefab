@@ -1287,7 +1287,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1517f4234e81e24193da3af750b63bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 0.002
+  sensitivity: 0.15
   rb: {fileID: 328785237261412725}
   rollPID:
     kp: 8
@@ -1319,15 +1319,15 @@ MonoBehaviour:
     iMax: 0.1
   pitchRatePID:
     kp: 3
-    ki: 2
-    kd: 0.1
+    ki: 4
+    kd: 0
     factors: {x: 1, y: 1, z: 1}
     iMin: -0.1
     iMax: 0.1
   yawRatePID:
     kp: 7
     ki: 1.4
-    kd: 0.2
+    kd: 0
     factors: {x: 1, y: 1, z: 1}
     iMin: -0.1
     iMax: 0.1
@@ -1340,6 +1340,16 @@ MonoBehaviour:
   generalFactor: 0.5
   damper: {x: 0.5, y: 0.5, z: 0.5}
   avgSize: 4
+  altPredictionSteps: 6
+  altPredictionStepTime: 0.02
+  altUseAngularAcceleration: 1
+  altYawLateralError: 1
+  altRateDeadband: 0.5
+  altAimSmoothing: 0.05
+  altAverageSize: 0
+  altProtectLimits: 0
+  altMaxAoaDeg: 26
+  altMaxG: 15
 --- !u!114 &8961641150374775139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10582,7 +10592,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: -4.3921}
-  m_LocalScale: {x: 0.41666666, y: 0.41666666, z: 6}
+  m_LocalScale: {x: 0.44444442, y: 0.44444442, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5528360555456476312}
@@ -10654,10 +10664,10 @@ MonoBehaviour:
   engine: {fileID: 7461631984622656303}
   afterburner: 0
   dryIntensity: 0
-  afterburnerIntensity: 1.4
+  afterburnerIntensity: 0.5
   smoothing: 7
   sizeFromNozzleRadius: 1
-  nozzleRadius: 0.3
+  nozzleRadius: 0.32
   cellLength: 1
   plumeLength: 6
   dryLengthFactor: 0.568
@@ -28960,10 +28970,10 @@ MonoBehaviour:
   isLeftVortexCloudPlaying: 0
   rightVortexCloud: {fileID: 2884984498226070912}
   isRightVortexCloudPlaying: 0
-  wingTipVotexCLThreshold: 0.5
-  wingTipVotexSpeedThreshold: 120
+  wingTipVotexCLThreshold: 0.3
+  wingTipVotexSpeedThreshold: 60
   vortexCloudAoaThreshold: 15
-  vortexCloudSpeedThreshold: 60
+  vortexCloudSpeedThreshold: 120
 --- !u!1 &4872022063146452644
 GameObject:
   m_ObjectHideFlags: 0
@@ -30347,7 +30357,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 100
+      scalar: 120
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -30802,7 +30812,7 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 2827
+        atime1: 328
         atime2: 65535
         atime3: 0
         atime4: 0
@@ -31554,12 +31564,12 @@ ParticleSystem:
         m_RotationOrder: 4
     inWorldSpace: 0
   InheritVelocityModule:
-    enabled: 0
+    enabled: 1
     m_Mode: 0
     m_Curve:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 0.3
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -56420,7 +56430,7 @@ Transform:
   m_GameObject: {fileID: 8540049490504606339}
   serializedVersion: 2
   m_LocalRotation: {x: -1, y: -0, z: -0, w: 0}
-  m_LocalPosition: {x: 4.700001, y: -0.4500122, z: -2.9000015}
+  m_LocalPosition: {x: 4.700001, y: -0.603, z: -1.914}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -57263,7 +57273,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 100
+      scalar: 120
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -57718,7 +57728,7 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 2827
+        atime1: 328
         atime2: 65535
         atime3: 0
         atime4: 0
@@ -58470,12 +58480,12 @@ ParticleSystem:
         m_RotationOrder: 4
     inWorldSpace: 0
   InheritVelocityModule:
-    enabled: 0
+    enabled: 1
     m_Mode: 0
     m_Curve:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 0.3
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -61199,8 +61209,8 @@ ParticleSystemRenderer:
   m_MinParticleSize: 0
   m_MaxParticleSize: 0.5
   m_CameraVelocityScale: 0
-  m_VelocityScale: 0
-  m_LengthScale: 2
+  m_VelocityScale: 1
+  m_LengthScale: 1
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_ShadowBias: 0
@@ -61210,7 +61220,7 @@ ParticleSystemRenderer:
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
   m_AllowRoll: 1
-  m_FreeformStretching: 0
+  m_FreeformStretching: 1
   m_RotateWithStretchDirection: 1
   m_UseCustomVertexStreams: 0
   m_VertexStreams: 00010304

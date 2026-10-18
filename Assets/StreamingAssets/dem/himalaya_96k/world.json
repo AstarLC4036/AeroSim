@@ -1,0 +1,83 @@
+{
+  "source": "AWS elevation-tiles-prod (Mapzen terrarium)",
+  "anchor": {
+    "lat": 27.99,
+    "lon": 86.93
+  },
+  "zoom": 12,
+  "origin": "north-west corner of the box; +X = east, +Z = south",
+  "cornerNW": {
+    "lat": 28.420391085674307,
+    "lon": 86.44180297851562
+  },
+  "cornerSE": {
+    "lat": 27.557895036114385,
+    "lon": 87.4185562133789
+  },
+  "sizeMeters": [
+    96000.0,
+    96000.0
+  ],
+  "metersPerPixel": 33.74807610710986,
+  "vertical": {
+    "baseMeters": 687.0,
+    "metersPerUnit": 0.12307927061875334,
+    "encoding": "uint16 LE"
+  },
+  "levels": [
+    {
+      "index": 0,
+      "file": "level/00.r16",
+      "pixels": [
+        2845,
+        2845
+      ],
+      "metersPerPixel": 33.74807610710986
+    },
+    {
+      "index": 1,
+      "file": "level/01.r16",
+      "pixels": [
+        1423,
+        1423
+      ],
+      "metersPerPixel": 67.49615221421972
+    },
+    {
+      "index": 2,
+      "file": "level/02.r16",
+      "pixels": [
+        712,
+        712
+      ],
+      "metersPerPixel": 134.99230442843944
+    },
+    {
+      "index": 3,
+      "file": "level/03.r16",
+      "pixels": [
+        356,
+        356
+      ],
+      "metersPerPixel": 269.9846088568789
+    },
+    {
+      "index": 4,
+      "file": "level/04.r16",
+      "pixels": [
+        178,
+        178
+      ],
+      "metersPerPixel": 539.9692177137578
+    },
+    {
+      "index": 5,
+      "file": "level/05.r16",
+      "pixels": [
+        89,
+        89
+      ],
+      "metersPerPixel": 1079.9384354275155
+    }
+  ]
+}

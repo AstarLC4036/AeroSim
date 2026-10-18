@@ -25,6 +25,16 @@ namespace AeroSim.Terrain
     public struct HeightFieldJob : IJobParallelFor
     {
         [ReadOnly] public NativeArray<NoiseLayer> layers;
+
+        // The DEM container must be a direct field: the job validator walks the job struct, and a
+        // NativeArray nested inside another struct field is reported as an unassigned
+        // UNKNOWN_OBJECT_TYPE container. The scalars stay flat for the same reason, and 'useDem' is
+        // what selects the DEM path (the container itself is always constructed, see the placeholder
+        // the generator keeps for chunks outside the dataset).
+        [ReadOnly] public NativeArray<ushort> demHeights;
+        public bool useDem;
+        public int demWidth, demHeight;
+        public float demMetersPerPixel, demBaseMeters, demMetersPerUnit, demOriginX, demOriginZ;
         public float originX;
         public float originZ;
         public float spacing;
@@ -42,12 +52,46 @@ namespace AeroSim.Terrain
             float pz = originZ + z * spacing;
 
             float height = 0f;
+
+            // A real DEM wins when one was handed in. The noise layers stay as the fallback for chunks
+            // outside the dataset, and for pure procedural test scenes.
+            if (useDem)
+            {
+                heights[index] = SampleDem(px, pz);
+                return;
+            }
+
             for (int i = 0; i < layers.Length; i++)
             {
                 height += layers[i].GetHeight(px, pz);
             }
 
             heights[index] = height;
+        }
+
+        /// <summary>
+        /// Bilinear read of the DEM. Deliberately the same maths as <see cref="DemLevel.Sample"/>,
+        /// kept inlined here so the job owns everything it touches.
+        /// </summary>
+        private float SampleDem(float px, float pz)
+        {
+            float u = (px - demOriginX) / demMetersPerPixel;
+            float v = (pz - demOriginZ) / demMetersPerPixel;
+
+            int x0 = (int)math.clamp(math.floor(u), 0f, demWidth - 1);
+            int y0 = (int)math.clamp(math.floor(v), 0f, demHeight - 1);
+            int x1 = math.min(x0 + 1, demWidth - 1);
+            int y1 = math.min(y0 + 1, demHeight - 1);
+
+            float fx = math.saturate(u - x0);
+            float fy = math.saturate(v - y0);
+
+            float a = demHeights[y0 * demWidth + x0];
+            float b = demHeights[y0 * demWidth + x1];
+            float c = demHeights[y1 * demWidth + x0];
+            float d = demHeights[y1 * demWidth + x1];
+
+            return demBaseMeters + math.lerp(math.lerp(a, b, fx), math.lerp(c, d, fx), fy) * demMetersPerUnit;
         }
     }
 

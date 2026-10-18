@@ -9,6 +9,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace AeroSim.Render
 {
+    [VolumeComponentMenu("AeroSim/Infared Sensor")]
     public class IREffect : VolumeComponent, IPostProcessComponent
     {
         public BoolParameter enabled = new BoolParameter(false); 

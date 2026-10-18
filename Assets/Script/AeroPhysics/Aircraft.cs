@@ -180,7 +180,8 @@ namespace AeroSim.AeroPhysics
 
         public void UpdateInput(float dt)
         {
-            controllingInput = flightController.AimRingControl(targetDir, dt);
+            //controllingInput = flightController.AimRingControl(targetDir, dt);
+            controllingInput = flightController.AimRingControlAlternative(targetDir, dt);
             float clampedX = Mathf.Clamp(controllingInput.x, -1, 1);
             float clampedY = Mathf.Clamp(controllingInput.y, -1, 1);
             float clampedZ = Mathf.Clamp(controllingInput.z, -1, 1);

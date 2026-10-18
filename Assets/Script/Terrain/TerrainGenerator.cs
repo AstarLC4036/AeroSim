@@ -8,6 +8,7 @@ using UnityEngine;
 namespace AeroSim.Terrain
 {
     // Mesh Generation based on Jobs/Burst system was written by LLM, simply checked.
+    // 我保留了一些手写，这样你才知道你读的是史山。
 
     public class TerrainGenerator : MonoBehaviour
     {
@@ -61,6 +62,22 @@ namespace AeroSim.Terrain
 
         [Header("Terrain Generation")]
         public List<TerrainNode> nodes = new List<TerrainNode>();
+        public int rootSize = 4096;
+        public int rootRes = 128;
+
+        [Tooltip("Baked DEM dataset driving the chunk heights. Empty keeps the noise layers in charge.")]
+        public DemAsset demAsset;
+
+        [Header("Performance")]
+        public int maxRootUpdateCount = 64;
+        public int generationRadius = 32;
+
+        // Root
+        private readonly Dictionary<Vector2Int, TerrainNode> roots = new Dictionary<Vector2Int, TerrainNode>();
+        private Queue<Vector2Int> pendingRootsLoad = new Queue<Vector2Int>();
+        private Queue<Vector2Int> pendingRootsUnload = new Queue<Vector2Int>();
+
+        // LOD
         private Queue<TerrainNode> splitedNodes = new Queue<TerrainNode>();
         private Queue<TerrainNode> mergedNodes = new Queue<TerrainNode>();
 
@@ -72,6 +89,12 @@ namespace AeroSim.Terrain
         // Copy of noiseLayers the jobs can read: NoiseLayer is a plain struct, so the inspector
         // array is copied straight into native memory.
         private NativeArray<NoiseLayer> layerArray;
+
+        // Native copy of the baked DEM, or null while the noise layers are in charge.
+        private DemTerrainData dem;
+
+        // 1x1 stand-in handed to chunks that have no DEM: job containers must always be constructed.
+        private NativeArray<ushort> demPlaceholder;
 
         // One index buffer per res. The topology of a chunk only depends on its res, so every chunk
         // with the same res shares one buffer instead of rebuilding 6 * res * res indices each time.
@@ -89,12 +112,17 @@ namespace AeroSim.Terrain
         {
             mainCamera = Camera.main;
             BuildLayerArray();
+            BuildDemData();
         }
 
         // Temporary method
         public void FixedUpdate()
         {
-            if (mainCamera != null) UpdateLod();   // no camera means nothing to measure distances against
+            if (mainCamera != null)
+            {
+                UpdateLod();   // no camera means nothing to measure distances against
+                UpdateRing(mainCamera.transform.position);
+            }
             UpdateMesh();
         }
 
@@ -107,6 +135,63 @@ namespace AeroSim.Terrain
         //        if (node != null) node.TryComplete();
         //    }
         //}
+
+        private void UpdateRing(Vector3 cameraPos)
+        {
+            // get camera cell
+            Vector2 cam = new Vector2(cameraPos.x - FloatingOrigin.origin.x, cameraPos.z - FloatingOrigin.origin.z);
+            Vector2Int camCell = new Vector2Int(
+                Mathf.FloorToInt(cam.x / rootSize), Mathf.FloorToInt(cam.y / rootSize));
+
+            // register nodes to be loaded
+            for (int x = -generationRadius; x <= generationRadius; x++)
+                for (int z = -generationRadius; z <= generationRadius; z++)
+                {
+                    var cell = new Vector2Int(camCell.x + x, camCell.y + z);
+                    if (!roots.ContainsKey(cell) && !pendingRootsLoad.Contains(cell)) pendingRootsLoad.Enqueue(cell);
+                }
+
+            // register nodes to be unloaded
+            foreach (Vector2Int cell in roots.Keys)
+            {
+                bool outsideX = cell.x > camCell.x + generationRadius || cell.x < camCell.x - generationRadius;
+                bool outsideY = cell.y > camCell.y + generationRadius || cell.y < camCell.y - generationRadius;
+                if ((outsideX || outsideY) && !pendingRootsUnload.Contains(cell))
+                {
+                    pendingRootsUnload.Enqueue(cell);
+                }
+            }
+
+            // create
+            for (int i = 0; i < maxRootUpdateCount && pendingRootsLoad.Count > 0; i++)
+            {
+                var cell = pendingRootsLoad.Dequeue();
+                if (roots.ContainsKey(cell)) continue;
+
+                var root = new TerrainNode
+                {
+                    offset = new Vector2(cell.x * rootSize, cell.y * rootSize),
+                    size = rootSize,
+                    res = rootRes,
+                    lodLevel = 0,
+                };
+                root.RentView();
+                roots[cell] = root;
+                nodes.Add(root);
+            }
+
+            // release
+            for (int i = 0; i < maxRootUpdateCount && pendingRootsUnload.Count > 0; i++)
+            {
+                var cell = pendingRootsUnload.Dequeue();
+                if (!roots.ContainsKey(cell)) continue;
+
+                var root = roots[cell];
+                roots.Remove(cell);
+                root.ReleaseView();
+                ReleaseSubtree(root);
+            }
+        }
 
         // --- LOD ---
         public void UpdateLod()
@@ -166,6 +251,11 @@ namespace AeroSim.Terrain
             {
                 if (node == null) continue;
 
+                // Pump whatever this node has in flight, whatever its state: it can hold a job from a
+                // previous state (it was building, then split), and a job nobody completes keeps its
+                // native buffers alive for good.
+                node.TryComplete();
+
                 if (node.treeState == TerrainNode.NodeState.Splitting) // build the four new sub-nodes
                 {
                     if (node.subNodes == null) continue;
@@ -179,7 +269,7 @@ namespace AeroSim.Terrain
 
                         if (!subNode.HasSubNode && subNode.NeedsBuild)
                         {
-                            subNode.ScheduleBuild(layerArray, GetIndexBuffer(subNode.Res));
+                            subNode.ScheduleBuild(layerArray, GetIndexBuffer(subNode.Res), DemLevelFor(subNode));
                         }
 
                         subNode.TryComplete();           // pump whatever this child has in flight
@@ -197,7 +287,7 @@ namespace AeroSim.Terrain
                 {
                     node.RentView();
 
-                    if (node.NeedsBuild) node.ScheduleBuild(layerArray, GetIndexBuffer(node.Res));
+                    if (node.NeedsBuild) node.ScheduleBuild(layerArray, GetIndexBuffer(node.Res), DemLevelFor(node));
                     node.TryComplete();
 
                     bool ready = node.filter != null && node.filter.sharedMesh != null && !node.IsBuilding;
@@ -215,7 +305,7 @@ namespace AeroSim.Terrain
                     // pressing Generate first. A Branch node renders nothing of its own, so it is skipped.
                     if (node.treeState == TerrainNode.NodeState.Leaf && node.NeedsBuild)
                     {
-                        node.ScheduleBuild(layerArray, GetIndexBuffer(node.Res));
+                        node.ScheduleBuild(layerArray, GetIndexBuffer(node.Res), DemLevelFor(node));
                     }
                     node.TryComplete();
                 }
@@ -286,6 +376,7 @@ namespace AeroSim.Terrain
         public void CreateMesh()
         {
             BuildLayerArray();
+            BuildDemData();     // pressing Generate in the inspector uses the DEM too
 
             if (nodes == null) return;
 
@@ -293,7 +384,7 @@ namespace AeroSim.Terrain
             foreach (var node in nodes)
             {
                 if (node == null) continue;
-                scheduled |= node.ScheduleBuild(layerArray, GetIndexBuffer(node.Res));
+                scheduled |= node.ScheduleBuild(layerArray, GetIndexBuffer(node.Res), DemLevelFor(node));
             }
 
             // Nothing pumps the jobs outside play mode, so finish them here: pressing Generate in
@@ -316,10 +407,57 @@ namespace AeroSim.Terrain
         {
             // A job must not outlive the buffers it writes into, and native memory is not garbage
             // collected: everything native this generator handed out is released here.
-            ReleaseAllNodes();
+            ReleaseAllNodes();     // finishes every pending job, so the DEM arrays are free to go
 
             DisposeIndexBuffers();
             DisposeLayerArray();
+            DisposeDemData();
+        }
+
+        /// <summary>
+        /// Loads the dataset once. Start, CreateMesh and the inspector's Generate button can all ask
+        /// for it, and a failure simply leaves the noise layers active.
+        /// </summary>
+        private void BuildDemData()
+        {
+            // The job validator rejects unconstructed containers, so even a chunk without a DEM has to
+            // be handed a valid NativeArray. 'DemLevel.active' then selects the noise path.
+            if (!demPlaceholder.IsCreated)
+            {
+                demPlaceholder = new NativeArray<ushort>(1, Allocator.Persistent, NativeArrayOptions.ClearMemory);
+            }
+
+            if (dem != null || demAsset == null) return;
+
+            dem = DemTerrainData.Load(demAsset);
+        }
+
+        private void DisposeDemData()
+        {
+            if (dem != null)
+            {
+                dem.Dispose();
+                dem = null;
+            }
+
+            if (demPlaceholder.IsCreated) demPlaceholder.Dispose();
+            demPlaceholder = default;
+        }
+
+        /// <summary>
+        /// DEM level for a chunk. Chunks outside the dataset - and every chunk when no asset is
+        /// assigned - get the inactive placeholder level, which sends the job down the noise path.
+        /// </summary>
+        private DemLevel DemLevelFor(TerrainNode node)
+        {
+            DemLevel level = dem == null ? default : dem.GetLevel(node);
+            if (level.active) return level;
+
+            level.heights = demPlaceholder;
+            level.width = 1;
+            level.height = 1;
+            level.active = false;
+            return level;
         }
 
         /// <summary>

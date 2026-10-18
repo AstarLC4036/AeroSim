@@ -45,9 +45,9 @@ MonoBehaviour:
           y: 0
           width: 0
           height: 0
-        posDelta: {x: 0, y: 200}
+        posDelta: {x: 0, y: 240}
         maxDrawDistance: 50
-        ppiRadius: 500
+        ppiRadius: 400
         scalerCount: 3
     - rid: 3950625575390675051
       type: {class: GimbalMasterPage, ns: AeroSim.Cockpit.MFD.CN.J10C, asm: Assembly-CSharp}
@@ -58,6 +58,7 @@ MonoBehaviour:
           y: 0
           width: 0
           height: 0
+        size: {x: 0, y: 0}
         bgColor: {r: 0, g: 0, b: 0, a: 0}
         gimbalRect:
           serializedVersion: 2
@@ -73,6 +74,7 @@ MonoBehaviour:
       type: {class: PowerplantSlavePage, ns: AeroSim.Cockpit.MFD.CN.J10C, asm: Assembly-CSharp}
       data:
         bgColor: {r: 0, g: 0, b: 0, a: 0}
+        size: {x: 0, y: 0}
         rect:
           serializedVersion: 2
           x: 512
