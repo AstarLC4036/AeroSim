@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AeroSim.AeroPhysics
 {
-    [CreateAssetMenu(fileName = "Surface Data", menuName = "Create Surface Data")]
+    [CreateAssetMenu(fileName = "Surface Data", menuName = "AeroSim/AeroPhysics/Create Surface Data")]
     public class AeroSurfaceData : ScriptableObject
     {
         public float span = 0;

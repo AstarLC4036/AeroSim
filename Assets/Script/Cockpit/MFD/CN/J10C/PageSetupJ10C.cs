@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace AeroSim.Cockpit.MFD.CN.J10C
 {
-    [CreateAssetMenu(fileName = "J10C Page Setup", menuName = "MFD/Page Setup/J10C", order = 0)]
+    [CreateAssetMenu(fileName = "J10C Page Setup", menuName = "AeroSim/MFD/Page Setup/J10C", order = 0)]
     public class PageSetupJ10C : MFDPageSetup
     {
         [SerializeReference]
