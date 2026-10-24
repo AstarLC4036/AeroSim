@@ -1,4 +1,4 @@
-Shader "PostEffect/IR"
+Shader "AeroSim/PostEffect/IR"
 {
     Properties
     {

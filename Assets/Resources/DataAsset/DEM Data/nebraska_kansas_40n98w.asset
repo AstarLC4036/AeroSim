@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   folder: dem/great_plains
   worldOrigin: {x: -48000, y: -48000}
-  verticalOffset: 0
+  verticalOffset: -500

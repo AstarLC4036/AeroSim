@@ -26,6 +26,7 @@ namespace AeroSim.Render.PostProcessing.AtomsphereScattering
         public static readonly int mieAnisotropicId = Shader.PropertyToID("_MieG");
         public static readonly int rayleighScatteringCoeffId = Shader.PropertyToID("_RayleighScatteringCoeff");
         public static readonly int mieScatteringCoeffId = Shader.PropertyToID("_MieScatteringCoeff");
+        public static readonly int ozoneCoeffId = Shader.PropertyToID("_OzoneCoeff");
         public static readonly int viewStepsId = Shader.PropertyToID("_ViewSteps");
         public static readonly int lightStepsId = Shader.PropertyToID("_LightSteps");
 
@@ -37,7 +38,7 @@ namespace AeroSim.Render.PostProcessing.AtomsphereScattering
         {
             renderPassEvent = e;
 
-            Shader effectShader = Shader.Find("PostEffect/AtomsohereScattering");
+            Shader effectShader = Shader.Find("AeroSim/PostEffect/AtomsohereScattering");
 
             if (effectShader == null)
             {
@@ -110,10 +111,11 @@ namespace AeroSim.Render.PostProcessing.AtomsphereScattering
             effectMat.SetVector(centerId, effect.center.value);
             effectMat.SetVector(rayleighScatteringCoeffId, effect.rayleighScatteringCoeff.value);
             effectMat.SetFloat(radiusId, effect.radius.value);
-            effectMat.SetFloat(exposureId, effect.exposure.value);
+            effectMat.SetFloat(exposureId, effect.sunIntensity.value);
             effectMat.SetFloat(rayleighHeightId, effect.rayleighHeight.value);
             effectMat.SetFloat(mieHeightId, effect.mieHeight.value);
             effectMat.SetFloat(mieScatteringCoeffId, effect.mieScatteringCoeff.value);
+            effectMat.SetVector(ozoneCoeffId, effect.ozoneCoeff.value);
             effectMat.SetFloat(mieAnisotropicId, effect.anisotropicParam.value);
             effectMat.SetFloat(heightId, effect.height.value);
             effectMat.SetInt(viewStepsId, effect.viewSteps.value);

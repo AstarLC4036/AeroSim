@@ -1299,7 +1299,7 @@ MonoBehaviour:
   pitchPID:
     kp: -12
     ki: -1.5
-    kd: 0
+    kd: -0.5
     factors: {x: 1, y: 1, z: 1}
     iMin: 0
     iMax: 0.01

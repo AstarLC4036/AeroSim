@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   skipIterations:
     m_OverrideState: 0
     m_Value: 1
@@ -439,7 +439,7 @@ MonoBehaviour:
   radius:
     m_OverrideState: 1
     m_Value: 6371
-  exposure:
+  sunIntensity:
     m_OverrideState: 1
     m_Value: 20
   rayleighHeight:
@@ -456,7 +456,10 @@ MonoBehaviour:
     m_Value: 0.004
   anisotropicParam:
     m_OverrideState: 1
-    m_Value: 0.76
+    m_Value: 0.78
+  ozoneCoeff:
+    m_OverrideState: 1
+    m_Value: {x: 0.00065, y: 0.00188, z: 0.000085}
   viewSteps:
     m_OverrideState: 1
     m_Value: 32

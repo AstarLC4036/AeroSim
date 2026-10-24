@@ -1,4 +1,4 @@
-Shader "PostEffect/AtomsohereScattering"
+Shader "AeroSim/PostEffect/AtomsohereScattering"
 {
     Properties
     {
@@ -15,6 +15,9 @@ Shader "PostEffect/AtomsohereScattering"
         _MieHeight ("Mie Height", float) = 12
         _MieScatteringCoeff ("Mie Scattering Coeff", float) = 0.021
         _MieG ("Mie Anisotropic Param", float) = 0.76
+         _OzoneHeight ("Ozone Height (km)", float) = 25
+        _OzoneWidth ("Ozone Width (km)", float) = 15
+        _OzoneCoeff ("Ozone Coeff", Vector) = (0.00065, 0.00188, 0.000085, 0)
     }
     SubShader
     {
@@ -33,20 +36,6 @@ Shader "PostEffect/AtomsohereScattering"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             #include "../../Shaders/Shader Common/AtmosphereCommon.hlsl"
 
-            sampler2D _MainTex;
-            float4 _WorldOffset;
-            float4 _Center;
-            float4 _RayleighScatteringCoeff;
-            float _MieScatteringCoeff;
-            int _ViewSteps;
-            int _LightSteps;
-            float _Radius;
-            float _Height;
-            float _RayleighHeight;
-            float _MieHeight;
-            float _MieG;
-            float _Exposure;
-
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -62,6 +51,22 @@ Shader "PostEffect/AtomsohereScattering"
             
             CBUFFER_START(UnityPerMaterial)
             float4 _MainColor;
+            sampler2D _MainTex;
+            float4 _WorldOffset;
+            float4 _Center;
+            float4 _RayleighScatteringCoeff;
+            float4 _OzoneCoeff;
+            float _MieScatteringCoeff;
+            int _ViewSteps;
+            int _LightSteps;
+            float _Radius;
+            float _Height;
+            float _RayleighHeight;
+            float _MieHeight;
+            float _OzoneHeight;
+            float _OzoneWidth;
+            float _MieG;
+            float _Exposure;
             CBUFFER_END
 
             float sceneRayDistance(float2 uv, float3 rayDir, float3 viewDir, float3 cameraPos)
@@ -94,26 +99,42 @@ Shader "PostEffect/AtomsohereScattering"
                 Light mainLight = GetMainLight();
                 float3 sunDir = mainLight.direction;
 
+                // normalize parameters prevent the floating-point precision issues
                 float rayleighHeightNorm = _RayleighHeight / _Radius;
                 float mieHeightNorm = _MieHeight / _Radius;
+                float ozoneHeightNorm = _OzoneHeight / _Radius;
+                float ozoneWidthNorm = _OzoneWidth / _Radius;
 
                 float3 rayleighScatteringCoeffNorm = _RayleighScatteringCoeff.xyz * _Radius;
                 float mieScatteringCoeffNorm = _MieScatteringCoeff * _Radius;
+                float3 ozoneCoeffNorm = _OzoneCoeff.xyz * _Radius;
 
                 float3 totalScattering = 0;
                 float3 opticalDepthCam = 0;
 
-                float viewStepsize = rayResult.y / _ViewSteps;
+                // nonlinear sampling for Mie Scattering
+                float prevT = 0.0;
+                float rayHeight = distance(cameraPos, float3(0,0,0)) - radiusNorm;
+                float exponent = 1.0 + saturate(1.0 - rayHeight / (atmRadiusNorm - radiusNorm)) * 8.0;
+
                 for(int i = 0; i < _ViewSteps; i++)
                 {
+                    // stepsize
+                    float t  = pow((float)i / _ViewSteps, exponent) * rayResult.y;
+                    float ds = t - prevT; // nonlinear stepsize
+
                     // camera transmittance
-                    float3 samplePoint = cameraPos + (viewStepsize * i + rayResult.x) * rayDir;
+                    //float3 samplePoint = cameraPos + (viewStepsize * i + rayResult.x) * rayDir;
+                    float3 samplePoint = cameraPos + (rayResult.x + t) * rayDir;
                     float height = distance(samplePoint, float3(0,0,0)) - radiusNorm;
 
+                    // calcucate density
                     float rayleighDensity = heightDensityDecay(height, rayleighHeightNorm);
                     float mieDensity = heightDensityDecay(height, mieHeightNorm);
+                    float ozoneDensity = ozoneDensityDecay(height, ozoneHeightNorm, ozoneWidthNorm);
 
-                    opticalDepthCam += (rayleighScatteringCoeffNorm.xyz * rayleighDensity + mieScatteringCoeffNorm * mieDensity) * viewStepsize;
+                    // final optical depth
+                    opticalDepthCam += (rayleighScatteringCoeffNorm.xyz * rayleighDensity + mieScatteringCoeffNorm * mieDensity + ozoneCoeffNorm.xyz * ozoneDensity) * ds;
                     float3 transmittanceView = exp(-opticalDepthCam);
 
                     // light sphere intersection
@@ -122,25 +143,31 @@ Shader "PostEffect/AtomsohereScattering"
 
                     // light transmittance
                     float3 opticalDepthLight = 0;
-                    if(lightRaySphereResult.y > 0)
+                    if(lightRaySphereResult.y > 0) // space view, ignore the light transmittance calcucation
                     {
                         for(int j = 0; j < _LightSteps; j++)
                         {
-                            float3 lightSamplePoint = samplePoint + (lightStepsize * j + lightRaySphereResult.x) * sunDir;
+                            // sampling light
+                            float3 lightSamplePoint = samplePoint + (lightStepsize * (j + 0.5)+ lightRaySphereResult.x) * sunDir; // + 0.5 -> midpoint sampling
                             float lightPointHeight = distance(lightSamplePoint, float3(0,0,0)) - radiusNorm;
 
+                            // density
                             float rayleighDensityL = heightDensityDecay(lightPointHeight, rayleighHeightNorm);
                             float mieDensityL = heightDensityDecay(lightPointHeight, mieHeightNorm);
+                            float ozoneDensityL = ozoneDensityDecay(height, ozoneHeightNorm, ozoneWidthNorm);
 
-                            opticalDepthLight += (rayleighScatteringCoeffNorm.xyz * rayleighDensityL + mieScatteringCoeffNorm * mieDensityL) * lightStepsize;
+                            opticalDepthLight += (rayleighScatteringCoeffNorm.xyz * rayleighDensityL + mieScatteringCoeffNorm * mieDensityL + ozoneCoeffNorm * ozoneDensityL) * lightStepsize;
                         }
                     }
-                    float3 transmittanceLight = exp(-opticalDepthLight);
+                    float3 transmittanceLight = exp(-opticalDepthLight); // final light transmittance
 
                     // full scattering
                     float theta = dot(rayDir, sunDir);
                     float3 scattering = rayleighScatteringCoeffNorm.xyz * rayleighDensity * rayleightPhase(theta) + mieScatteringCoeffNorm * mieDensity * miePhase(theta, _MieG);
-                    totalScattering += transmittanceView * transmittanceLight * scattering * viewStepsize;
+                    totalScattering += transmittanceView * transmittanceLight * scattering * ds;
+
+                    // update nonlinear stepsize
+                    prevT = t;
                 }
 
                 transmittanceOut = exp(-opticalDepthCam);
@@ -170,7 +197,7 @@ Shader "PostEffect/AtomsohereScattering"
                 //float4 worldPos = mul(UNITY_MATRIX_I_VP, clipPos);
                 float3 cameraPos = GetCameraPositionWS();
                 float3 cameraPosPlanet = cameraPos + _WorldOffset;
-                float3 cameraRelativePos = cameraPosPlanet / 1000 - _Center.xyz; // Solving floating-point precision problems using a planetary coordinate system
+                float3 cameraRelativePos = cameraPosPlanet / 1000 - _Center.xyz; // Solving floating-point precision issues using a planetary coordinate system
                 float3 cameraPosNorm = cameraRelativePos / _Radius;
                 float radiusNorm = 1.0;
                 float atmRadiusNorm = 1.0 + (_Height / _Radius);

@@ -61,6 +61,7 @@ namespace AeroSim.Terrain
         };
 
         [Header("Terrain Generation")]
+        public GameObject placeholder;
         public List<TerrainNode> nodes = new List<TerrainNode>();
         public int rootSize = 4096;
         public int rootRes = 128;
@@ -113,6 +114,8 @@ namespace AeroSim.Terrain
             mainCamera = Camera.main;
             BuildLayerArray();
             BuildDemData();
+
+            placeholder?.SetActive(false); // hide placeholder
         }
 
         // Temporary method

@@ -1,4 +1,4 @@
-ï»¿#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 // Sphere raycast method form SebLague's Shader
 // Returns vector (dstToSphere, dstThroughSphere)
@@ -51,24 +51,35 @@ float3 compressScreenLuminance(float3 hdrColor, float knee = 1.0, float maxLum =
 	return hdrColor * scale;
 }
 
+// comments were written by DeepSeek v4.1-flash
 float heightDensityDecay(float height, float referenceHeight)
 {
-	return exp(-height / referenceHeight);
+	// The clamp matters for the light march: a sample ray can dip below the ground, and without it the
+	// density turns into exp(+huge) -> Inf/NaN and the pixel goes black.
+	return exp(-max(0, height) / referenceHeight);
 }
 
-float rayleightPhase(float theta)
+// Both phase functions take the cosine between the view ray and the sun, not the angle. The old code
+// applied cos() a second time, which squashed the argument into [0.54, 1] and made the phase almost
+// constant, so the anisotropy parameter had no visible effect.
+float rayleightPhase(float cosTheta)
 {
-	float cosine = cos(theta);
-	return 3 / (16 * PI) * (1 + cosine * cosine);
+	return 3.0 / (16.0 * PI) * (1.0 + cosTheta * cosTheta);
 }
 
-// g: anisotropicParam
-float miePhase(float theta, float g)
+// g: anisotropicParam. Cornette-Shanks, normalised so the integral over the sphere is 1.
+float miePhase(float cosTheta, float g)
 {
-	float pow2g = g * g;
-	float cosineTheta = cos(theta);
-	float pow2CosTheta = cosineTheta * cosineTheta;
-	float a = (1 - pow2g) * (1 + pow2CosTheta);
-	float b = (2 + pow2g) * pow(1 + pow2g - 2 * g * cosineTheta, 1.5);
-	return (3 / 8 * PI) * (a / b);
+	float g2 = g * g;
+	float a = (1.0 - g2) * (1.0 + cosTheta * cosTheta);
+	float b = (2.0 + g2) * pow(max(1.0 + g2 - 2.0 * g * cosTheta, 1e-4), 1.5);
+	return (3.0 / (8.0 * PI)) * (a / b);
+}
+
+// Ozone: a thin absorbing layer centred at 25 km. It never scatters, so it only ever shows up in the
+// optical depth. It eats red, which is what keeps the zenith blue and stretches the twilight out into
+// purple instead of collapsing straight into night.
+float ozoneDensityDecay(float height, float ozoneHeight, float ozoneWidth)
+{
+    return max(0.0, 1.0 - abs(height - ozoneHeight) / ozoneWidth);   // 10 km ´¦Îª 0£¬25 km ´¦Îª 1£¬40 km ´¦Îª 0
 }

@@ -136,13 +136,13 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GrassColor: {r: 0.25632215, g: 0.5283019, b: 0.16114861, a: 1}
+    - _GrassColor: {r: 0.122559376, g: 0.32704395, b: 0.052450396, a: 1}
     - _MeadowColor: {r: 0.21862856, g: 0.3584906, b: 0.09582289, a: 1}
     - _RiverColor: {r: 0.3, g: 0.29, b: 0.26, a: 1}
     - _RockColor: {r: 0.32, g: 0.3, b: 0.28, a: 1}
     - _SnowColor: {r: 0.92, g: 0.94, b: 0.98, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _WorldOffset: {r: -2000, g: 5000, b: -1000, a: 0}
+    - _WorldOffset: {r: -1000, g: 1000, b: 10000, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &8960213562842897235

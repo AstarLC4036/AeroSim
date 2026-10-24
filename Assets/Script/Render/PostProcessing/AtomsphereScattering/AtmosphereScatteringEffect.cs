@@ -17,7 +17,7 @@ namespace AeroSim.Render.PostProcessing
         public Vector3Parameter center = new Vector3Parameter(Vector3.zero);
         public FloatParameter height = new FloatParameter(10);
         public FloatParameter radius = new FloatParameter(1);
-        public ClampedFloatParameter exposure = new ClampedFloatParameter(1, 0, 50);
+        public ClampedFloatParameter sunIntensity = new ClampedFloatParameter(1, 0, 50);
         [Header("Rayleigh Scattering")]
         [Tooltip("Reference height in kilometres")]
         public FloatParameter rayleighHeight = new FloatParameter(8);
@@ -27,6 +27,8 @@ namespace AeroSim.Render.PostProcessing
         public FloatParameter mieHeight = new FloatParameter(12);
         public FloatParameter mieScatteringCoeff = new FloatParameter(21.0f * 0.001f);
         public ClampedFloatParameter anisotropicParam = new ClampedFloatParameter(0.76f, 0, 1);
+        [Header("Ozone")]
+        public Vector3Parameter ozoneCoeff = new Vector3Parameter(new Vector3(0.00065f, 0.00188f, 0.000085f));
         [Header("Ray Marching")]
         public IntParameter viewSteps = new IntParameter(8);
         public IntParameter lightSteps = new IntParameter(2);

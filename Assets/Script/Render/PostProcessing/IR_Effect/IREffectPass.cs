@@ -29,7 +29,7 @@ namespace AeroSim.Render
         {
             renderPassEvent = e;
 
-            Shader effectShader = Shader.Find("PostEffect/IR");
+            Shader effectShader = Shader.Find("AeroSim/PostEffect/IR");
 
             if(effectShader == null)
             {
